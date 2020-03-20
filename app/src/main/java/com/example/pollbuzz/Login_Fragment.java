@@ -130,9 +130,14 @@ public class Login_Fragment extends Fragment {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful())
                 {
-                    Toast.makeText(getActivity(),"Logged in",Toast.LENGTH_LONG).show();
-                    Intent i=new Intent(getActivity(),MainActivity.class);
-                    startActivity(i);
+                    if(!auth.getCurrentUser().isEmailVerified()){
+                        Toast.makeText(getContext(),"Please verify your mail.",Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        Toast.makeText(getActivity(), "Logged in", Toast.LENGTH_LONG).show();
+                        Intent i = new Intent(getActivity(), MainActivity.class);
+                        startActivity(i);
+                    }
                 }
                 else
                 {
