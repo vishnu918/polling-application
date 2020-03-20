@@ -35,12 +35,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
  * create an instance of this fragment.
  */
 public class Login_Fragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "Login";
-    //private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
+    private static final String ARG_PARAM1 = "Login";
+
     private String title;
 
     TextInputLayout email,password;
@@ -55,15 +52,7 @@ public class Login_Fragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     *
-     * @return A new instance of fragment Login_Fragment.
-     */
-    // TODO: Rename and change types and number of parameters
+
     public static Login_Fragment newInstance(String param1) {
         Login_Fragment fragment = new Login_Fragment();
         Bundle args = new Bundle();
@@ -84,16 +73,13 @@ public class Login_Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        //View view=inflater.inflate(R.layout.fragment_login, container, false);
+
 
         return inflater.inflate(R.layout.fragment_login, container, false);
 
     }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        // Setup any handles to view objects here
-        // EditText etFoo = (EditText) view.findViewById(R.id.etFoo);
         email = (TextInputLayout) view.findViewById(R.id.email);
         password = (TextInputLayout) view.findViewById(R.id.password);
         login=view.findViewById(R.id.login);
@@ -125,28 +111,36 @@ public class Login_Fragment extends Fragment {
     }
     private void log_in(String email,String password)
     {
-        auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful())
-                {
-                    if(!auth.getCurrentUser().isEmailVerified()){
-                        Toast.makeText(getContext(),"Please verify your mail.",Toast.LENGTH_LONG).show();
+        if(email.isEmpty() || password.isEmpty())
+        {
+            Toast.makeText(getContext(), "Email and Password can't be empty", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful())
+                    {
+                        if(!auth.getCurrentUser().isEmailVerified()){
+                            Toast.makeText(getContext(),"Please verify your mail.",Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(getActivity(), "Logged in", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(getActivity(), MainActivity.class);
+                            startActivity(i);
+                        }
                     }
-                    else {
-                        Toast.makeText(getActivity(), "Logged in", Toast.LENGTH_LONG).show();
-                        Intent i = new Intent(getActivity(), MainActivity.class);
-                        startActivity(i);
+                    else
+                    {
+                        Toast.makeText(getActivity(),"Loggin failed",Toast.LENGTH_LONG).show();
                     }
-                }
-                else
-                {
-                    Toast.makeText(getActivity(),"Loggin failed",Toast.LENGTH_LONG).show();
-                }
 
 
-            }
-        });
+                }
+            });
+        }
+
 
     }
     private void google_sign_in()
@@ -183,8 +177,7 @@ public class Login_Fragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            // Log.d(TAG, "signInWithCredential:success");
+
                             Toast.makeText(getContext(),"GSignup successful",Toast.LENGTH_LONG).show();
                             FirebaseUser user = auth.getCurrentUser();
 
