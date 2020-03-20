@@ -30,9 +30,10 @@ public class Single_type_poll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 RadioButton button=new RadioButton(getApplicationContext());
-                String t="option"+(group.getChildCount()+1);
+                button.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,RadioGroup.LayoutParams.WRAP_CONTENT));
+                String t="Option"+(group.getChildCount()+1);
                 button.setText(t);
-                button.setClickable(false);
+                button.setTag(t.toLowerCase());
                 group.addView(button);
                 group.setVisibility(View.VISIBLE);
 
