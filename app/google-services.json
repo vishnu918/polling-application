@@ -13,7 +13,16 @@
           "package_name": "com.PollBuzz.pollbuzz"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "896875392739-5jate3fapvfmgaujnlmn3bqg6tg5a7ip.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.PollBuzz.pollbuzz",
+            "certificate_hash": "ab94ec126afe99df0a302f280a5c7d8caead6816"
+          }
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCLExkitW4K_OwLSm60_YHS6cZvL9bUqk8"
