@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.pollbuzz">
+    package="com.PollBuzz.pollbuzz">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,18 +10,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Multiple_type_poll"></activity>
-        <activity android:name=".Poll_list" />
-        <activity android:name=".Single_type_poll" />
-        <activity android:name=".ProfileSetUp" />
-        <activity android:name=".Login_Signup_Activity">
+        <activity android:name="com.PollBuzz.pollbuzz.Multiple_type_poll"></activity>
+        <activity android:name="com.PollBuzz.pollbuzz.Poll_list"></activity>
+        <activity android:name="com.PollBuzz.pollbuzz.Single_type_poll"></activity>
+        <activity android:name="com.PollBuzz.pollbuzz.ProfileSetUp" />
+        <activity android:name="com.PollBuzz.pollbuzz.Login_Signup_Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name="com.PollBuzz.pollbuzz.MainActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

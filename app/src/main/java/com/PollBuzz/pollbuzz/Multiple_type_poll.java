@@ -1,4 +1,4 @@
-package com.example.pollbuzz;
+package com.PollBuzz.pollbuzz;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +18,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.PollBuzz.pollbuzz.R;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class Multiple_type_poll extends AppCompatActivity {
