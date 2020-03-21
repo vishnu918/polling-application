@@ -15,6 +15,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
+import com.crashlytics.android.Crashlytics;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -96,7 +98,6 @@ public class Login_Fragment extends Fragment {
             public void onClick(View v) {
                 String mail=email.getEditText().getText().toString();
                 String pass=password.getEditText().getText().toString();
-
                 log_in(mail,pass);
             }
         });
@@ -159,7 +160,6 @@ public class Login_Fragment extends Fragment {
                 if (account != null) {
                     firebaseAuthWithGoogle(account);
                 }
-                Toast.makeText(getContext(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
             } catch (ApiException e) {
                 if (e.getMessage() != null) {
                     Log.d("error", e.getMessage());
