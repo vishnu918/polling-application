@@ -44,7 +44,7 @@ public class Multiple_type_poll extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RadioButton button=new RadioButton(getApplicationContext());
+                final RadioButton button=new RadioButton(getApplicationContext());
                 button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
                 String t="Option"+(c+1);
                 //
@@ -64,6 +64,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         v.showContextMenu();
+                        button.setChecked(false);
                     }
                 });
 
