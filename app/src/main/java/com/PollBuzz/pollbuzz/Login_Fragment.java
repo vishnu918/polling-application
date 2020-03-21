@@ -87,7 +87,8 @@ public class Login_Fragment extends Fragment {
         gsignin=view.findViewById(R.id.gsignin);
         auth=FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("999925422455-jmu7rqjg3pu8uvahn4qtgmj52u5rvn2b.apps.googleusercontent.com")
+
+                .requestIdToken("896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         if (getActivity() != null)
@@ -172,7 +173,7 @@ public class Login_Fragment extends Fragment {
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         // Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
