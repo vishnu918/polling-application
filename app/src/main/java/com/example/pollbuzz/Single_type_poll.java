@@ -22,6 +22,7 @@ public class Single_type_poll extends AppCompatActivity {
     Button add;
     RadioGroup group;
     String name;
+    int c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class Single_type_poll extends AppCompatActivity {
         View view =getSupportActionBar().getCustomView();
         group=findViewById(R.id.options);
         add=findViewById(R.id.add);
+        c=group.getChildCount();
 
         if(group.getChildCount()==0)
             group.setVisibility(View.INVISIBLE);
@@ -41,12 +43,16 @@ public class Single_type_poll extends AppCompatActivity {
             public void onClick(View v) {
                 RadioButton button=new RadioButton(getApplicationContext());
                 button.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,RadioGroup.LayoutParams.WRAP_CONTENT));
-                String t="Option"+(group.getChildCount()+1);
+                String t="Option"+(c+1);
                 //
                showDialog(Single_type_poll.this, button);
 
                 button.setTag(t.toLowerCase());
-                group.removeAllViews();
+
+                //group.removeAllViews();
+               group.removeView(findViewById(R.id.option1));
+                group.removeView(findViewById(R.id.option2));
+
                 //button.setText(name);
                 group.addView(button);
                 group.setVisibility(View.VISIBLE);
