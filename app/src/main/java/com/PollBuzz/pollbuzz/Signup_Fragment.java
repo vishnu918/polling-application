@@ -88,7 +88,7 @@ public class Signup_Fragment extends Fragment {
         gsignin=view.findViewById(R.id.gsignin);
         auth=FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken("896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         googleSignInClient=GoogleSignIn.getClient(getActivity(),gso);
