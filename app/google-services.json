@@ -15,12 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "999925422455-274dt6go48tq3kheqvtq77abtcs3tqih.apps.googleusercontent.com",
+
+          "client_id": "896875392739-5jate3fapvfmgaujnlmn3bqg6tg5a7ip.apps.googleusercontent.com",
+
           "client_type": 1,
           "android_info": {
             "package_name": "com.PollBuzz.pollbuzz",
             "certificate_hash": "ab94ec126afe99df0a302f280a5c7d8caead6816"
           }
+
         },
         {
           "client_id": "999925422455-m98t0s83dltqrg53n1cgs3qtr0nfb06e.apps.googleusercontent.com",
