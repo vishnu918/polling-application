@@ -16,7 +16,7 @@
         app:strokeWidth="1dp"
         android:layout_margin="10dp"
         app:cardBackgroundColor="#f2e2ff"
-        app:cardElevation="10dp"
+        app:cardElevation="20dp"
         >
     <ScrollView
         android:layout_width="match_parent"
@@ -104,7 +104,8 @@
                 android:layout_marginHorizontal="10dp"
                 android:layout_marginVertical="10dp"
                 android:background="@drawable/circle"
-                android:tag="Options">
+                android:tag="Options"
+                >
                <RadioButton
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

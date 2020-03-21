@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -23,6 +26,7 @@ public class Single_type_poll extends AppCompatActivity {
     RadioGroup group;
     String name;
     int c;
+    RadioButton b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,20 @@ public class Single_type_poll extends AppCompatActivity {
                 //button.setText(name);
                 group.addView(button);
                 group.setVisibility(View.VISIBLE);
+                registerForContextMenu(button);
+
+
+
+            }
+        });
+        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton button=(RadioButton)findViewById(checkedId);
+                button.setChecked(false);
+                button.showContextMenu();
+
+
 
             }
         });
@@ -96,5 +114,29 @@ public class Single_type_poll extends AppCompatActivity {
 
 
 
+    }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.radiobutton_menu, menu);
+        b=(RadioButton)v;
+        menu.setHeaderTitle("Select The Action");
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        if(item.getItemId()==R.id.edit){
+            //Toast.makeText(getApplicationContext(),"calling code",Toast.LENGTH_LONG).show();
+            showDialog(Single_type_poll.this,b);
+        }
+        else if(item.getItemId()==R.id.delete){
+            group.removeView(b);
+            if(group.getChildCount()==0)
+                group.setVisibility(View.INVISIBLE);
+        }else{
+            return false;
+        }
+        return true;
     }
 }
