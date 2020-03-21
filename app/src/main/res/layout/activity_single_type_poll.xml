@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Single_type_poll"
+    tools:context="com.PollBuzz.pollbuzz.Single_type_poll"
     android:orientation="vertical"
     android:background="@android:color/transparent">
     <com.google.android.material.card.MaterialCardView
