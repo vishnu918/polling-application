@@ -10,8 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.PollBuzz.pollbuzz.Poll_list"></activity>
-        <activity android:name="com.PollBuzz.pollbuzz.Single_type_poll"></activity>
+        <activity android:name="com.PollBuzz.pollbuzz.Poll_list" />
+        <activity android:name="com.PollBuzz.pollbuzz.Single_type_poll" />
         <activity android:name="com.PollBuzz.pollbuzz.ProfileSetUp" />
         <activity android:name="com.PollBuzz.pollbuzz.Login_Signup_Activity">
             <intent-filter>
