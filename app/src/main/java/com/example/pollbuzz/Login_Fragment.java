@@ -1,18 +1,5 @@
 package com.example.pollbuzz;
 
-import android.content.Intent;
-import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -25,8 +12,20 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 
 /**
@@ -89,7 +88,8 @@ public class Login_Fragment extends Fragment {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        googleSignInClient= GoogleSignIn.getClient(getActivity(),gso);
+        if (getActivity() != null)
+            googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +113,8 @@ public class Login_Fragment extends Fragment {
     {
         if(email.isEmpty() || password.isEmpty())
         {
-            Toast.makeText(getContext(), "Email and Password can't be empty", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Email and Password can't be empty", Toast.LENGTH_SHORT).show();
+//            
         }
         else
         {
@@ -123,29 +124,25 @@ public class Login_Fragment extends Fragment {
                     if(task.isSuccessful())
                     {
                         if(!auth.getCurrentUser().isEmailVerified()){
-                            Toast.makeText(getContext(),"Please verify your mail.",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "Please verify your mail.", Toast.LENGTH_SHORT).show();
                         }
                         else {
-                            Toast.makeText(getActivity(), "Logged in", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
                             Intent i = new Intent(getActivity(), MainActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i);
                         }
                     }
                     else
                     {
-                        Toast.makeText(getActivity(),"Loggin failed",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Log In Failed!", Toast.LENGTH_SHORT).show();
                     }
-
-
                 }
             });
         }
-
-
     }
     private void google_sign_in()
     {
-
         Intent signInIntent = googleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, 101);
     }
@@ -159,12 +156,16 @@ public class Login_Fragment extends Fragment {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-                Toast.makeText(getContext(),"Registered Successfully",Toast.LENGTH_LONG).show();
+                if (account != null) {
+                    firebaseAuthWithGoogle(account);
+                }
+                Toast.makeText(getContext(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
             } catch (ApiException e) {
-                Log.d("error",e.getStackTrace().toString());
-                Toast.makeText(getContext(),"GSignup failed",Toast.LENGTH_LONG).show();
-
+                if (e.getMessage() != null) {
+                    Log.d("error", e.getMessage());
+                    FirebaseCrashlytics.getInstance().log(e.getMessage());
+                }
+                Toast.makeText(getContext(), "Google Sign Up failed!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -177,16 +178,13 @@ public class Login_Fragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
-                            Toast.makeText(getContext(),"GSignup successful",Toast.LENGTH_LONG).show();
-                            FirebaseUser user = auth.getCurrentUser();
-
+                            Toast.makeText(getContext(), "Google Sign In Successful!", Toast.LENGTH_SHORT).show();
+                            Intent i = new Intent(getActivity(), MainActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(i);
                         } else {
-
-
+                            Toast.makeText(getContext(), "Google Sign In Failed!", Toast.LENGTH_SHORT).show();
                         }
-
-
                     }
                 });
     }
