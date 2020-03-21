@@ -87,6 +87,7 @@ public class Login_Fragment extends Fragment {
         gsignin=view.findViewById(R.id.gsignin);
         auth=FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+
                 .requestIdToken("896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
@@ -183,6 +184,7 @@ public class Login_Fragment extends Fragment {
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i);
                             Toast.makeText(getContext(), acct.getEmail(), Toast.LENGTH_SHORT).show();
+
                         } else {
                             Toast.makeText(getContext(), "Google Sign In Failed!", Toast.LENGTH_SHORT).show();
                         }
