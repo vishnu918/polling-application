@@ -87,7 +87,7 @@ public class Login_Fragment extends Fragment {
         gsignin=view.findViewById(R.id.gsignin);
         auth=FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken("999925422455-jmu7rqjg3pu8uvahn4qtgmj52u5rvn2b.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         if (getActivity() != null)
@@ -169,7 +169,7 @@ public class Login_Fragment extends Fragment {
             }
         }
     }
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         // Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -182,6 +182,8 @@ public class Login_Fragment extends Fragment {
                             Intent i = new Intent(getActivity(), MainActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i);
+                            Toast.makeText(getContext(), acct.getEmail(), Toast.LENGTH_SHORT).show();
+
                         } else {
                             Toast.makeText(getContext(), "Google Sign In Failed!", Toast.LENGTH_SHORT).show();
                         }
