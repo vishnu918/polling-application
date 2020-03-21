@@ -32,6 +32,7 @@ public class Login_Signup_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_login_signup);
         login=findViewById(R.id.login);
         signup=findViewById(R.id.signup);
+        getSupportActionBar().hide();
         login_frag=Login_Fragment.newInstance("Login");
         signup_frag=Signup_Fragment.newInstance("Signup ");
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

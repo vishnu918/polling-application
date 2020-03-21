@@ -48,22 +48,13 @@ public class Signup_Fragment extends Fragment {
     SignInButton gsignin;
     FirebaseAuth auth;
     private GoogleSignInClient googleSignInClient;
-    private static final int RC_SIGN_IN = 1;
 
 
     public Signup_Fragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     *
-     * @return A new instance of fragment Signup_activity.
-     */
-    // TODO: Rename and change types and number of parameters
+
     public static Signup_Fragment newInstance(String param1) {
         Signup_Fragment fragment = new Signup_Fragment();
         Bundle args = new Bundle();
@@ -85,15 +76,13 @@ public class Signup_Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-       // View view=inflater.inflate(R.layout.fragment_signup, container, false);
+
 
         return inflater.inflate(R.layout.fragment_signup, container, false);
     }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        // Setup any handles to view objects here
-        // EditText etFoo = (EditText) view.findViewById(R.id.etFoo);
+
         email = (TextInputLayout) view.findViewById(R.id.email);
         password = (TextInputLayout) view.findViewById(R.id.password);
         signup=view.findViewById(R.id.signup);
@@ -127,25 +116,33 @@ public class Signup_Fragment extends Fragment {
     }
     private void sign_up(String email,String password)
     {
+          if(email.isEmpty() || password.isEmpty())
+          {
+              Toast.makeText(getContext(), "Email and Password can't be empty", Toast.LENGTH_LONG).show();
+          }
+          else
+          {
 
-                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful())
-                {
-                    auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(getContext(), "Signup successful.\nPlease verify your mail.", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-                else
-                {
-                    Toast.makeText(getContext(),"Signup failed",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+              auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                  @Override
+                  public void onComplete(@NonNull Task<AuthResult> task) {
+                      if(task.isSuccessful())
+                      {
+                          auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                              @Override
+                              public void onComplete(@NonNull Task<Void> task) {
+                                  Toast.makeText(getContext(), "Signup successful.\nPlease verify your mail.", Toast.LENGTH_LONG).show();
+                              }
+                          });
+                      }
+                      else
+                      {
+                          Toast.makeText(getContext(),"Signup failed",Toast.LENGTH_LONG).show();
+                      }
+                  }
+              });
+          }
+
     }
     private void google_sign_in()
     {
