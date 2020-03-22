@@ -14,6 +14,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class Signup_Fragment extends Fragment {
     Button signup;
     SignInButton gsignin;
     FirebaseAuth auth;
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private GoogleSignInClient googleSignInClient;
 
 
