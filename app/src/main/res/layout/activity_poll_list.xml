@@ -190,7 +190,7 @@
                 android:padding="12dp"
                 android:textSize="15sp"
                 android:textColor="@color/white"
-                android:text="Select options in order of preferance"/>
+                android:text="Select options in order of preference"/>
 
         </LinearLayout>
 
