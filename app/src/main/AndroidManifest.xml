@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Ranking_type"></activity>
+        <activity android:name=".Ranking_type_poll"></activity>
         <activity android:name=".Descriptive_type_poll" />
         <activity android:name=".Multiple_type_poll" />
         <activity android:name=".Poll_list" />
