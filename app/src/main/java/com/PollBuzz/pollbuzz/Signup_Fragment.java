@@ -1,23 +1,13 @@
 package com.PollBuzz.pollbuzz;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,9 +32,8 @@ public class Signup_Fragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private String title;
-    TextInputLayout email,password;
+    TextInputLayout emailL, passwordL, password2L;
     Button signup;
-    SignInButton gsignin;
     FirebaseAuth auth;
     private GoogleSignInClient googleSignInClient;
 
@@ -82,46 +71,42 @@ public class Signup_Fragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        email = (TextInputLayout) view.findViewById(R.id.email);
-        password = (TextInputLayout) view.findViewById(R.id.password);
+        emailL = (TextInputLayout) view.findViewById(R.id.email);
+        passwordL = (TextInputLayout) view.findViewById(R.id.password);
+        password2L = (TextInputLayout) view.findViewById(R.id.password2);
         signup=view.findViewById(R.id.signup);
-        gsignin=view.findViewById(R.id.gsignin);
         auth=FirebaseAuth.getInstance();
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-        googleSignInClient=GoogleSignIn.getClient(getActivity(),gso);
-
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String mail=email.getEditText().getText().toString();
-                String pass=password.getEditText().getText().toString();
-                Toast.makeText(getContext(),mail,Toast.LENGTH_LONG).show();
-
-                sign_up(mail,pass);
+                String mail=emailL.getEditText().getText().toString();
+                String pass=passwordL.getEditText().getText().toString();
+                String pass2 = password2L.getEditText().getText().toString();
+                sign_up(mail, pass, pass2);
             }
         });
-        gsignin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            google_sign_in();
-            }
-        });
-
-
     }
-    private void sign_up(String email,String password)
+    private void sign_up(String email, final String password, String password2)
     {
-          if(email.isEmpty() || password.isEmpty())
-          {
-              Toast.makeText(getContext(), "Email and Password can't be empty", Toast.LENGTH_LONG).show();
-          }
-          else
-          {
-
+        if (email.isEmpty()) {
+            Toast.makeText(getContext(), "Email can't be empty", Toast.LENGTH_SHORT).show();
+            emailL.requestFocus();
+        } else if (password.isEmpty()) {
+            Toast.makeText(getContext(), "Password can't be empty", Toast.LENGTH_SHORT).show();
+            passwordL.requestFocus();
+        }
+        else if(password2.isEmpty()){
+            Toast.makeText(getContext(), "Password can't be empty", Toast.LENGTH_SHORT).show();
+            password2L.requestFocus();
+        }
+        else if(!password.equals(password2)){
+            Toast.makeText(getContext(), "Passwords must be same", Toast.LENGTH_SHORT).show();
+            passwordL.getEditText().getText().clear();
+            password2L.getEditText().getText().clear();
+            passwordL.requestFocus();
+        }
+        else {
               auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                   @Override
                   public void onComplete(@NonNull Task<AuthResult> task) {
@@ -136,59 +121,13 @@ public class Signup_Fragment extends Fragment {
                       }
                       else
                       {
-                          Toast.makeText(getContext(),"Signup failed",Toast.LENGTH_LONG).show();
+                          Toast.makeText(getContext(),"Signup failed!",Toast.LENGTH_LONG).show();
+                          passwordL.getEditText().getText().clear();
+                          password2L.getEditText().getText().clear();
                       }
                   }
               });
           }
 
-    }
-    private void google_sign_in()
-    {
-
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, 101);
-    }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == 101) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-                Toast.makeText(getContext(),"Registered Successfully",Toast.LENGTH_LONG).show();
-            } catch (ApiException e) {
-                      Log.d("error",e.getStackTrace().toString());
-                Toast.makeText(getContext(),"GSignup failed",Toast.LENGTH_LONG).show();
-
-            }
-        }
-    }
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-       // Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        auth.signInWithCredential(credential)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                           // Log.d(TAG, "signInWithCredential:success");
-                            Toast.makeText(getContext(),"GSignup successful",Toast.LENGTH_LONG).show();
-                            FirebaseUser user = auth.getCurrentUser();
-
-                        } else {
-
-
-                        }
-
-
-                    }
-                });
     }
 }

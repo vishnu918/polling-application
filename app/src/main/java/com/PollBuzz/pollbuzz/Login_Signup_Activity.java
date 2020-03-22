@@ -32,7 +32,6 @@ public class Login_Signup_Activity extends AppCompatActivity {
         login.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         login.setTextColor(getResources().getColor(R.color.white));
         ft.replace(R.id.placeholder,login_frag,"Login Fragment");
-        ft.addToBackStack("Login Fragment");
         ft.commit();
         signup.setBackgroundColor(getResources().getColor(R.color.white));
         signup.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -45,7 +44,6 @@ public class Login_Signup_Activity extends AppCompatActivity {
             public void onClick(View v) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.placeholder,login_frag,"Login Fragment");
-                ft.addToBackStack("Login Fragment");
                 ft.commit();
                 login.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                 login.setTextColor(getResources().getColor(R.color.white));
@@ -63,7 +61,6 @@ public class Login_Signup_Activity extends AppCompatActivity {
             public void onClick(View v) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.placeholder,signup_frag,"Signup Fragment");
-                ft.addToBackStack("Signup Fragment");
                 ft.commit();
                 signup.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                 signup.setTextColor(getResources().getColor(R.color.white));

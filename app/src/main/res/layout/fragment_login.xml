@@ -31,10 +31,8 @@
         android:hint="Password"
         app:startIconDrawable="@drawable/ic_vpn_key_black_24dp"
         app:endIconMode="password_toggle"
-        app:passwordToggleTint="@color/black"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         app:boxBackgroundColor="@color/white"
-        app:passwordToggleEnabled="true"
         app:boxStrokeColor="@color/colorPrimary"
         app:boxStrokeWidth="1dp"
         android:layout_marginTop="8dp"
@@ -69,6 +67,4 @@
         android:fontFamily="@font/maven_pro"
         android:textStyle="bold"
         android:id="@+id/gsignin"/>
-
-
 </LinearLayout>
