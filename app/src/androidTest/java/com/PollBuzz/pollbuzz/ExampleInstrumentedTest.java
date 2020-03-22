@@ -1,4 +1,4 @@
-package com.PollBuzz.pollbuzz;
+package com.example.pollbuzz;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.PollBuzz.pollbuzz", appContext.getPackageName());
+        assertEquals("com.example.pollbuzz", appContext.getPackageName());
     }
 }

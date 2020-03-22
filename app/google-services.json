@@ -1,82 +1,38 @@
 {
   "project_info": {
-    "project_number": "999925422455",
-    "firebase_url": "https://poll-buzz.firebaseio.com",
-    "project_id": "poll-buzz",
-    "storage_bucket": "poll-buzz.appspot.com"
+    "project_number": "896875392739",
+    "firebase_url": "https://glass-pen-271820.firebaseio.com",
+    "project_id": "glass-pen-271820",
+    "storage_bucket": "glass-pen-271820.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:999925422455:android:31c62881b40bb6e367a972",
+        "mobilesdk_app_id": "1:896875392739:android:713c3d41d062f25b691fd6",
         "android_client_info": {
           "package_name": "com.PollBuzz.pollbuzz"
         }
       },
       "oauth_client": [
         {
-
           "client_id": "896875392739-5jate3fapvfmgaujnlmn3bqg6tg5a7ip.apps.googleusercontent.com",
-
           "client_type": 1,
           "android_info": {
             "package_name": "com.PollBuzz.pollbuzz",
             "certificate_hash": "ab94ec126afe99df0a302f280a5c7d8caead6816"
           }
-
-        },
-        {
-          "client_id": "999925422455-m98t0s83dltqrg53n1cgs3qtr0nfb06e.apps.googleusercontent.com",
-          "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDS12JZm0b0q_rjDk2JSZ0cLBNiIC5uYBU"
+          "current_key": "AIzaSyCLExkitW4K_OwLSm60_YHS6cZvL9bUqk8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "999925422455-m98t0s83dltqrg53n1cgs3qtr0nfb06e.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:999925422455:android:860d68743404d3cc67a972",
-        "android_client_info": {
-          "package_name": "com.example.pollbuzz"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "999925422455-bok1e5stnd25tjm26slq5id99737citm.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.pollbuzz",
-            "certificate_hash": "79e1a713feaff24e189ccd9c2fa2aa8c56189a80"
-          }
-        },
-        {
-          "client_id": "999925422455-m98t0s83dltqrg53n1cgs3qtr0nfb06e.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDS12JZm0b0q_rjDk2JSZ0cLBNiIC5uYBU"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "999925422455-m98t0s83dltqrg53n1cgs3qtr0nfb06e.apps.googleusercontent.com",
+              "client_id": "896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
