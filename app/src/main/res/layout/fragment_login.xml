@@ -44,21 +44,23 @@
             android:fontFamily="@font/maven_pro"
                 />
     </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/login"
-        android:text="Login"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/maven_pro"
-        android:textStyle="bold"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/login"
+            android:text="Login"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/maven_pro"
+            android:textStyle="bold" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="OR"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"/>
+
     <com.google.android.gms.common.SignInButton
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"

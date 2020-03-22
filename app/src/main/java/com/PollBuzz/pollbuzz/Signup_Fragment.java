@@ -116,12 +116,13 @@ public class Signup_Fragment extends Fragment {
                               @Override
                               public void onComplete(@NonNull Task<Void> task) {
                                   Toast.makeText(getContext(), "Signup successful.\nPlease verify your mail.", Toast.LENGTH_LONG).show();
+                                  auth.signOut();
                               }
                           });
                       }
                       else
                       {
-                          Toast.makeText(getContext(),"Signup failed!",Toast.LENGTH_LONG).show();
+                          Toast.makeText(getContext(),task.getException().toString(),Toast.LENGTH_LONG).show();
                           passwordL.getEditText().getText().clear();
                           password2L.getEditText().getText().clear();
                       }
