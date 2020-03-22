@@ -1,11 +1,13 @@
 package com.PollBuzz.pollbuzz;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,7 +19,20 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Single_type_poll extends AppCompatActivity {
     Button add;
@@ -25,6 +40,11 @@ public class Single_type_poll extends AppCompatActivity {
     String name;
     int c;
     RadioButton b;
+    TextInputEditText title,question;
+    MaterialButton button;
+    Date date = Calendar.getInstance().getTime();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseFirestore fb = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +57,12 @@ public class Single_type_poll extends AppCompatActivity {
         group=findViewById(R.id.options);
         add=findViewById(R.id.add);
         c=group.getChildCount();
+        title = findViewById(R.id.title1);
+        button = findViewById(R.id.post);
+        question = findViewById(R.id.question);
+
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        final String formattedDate = df.format(date);
 
         if(group.getChildCount()==0)
             group.setVisibility(View.INVISIBLE);
@@ -61,7 +87,6 @@ public class Single_type_poll extends AppCompatActivity {
                 registerForContextMenu(button);
 
 
-
             }
         });
         group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -76,6 +101,54 @@ public class Single_type_poll extends AppCompatActivity {
             }
         });
 
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(title.getText().toString().isEmpty())
+                {
+                    title.setError("Please enter the title");
+                    title.requestFocus();
+                }
+                else if(question.getText().toString().isEmpty())
+                {
+                    question.setError("Please enter the question");
+                     question.requestFocus();
+                }
+                else if(group.getChildCount()==0) {
+                    Toast.makeText(Single_type_poll.this, "U shld have atleast two options", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    if(auth.getCurrentUser()!=null) {
+                        Polldetails polldetails = new Polldetails();
+                        polldetails.setTitle(title.getText().toString());
+                        polldetails.setQuestion(question.getText().toString());
+                        Map<String,Integer> map = new HashMap<>();
+                        for(int i=0; i<group.getChildCount();i++)
+                        {
+                            RadioButton v = (RadioButton)group.getChildAt(i);
+                            map.put(v.getText().toString(),0);
+                        }
+                        polldetails.setMap(map);
+                        polldetails.setCreated_date(formattedDate);
+                        fb.collection("Users").document().set(polldetails)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(Single_type_poll.this, "Added to database", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(Single_type_poll.this, "Unable to add retry", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                }
+            }
+
+        });
 
     }
     public void showDialog(Activity activity, final RadioButton button){
