@@ -34,7 +34,7 @@ public class Poll_list extends AppCompatActivity {
         card2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this,Single_type_poll.class);
+                Intent intent = new Intent(Poll_list.this,Multiple_type_poll.class);
                 startActivity(intent);
             }
         });
@@ -42,7 +42,7 @@ public class Poll_list extends AppCompatActivity {
         card3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this,Single_type_poll.class);
+                Intent intent = new Intent(Poll_list.this, Descriptive_type_poll.class);
                 startActivity(intent);
             }
         });
