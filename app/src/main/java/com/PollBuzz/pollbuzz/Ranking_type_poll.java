@@ -21,20 +21,35 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Ranking_type_poll extends AppCompatActivity {
     Button add;
     LinearLayout group;
     String name;
+    TextInputEditText title_ranking, question_ranking;
+    MaterialButton post_ranking;
     int c;
     RadioButton b;
     TextView page_title;
     FirebaseAuth auth;
     ImageButton home,logout;
     FirebaseAuth.AuthStateListener listener;
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    Date date = Calendar.getInstance().getTime();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +79,11 @@ public class Ranking_type_poll extends AppCompatActivity {
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
         c = group.getChildCount();
+        title_ranking = findViewById(R.id.title_ranking);
+        question_ranking = findViewById(R.id.question_ranking);
+        post_ranking = findViewById(R.id.post_ranking);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        final String formatteddate = dateFormat.format(date);
         if (group.getChildCount() == 0)
             group.setVisibility(View.INVISIBLE);
 
@@ -107,6 +127,52 @@ public class Ranking_type_poll extends AppCompatActivity {
             }
         };
 
+        post_ranking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(title_ranking.getText().toString().isEmpty()){
+                    title_ranking.setError("Please enter the question");
+                    title_ranking.requestFocus();
+                }
+                else if(question_ranking.getText().toString().isEmpty())
+                {
+                    question_ranking.setError("Please enter the question");
+                    question_ranking.requestFocus();
+                }
+                else
+                {
+                    if(auth.getCurrentUser() != null)
+                    {
+                        Polldetails polldetails = new Polldetails();
+                        polldetails.setTitle(title_ranking.getText().toString().trim());
+                        polldetails.setQuestion(question_ranking.getText().toString().trim());
+                        polldetails.setCreated_date(formatteddate);
+                        Map<String,Integer> map = new HashMap<>();
+                        for(int i=0;i<group.getChildCount();i++)
+                        {
+                            RadioButton v = (RadioButton)group.getChildAt(i);
+                            map.put(v.getText().toString().trim(),0);
+                        }
+                        polldetails.setMap(map);
+                        firebaseFirestore.collection("Polls").document().set(polldetails)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(Ranking_type_poll.this, "Added Successfully", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(Ranking_type_poll.this, "Please try again", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                }
+
+            }
+        });
+
     }
     public void showDialog(Activity activity, final RadioButton button){
         final Dialog dialog = new Dialog(activity);
@@ -133,10 +199,16 @@ public class Ranking_type_poll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 name=text.getEditText().getText().toString();
-                button.setText(name);
-                Toast.makeText(getApplicationContext(),name,Toast.LENGTH_LONG).show();
-                dialog.dismiss();
-
+                if(name.isEmpty())
+                {
+                    text.setError("Please enter tit");
+                    text.requestFocus();
+                }
+                else {
+                    button.setText(name);
+                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                }
             }
         });
 

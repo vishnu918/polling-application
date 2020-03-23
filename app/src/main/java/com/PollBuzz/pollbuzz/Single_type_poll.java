@@ -61,7 +61,7 @@ public class Single_type_poll extends AppCompatActivity {
         button = findViewById(R.id.post);
         question = findViewById(R.id.question);
 
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         final String formattedDate = df.format(date);
 
         if(group.getChildCount()==0)
@@ -131,7 +131,7 @@ public class Single_type_poll extends AppCompatActivity {
                         }
                         polldetails.setMap(map);
                         polldetails.setCreated_date(formattedDate);
-                        fb.collection("Users").document().set(polldetails)
+                        fb.collection("Polls").document().set(polldetails)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -176,9 +176,15 @@ public class Single_type_poll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 name=text.getEditText().getText().toString();
-                button.setText(name);
-                Toast.makeText(getApplicationContext(),name,Toast.LENGTH_LONG).show();
-                dialog.dismiss();
+                if(name.isEmpty())
+                {
+                    Toast.makeText(getApplicationContext(), "Please Enter the option name", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    button.setText(name);
+                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                }
 
             }
         });
