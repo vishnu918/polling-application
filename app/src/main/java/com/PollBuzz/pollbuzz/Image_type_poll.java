@@ -119,10 +119,12 @@ public class Image_type_poll extends AppCompatActivity {
         if(resultCode==RESULT_OK)
         {  uri=data.getData();
             if(requestCode==1) {
+                view1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                 Picasso.get().load(uri).placeholder(R.drawable.place_holder).into(view1);
             }
             if(requestCode==2) {
-                Picasso.get().load(uri).placeholder(R.drawable.place_holder).into(view2);
+                view2.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                Picasso.get().load(uri).fit().placeholder(R.drawable.place_holder).into(view2);
 
             }
         }
