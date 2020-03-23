@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:dots="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <pl.tajchert.waitingdots.DotsTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="60sp"
+        android:textColor="@color/colorPrimaryDark"
+        dots:autoplay="true"
+        dots:period="1000"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+
+
+    />
+
+
+</FrameLayout>
