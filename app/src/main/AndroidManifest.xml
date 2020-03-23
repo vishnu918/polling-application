@@ -19,19 +19,20 @@
         tools:targetApi="q">
         <activity android:name="Utils.ImagePickerActivity" />
         <activity android:name=".AuthCheck">
-        <activity android:name=".Ranking_type_poll"></activity>
-        <activity android:name=".Descriptive_type_poll" />
-        <activity android:name=".Multiple_type_poll" />
-        <activity android:name=".Poll_list" />
-        <activity android:name=".Single_type_poll" />
-        <activity android:name=".ProfileSetUp" />
-        <activity android:name=".Login_Signup_Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Ranking_type_poll" />
+        <activity android:name=".Descriptive_type_poll" />
+        <activity android:name=".Multiple_type_poll" />
+        <activity android:name=".Poll_list" />
+        <activity android:name=".Single_type_poll" />
+        <activity android:name=".ProfileSetUp" />
+        <activity android:name=".MainActivity" />
+        <activity android:name=".Login_Signup_Activity" />
         <activity
                 android:name="com.yalantis.ucrop.UCropActivity"
                 android:screenOrientation="fullSensor"
@@ -47,14 +48,6 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/file_paths" />
         </provider>
-
-        <activity android:name=".Multiple_type_poll" />
-        <activity android:name=".Poll_list" />
-        <activity android:name=".Single_type_poll" />
-        <activity android:name=".ProfileSetUp"/>
-        <activity android:name=".Login_Signup_Activity" />
-        <activity android:name=".MainActivity" />
-
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
