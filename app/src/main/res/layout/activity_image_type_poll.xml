@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Image_type_poll"
+    android:orientation="vertical">
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="10dp"
+        app:cardCornerRadius="10dp"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="1dp"
+        android:layout_margin="10dp"
+        app:cardBackgroundColor="#f2e2ff"
+        app:cardElevation="20dp"
+        >
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Image based Two Choices Poll"
+                    android:layout_margin="10dp"
+                    android:textSize="30sp"
+                    android:fontFamily="@font/maven_pro"
+                    android:textStyle="bold"
+                    />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeColor="@color/white"
+                    android:id="@+id/title"
+                    app:boxBackgroundColor="@color/white"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_marginVertical="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:endIconDrawable="@drawable/ic_email_black_24dp"
+                    android:hint="Poll Title"
+
+                    >
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/maven_pro"
+                        android:textSize="20sp"
+                        android:layout_marginHorizontal="5dp"
+
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeColor="@color/white"
+                    android:id="@+id/query"
+                    android:layout_marginHorizontal="10dp"
+                    app:boxBackgroundColor="@color/white"
+                    android:layout_marginVertical="10dp"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusBottomEnd="0dp"
+                    app:boxCornerRadiusBottomStart="0dp"
+                    android:paddingVertical="5dp"
+
+                    >
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Your Query"/>
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Options"
+                    android:layout_margin="10dp"
+                    android:textSize="25sp"
+                    android:fontFamily="@font/maven_pro"
+                    android:textStyle="bold"
+                    />
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/options"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="10dp"
+
+                    android:tag="Options"
+                    >
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginVertical="7dp"
+                        android:id="@+id/l1">
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Option 1"
+                            android:id="@+id/option1"/>
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginVertical="3dp"
+                            android:background="@drawable/circle"
+                            android:id="@+id/image1"
+                            android:src="@drawable/place_holder"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginVertical="7dp"
+                        android:id="@+id/l2">
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Option 2"
+                            android:id="@+id/option2"/>
+
+
+                        <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@drawable/circle"
+                            android:layout_marginVertical="3dp"
+                            android:id="@+id/image2"
+                        android:src="@drawable/place_holder"/>
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:text="ADD option"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:layout_marginHorizontal="5dp"
+                    android:textSize="20sp"
+                    android:id="@+id/add"/>
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cornerRadius="20dp"
+                    android:layout_gravity="center"
+                    android:text="POST"
+                    android:fontFamily="@font/maven_pro"
+                    android:textStyle="bold"
+                    android:layout_marginTop="50dp"
+                    android:padding="10dp"
+                    android:textSize="15sp"
+                    android:stateListAnimator="@animator/button_anim"/>
+
+
+            </LinearLayout>
+        </ScrollView>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
