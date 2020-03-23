@@ -16,6 +16,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.content.Intent;
