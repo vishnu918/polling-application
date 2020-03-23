@@ -52,6 +52,7 @@
 
                         >
                     <com.google.android.material.textfield.TextInputEditText
+                              android:id="@+id/title_multi"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/maven_pro"
@@ -78,6 +79,7 @@
 
                         >
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/question_multi"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Your Query"/>
@@ -129,6 +131,7 @@
                         android:textSize="20sp"
                         android:id="@+id/add"/>
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/post_multi"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:cornerRadius="20dp"

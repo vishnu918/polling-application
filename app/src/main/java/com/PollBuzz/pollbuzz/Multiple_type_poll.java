@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,14 +20,31 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.PollBuzz.pollbuzz.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Multiple_type_poll extends AppCompatActivity {
     Button add;
+    MaterialButton post_multi;
+    TextInputEditText title_multi,question_multi;
     LinearLayout group;
     String name;
     int c;
     RadioButton b;
+    FirebaseAuth auth;
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    Date date = Calendar.getInstance().getTime();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +57,13 @@ public class Multiple_type_poll extends AppCompatActivity {
         group=findViewById(R.id.options);
         add=findViewById(R.id.add);
         c=group.getChildCount();
+        post_multi = findViewById(R.id.post_multi);
+        title_multi = findViewById(R.id.title_multi);
+        question_multi = findViewById(R.id.question_multi);
+        auth = FirebaseAuth.getInstance();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        final String formatteddate = dateFormat.format(date);
 
         if(group.getChildCount()==0)
             group.setVisibility(View.INVISIBLE);
@@ -74,6 +99,53 @@ public class Multiple_type_poll extends AppCompatActivity {
             }
         });
 
+        post_multi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(title_multi.getText().toString().isEmpty())
+                {
+                    title_multi.setError("Please enter the title");
+                    title_multi.requestFocus();
+                }
+                else if(question_multi.getText().toString().isEmpty())
+                {
+                    question_multi.setError("Please enter the question");
+                    question_multi.requestFocus();
+                }
+                else if(group.getChildCount()==0)
+                {
+                    Toast.makeText(Multiple_type_poll.this, "Please enter atleast two options", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    if (auth.getCurrentUser() != null) {
+                        Polldetails polldetails = new Polldetails();
+                        polldetails.setTitle(title_multi.getText().toString().trim());
+                        polldetails.setQuestion(question_multi.getText().toString().trim());
+                        polldetails.setCreated_date(formatteddate);
+                        Map<String, Integer> map = new HashMap<>();
+                        for (int i = 0; i < group.getChildCount(); i++) {
+                            RadioButton v = (RadioButton) group.getChildAt(i);
+                            map.put(v.getText().toString().trim(), 0);
+                        }
+                        polldetails.setMap(map);
+                        firebaseFirestore.collection("Polls").document().set(polldetails)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(Multiple_type_poll.this, "Added to Database", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(Multiple_type_poll.this, "Unable to add try again later", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                }
+            }
+        });
+
 
     }
     public void showDialog(Activity activity, final RadioButton button){
@@ -101,9 +173,16 @@ public class Multiple_type_poll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 name=text.getEditText().getText().toString();
-                button.setText(name);
-                Toast.makeText(getApplicationContext(),name,Toast.LENGTH_LONG).show();
-                dialog.dismiss();
+                if(name.isEmpty())
+                {
+                   text.setError("Please enter tit");
+                   text.requestFocus();
+                }
+                else {
+                    button.setText(name);
+                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                }
 
             }
         });
