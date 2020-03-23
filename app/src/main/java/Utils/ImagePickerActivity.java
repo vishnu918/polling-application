@@ -8,10 +8,6 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.yalantis.ucrop.UCrop;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContentResolverCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,6 +24,9 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
@@ -248,18 +247,5 @@ public class ImagePickerActivity extends AppCompatActivity {
         String name = returnCursor.getString(nameIndex);
         returnCursor.close();
         return name;
-    }
-
-    /**
-     * Calling this will delete the images from cache directory
-     * useful to clear some memory
-     */
-    public static void clearCache(Context context) {
-        File path = new File(context.getExternalCacheDir(), "camera");
-        if (path.exists() && path.isDirectory()) {
-            for (File child : path.listFiles()) {
-                child.delete();
-            }
-        }
     }
 }

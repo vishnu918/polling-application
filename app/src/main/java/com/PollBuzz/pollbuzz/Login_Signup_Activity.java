@@ -73,8 +73,5 @@ public class Login_Signup_Activity extends AppCompatActivity {
 
             }
         });
-
-
-
     }
 }
