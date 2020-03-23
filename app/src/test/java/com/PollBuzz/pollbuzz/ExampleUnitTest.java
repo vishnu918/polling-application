@@ -1,4 +1,4 @@
-package com.example.pollbuzz;
+package com.PollBuzz.pollbuzz;
 
 import org.junit.Test;
 
