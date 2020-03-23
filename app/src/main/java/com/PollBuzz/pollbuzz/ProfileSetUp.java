@@ -41,6 +41,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -314,6 +315,24 @@ public class ProfileSetUp extends AppCompatActivity {
             data.put("gender", gender);
             if (uri == null) {
                 data.put("pic", null);
+                db.collection("Users")
+                        .document(mUser.getUid())
+                        .set(data)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Utils.helper.setProfileSetUpPref(getApplicationContext(), true);
+                                    progressDialog.dismiss();
+                                    Intent i = new Intent(ProfileSetUp.this, MainActivity.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
+                                } else {
+                                    Toast.makeText(ProfileSetUp.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    Log.d("Exception", task.getException().toString());
+                                }
+                            }
+                        });
             } else {
                 StorageReference mRef = mStorage.child("images/" + mUser.getUid());
                 Bitmap bmp = null;
@@ -325,6 +344,7 @@ public class ProfileSetUp extends AppCompatActivity {
                     dataCompressed = baos.toByteArray();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Log.d("Exception", e.toString());
                 }
                 mRef.putBytes(dataCompressed)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -344,12 +364,16 @@ public class ProfileSetUp extends AppCompatActivity {
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
                                                             Utils.helper.setProfileSetUpPref(getApplicationContext(), true);
+                                                            deleteDir(getApplicationContext().getCacheDir());
+                                                            deleteDir(getApplicationContext().getExternalCacheDir());
                                                             progressDialog.dismiss();
                                                             Intent i = new Intent(ProfileSetUp.this, MainActivity.class);
                                                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                                             startActivity(i);
-                                                        } else
+                                                        } else {
                                                             Toast.makeText(ProfileSetUp.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                            Log.d("Exception", task.getException().toString());
+                                                        }
                                                     }
                                                 });
                                     }
@@ -360,12 +384,13 @@ public class ProfileSetUp extends AppCompatActivity {
                             @Override
                             public void onFailure(@NonNull Exception exception) {
                                 exception.printStackTrace();
+                                Log.d("Exception", exception.toString());
                             }
                         })
                         .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                                double progress = (1.00 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                             }
                         });
             }
@@ -391,5 +416,27 @@ public class ProfileSetUp extends AppCompatActivity {
         Uri uri = Uri.fromParts("package", getPackageName(), null);
         intent.setData(uri);
         startActivityForResult(intent, 101);
+    }
+    /**
+     * Calling this will delete the images from cache directory
+     * useful to clear some memory
+     */
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            if (children != null) {
+                for (String child : children) {
+                    boolean success = deleteDir(new File(dir, child));
+                    if (!success) {
+                        return false;
+                    }
+                }
+            }
+            return dir.delete();
+        } else if(dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
     }
 }
