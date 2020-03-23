@@ -14,11 +14,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +32,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import okhttp3.internal.Util;
 
 
 /**
@@ -47,6 +51,7 @@ public class Login_Fragment extends Fragment {
     SignInButton gsignin;
     FirebaseAuth auth;
     GoogleSignInClient googleSignInClient;
+    FirebaseFirestore db;
 
 
 
@@ -87,13 +92,13 @@ public class Login_Fragment extends Fragment {
         login=view.findViewById(R.id.login);
         gsignin=view.findViewById(R.id.gsignin);
         auth=FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
-        if (getActivity() != null)
-            googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-
+        googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+        googleSignInClient.signOut();
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,35 +116,60 @@ public class Login_Fragment extends Fragment {
 
 
     }
-    private void log_in(String email,String password)
+    private void log_in(String emailS,String passwordS)
     {
-        if(email.isEmpty() || password.isEmpty())
+        if(emailS.isEmpty())
         {
-            Toast.makeText(getContext(), "Email and Password can't be empty", Toast.LENGTH_SHORT).show();
-//            
+            Toast.makeText(getContext(), "Email can't be empty", Toast.LENGTH_SHORT).show();
+            this.email.requestFocus();
+        }
+        else if(passwordS.isEmpty()){
+            Toast.makeText(getContext(), "Password can't be empty", Toast.LENGTH_SHORT).show();
+            this.password.requestFocus();
         }
         else
         {
-            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+            auth.signInWithEmailAndPassword(emailS, passwordS).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful())
                     {
                         if(!auth.getCurrentUser().isEmailVerified()){
                             Toast.makeText(getContext(), "Please verify your mail.", Toast.LENGTH_SHORT).show();
+                            auth.signOut();
                         }
                         else {
-                            Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
-                            Intent i = new Intent(getActivity(), MainActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
-
-
+                            DocumentReference doc = db.collection("Users").document(auth.getCurrentUser().getUid());
+                            doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
+                                        DocumentSnapshot dS = task.getResult();
+                                        if (dS != null && dS.exists()) {
+                                            Utils.helper.setProfileSetUpPref(getContext(),true);
+                                            Intent i = new Intent(getActivity(), MainActivity.class);
+                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(i);
+                                        } else {
+                                            Utils.helper.setProfileSetUpPref(getContext(),false);
+                                            Intent i = new Intent(getActivity(), ProfileSetUp.class);
+                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(i);
+                                        }
+                                    } else {
+                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Log.d("UID", task.getException().toString());
+                                        password.getEditText().getText().clear();
+                                    }
+                                }
+                            });
                         }
                     }
                     else
                     {
-                        Toast.makeText(getActivity(), "Log In Failed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        password.getEditText().getText().clear();
                     }
                 }
             });
@@ -168,7 +198,7 @@ public class Login_Fragment extends Fragment {
                     Log.d("error", e.getMessage());
                     FirebaseCrashlytics.getInstance().log(e.getMessage());
                 }
-                Toast.makeText(getContext(), "Google Sign Up failed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Google Sign In failed!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -181,11 +211,31 @@ public class Login_Fragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Google Sign In Successful!", Toast.LENGTH_SHORT).show();
-                            Intent i = new Intent(getActivity(), MainActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
-                            Toast.makeText(getContext(), acct.getEmail(), Toast.LENGTH_SHORT).show();
+                            DocumentReference doc = db.collection("Users").document(auth.getCurrentUser().getUid());
+                            doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
+                                        DocumentSnapshot dS = task.getResult();
+                                        if (dS != null && dS.exists()) {
+                                            Utils.helper.setProfileSetUpPref(getContext(),true);
+                                            Intent i = new Intent(getActivity(), MainActivity.class);
+                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(i);
+                                        } else {
+                                            Utils.helper.setProfileSetUpPref(getContext(),false);
+                                            Intent i = new Intent(getActivity(), ProfileSetUp.class);
+                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(i);
+                                        }
+                                    } else {
+                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Log.d("UID", task.getException().toString());
+                                        password.getEditText().getText().clear();
+                                    }
+                                }
+                            });
                         } else {
                             Toast.makeText(getContext(), "Google Sign In Failed!", Toast.LENGTH_SHORT).show();
                         }
