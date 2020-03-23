@@ -136,6 +136,16 @@ public class Single_type_response extends AppCompatActivity {
                            button.setText(entry.getKey());
                            button.setTextSize(20.0f);
                            group.addView(button);
+                           button.setOnClickListener(new View.OnClickListener() {
+                               @Override
+                               public void onClick(View v) {
+                                   RadioButton b=(RadioButton)v;
+                                   if(b.isChecked())
+                                       resp=b.getText().toString();
+
+
+                               }
+                           });
                        }
                    }
                    }
@@ -144,6 +154,26 @@ public class Single_type_response extends AppCompatActivity {
            }
 
        );
+
+        ref=db.collection("Polls").document(key).collection("Response");
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RadioButton button=findViewById(b_id);
+                Toast.makeText(getApplicationContext(),resp+" Opted",Toast.LENGTH_LONG).show();
+                options.clear();
+                options.put(resp,0);
+
+                ref.document(auth.getCurrentUser().getUid()).set(options);
+
+               db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(options);
+                Intent i=new Intent(Single_type_response.this,MainActivity.class);
+                startActivity(i);
+
+
+            }
+        });
+
 
 
 
