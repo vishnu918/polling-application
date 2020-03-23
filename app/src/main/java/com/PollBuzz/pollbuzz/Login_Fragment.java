@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,11 +28,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import okhttp3.internal.Util;
 
 
 /**
@@ -138,43 +137,31 @@ public class Login_Fragment extends Fragment {
                             auth.signOut();
                         }
                         else {
-                            DocumentReference doc = db.collection("Temp").document(auth.getCurrentUser().getUid());
-                            Map<String, String> m = new HashMap<>();
-                            m.put("key", "value");
-                            doc.set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            DocumentReference doc = db.collection("Users").document(auth.getCurrentUser().getUid());
+                            doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) Log.d("UID", "Done");
-                                    else Log.d("UID", task.getException().toString());
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
+                                        DocumentSnapshot dS = task.getResult();
+                                        if (dS != null && dS.exists()) {
+                                            Utils.helper.setProfileSetUpPref(getContext(),true);
+                                            Intent i = new Intent(getActivity(), MainActivity.class);
+                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(i);
+                                        } else {
+                                            Utils.helper.setProfileSetUpPref(getContext(),false);
+                                            Intent i = new Intent(getActivity(), ProfileSetUp.class);
+                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(i);
+                                        }
+                                    } else {
+                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Log.d("UID", task.getException().toString());
+                                        password.getEditText().getText().clear();
+                                    }
                                 }
                             });
-//                            DocumentReference doc = db.collection("Users").document(auth.getCurrentUser().getUid());
-//                            doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                                    Log.d("UID", doc.getPath());
-//                                    if (task.isSuccessful()) {
-//                                        Log.d("UID", "Reached1");
-//                                        Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
-//                                        DocumentSnapshot dS = task.getResult();
-//
-//                                        if (dS != null && dS.exists()) {
-//                                            Log.d("UID", dS.get("key").toString());
-//                                            Intent i = new Intent(getActivity(), MainActivity.class);
-//                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                            startActivity(i);
-//                                        } else {
-//                                            Intent i = new Intent(getActivity(), ProfileSetUp.class);
-//                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                            startActivity(i);
-//                                        }
-//                                    } else {
-//                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-//                                        Log.d("UID",task.getException().toString());
-//                                        password.getEditText().getText().clear();
-//                                    }
-//                                }
-//                            });
                         }
                     }
                     else
@@ -227,16 +214,23 @@ public class Login_Fragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(getContext(), "Google Sign In Successful!", Toast.LENGTH_SHORT).show();
-                                        if (task.getResult().exists()) {
+                                        Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
+                                        DocumentSnapshot dS = task.getResult();
+                                        if (dS != null && dS.exists()) {
+                                            Utils.helper.setProfileSetUpPref(getContext(),true);
                                             Intent i = new Intent(getActivity(), MainActivity.class);
                                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(i);
                                         } else {
+                                            Utils.helper.setProfileSetUpPref(getContext(),false);
                                             Intent i = new Intent(getActivity(), ProfileSetUp.class);
                                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(i);
                                         }
+                                    } else {
+                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Log.d("UID", task.getException().toString());
+                                        password.getEditText().getText().clear();
                                     }
                                 }
                             });

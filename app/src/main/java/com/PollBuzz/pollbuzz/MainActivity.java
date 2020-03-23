@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void logOut() {
         if(auth.getCurrentUser()!=null) {
+            Utils.helper.removeProfileSetUpPref(getApplicationContext());
             auth.signOut();
             Intent i=new Intent(this,Login_Signup_Activity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);

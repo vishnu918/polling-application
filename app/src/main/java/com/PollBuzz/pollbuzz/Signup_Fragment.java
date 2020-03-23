@@ -4,8 +4,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -70,7 +72,8 @@ public class Signup_Fragment extends Fragment {
     }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
+        FirebaseApp.initializeApp(getContext());
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
         emailL = (TextInputLayout) view.findViewById(R.id.email);
         passwordL = (TextInputLayout) view.findViewById(R.id.password);
         password2L = (TextInputLayout) view.findViewById(R.id.password2);

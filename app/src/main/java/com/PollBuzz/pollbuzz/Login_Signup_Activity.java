@@ -47,9 +47,9 @@ public class Login_Signup_Activity extends AppCompatActivity {
                 ft.commit();
                 login.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                 login.setTextColor(getResources().getColor(R.color.white));
+                login.setAlpha(1.0f);
                 signup.setBackgroundColor(getResources().getColor(R.color.white));
                 signup.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-                login.setAlpha(1.0f);
                 signup.setAlpha(0.5f);
                 signup.setElevation(-0.5f);
 
