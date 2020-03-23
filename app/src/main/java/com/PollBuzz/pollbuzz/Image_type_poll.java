@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,11 +10,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -22,9 +26,9 @@ public class Image_type_poll extends AppCompatActivity {
     Button add;
     LinearLayout l1,l2,group;
     int c;
-
-
-
+    FirebaseAuth auth;
+    FirebaseAuth.AuthStateListener listener;
+    ImageButton home,logout;
     Uri uri;
     ImageView view1,view2;
     RadioButton b1,b2;
@@ -46,9 +50,25 @@ public class Image_type_poll extends AppCompatActivity {
         b2=findViewById(R.id.option2);
         view1=findViewById(R.id.image1);
         view2=findViewById(R.id.image2);
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
         c=group.getChildCount();
         registerForContextMenu(b1);
         registerForContextMenu(b1);
+
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Image_type_poll.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                auth.signOut();
+            }
+        });
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,6 +93,19 @@ public class Image_type_poll extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
             }
         });
+        auth = FirebaseAuth.getInstance();
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Image_type_poll.this, Login_Signup_Activity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
 
 
 
@@ -95,6 +128,12 @@ public class Image_type_poll extends AppCompatActivity {
         }
 
         }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(listener);
+
+    }
 
 
 
