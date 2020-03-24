@@ -27,6 +27,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -131,11 +132,15 @@ public class Multiple_type_poll extends AppCompatActivity {
                             map.put(v.getText().toString().trim(), 0);
                         }
                         polldetails.setMap(map);
+                        CollectionReference docCreated = firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created");
                         DocumentReference doc = firebaseFirestore.collection("Polls").document();
                         doc.set(polldetails)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+                                        Map<String,String> m=new HashMap<>();
+                                        m.put("pollId",doc.getId());
+                                        docCreated.document().set(m);
                                         Toast.makeText(Multiple_type_poll.this, "Added to Database", Toast.LENGTH_SHORT).show();
                                     }
                                 })

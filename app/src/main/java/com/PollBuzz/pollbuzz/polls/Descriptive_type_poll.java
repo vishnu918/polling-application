@@ -17,6 +17,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -71,11 +72,15 @@ public class Descriptive_type_poll extends AppCompatActivity {
                         polldetails.setQuestion(question_descriptive.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
                         polldetails.setPoll_type("DESCRIPTIVE POLL");
+                        CollectionReference docCreated = firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created");
                         DocumentReference doc = firebaseFirestore.collection("Polls").document();
                         doc.set(polldetails)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+                                        Map<String,String> m=new HashMap<>();
+                                        m.put("pollId",doc.getId());
+                                        docCreated.document().set(m);
                                         Toast.makeText(Descriptive_type_poll.this, "Added successfully", Toast.LENGTH_SHORT).show();
                                     }
                                 })
