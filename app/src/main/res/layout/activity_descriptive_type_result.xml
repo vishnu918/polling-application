@@ -68,7 +68,6 @@
                     android:text="Answer"
                     android:layout_margin="10dp"
                     android:textAlignment="viewStart"
-                    android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="27sp"
                     android:background="@color/white"

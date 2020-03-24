@@ -59,7 +59,7 @@ public class Descriptive_type_response extends AppCompatActivity {
         View view =getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
-        key="npZZ7n4OXlchpJsen8eJ";
+        key="80E2L7Whekw7AAtFu6yA";
         response=new HashMap<>();
         home.setOnClickListener(new View.OnClickListener() {
             @Override
