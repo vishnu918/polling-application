@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class HomeFeed extends Fragment {
     private ArrayList<Polldetails> arrayList;
     private RecyclerView recyclerView;
-    private com.PollBuzz.pollbuzz.HomePageAdapter adapter;
+    private com.PollBuzz.pollbuzz.adapters.HomePageAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     FloatingActionButton fab;
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -55,7 +55,7 @@ public class HomeFeed extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
-        adapter = new com.PollBuzz.pollbuzz.HomePageAdapter(getContext(),arrayList);
+        adapter = new com.PollBuzz.pollbuzz.adapters.HomePageAdapter(getContext(),arrayList);
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);

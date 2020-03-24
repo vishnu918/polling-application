@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 //                        openFragment(new com.PollBuzz.pollbuzz.ProfileFeed());
                         break;
                     case 2:
-                        openFragment(new com.PollBuzz.pollbuzz.ProfileFeed());
+                        openFragment(new com.PollBuzz.pollbuzz.navFragments.ProfileFeed());
                         break;
                 }
             }

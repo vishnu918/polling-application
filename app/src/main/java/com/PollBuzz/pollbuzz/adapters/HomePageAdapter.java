@@ -1,4 +1,4 @@
-package com.PollBuzz.pollbuzz;
+package com.PollBuzz.pollbuzz.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -11,6 +11,9 @@ import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.R;
 
 public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.HomeViewHolder> {
 

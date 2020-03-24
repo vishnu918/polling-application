@@ -1,5 +1,7 @@
-package com.PollBuzz.pollbuzz;
+package com.PollBuzz.pollbuzz.navFragments;
 
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textview.MaterialTextView;

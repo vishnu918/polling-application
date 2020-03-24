@@ -1,5 +1,9 @@
 package com.PollBuzz.pollbuzz;
 
+import com.PollBuzz.pollbuzz.polls.Descriptive_type_poll;
+import com.PollBuzz.pollbuzz.polls.Multiple_type_poll;
+import com.PollBuzz.pollbuzz.polls.Ranking_type_poll;
+import com.PollBuzz.pollbuzz.polls.Single_type_poll;
 import com.google.android.material.card.MaterialCardView;
 
 import com.PollBuzz.pollbuzz.polls.Image_type_poll;
@@ -38,7 +42,7 @@ public class Poll_list extends AppCompatActivity {
         card1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this, Single_type_response.class);
+                Intent intent = new Intent(Poll_list.this, Single_type_poll.class);
                 startActivity(intent);
             }
         });
@@ -46,7 +50,7 @@ public class Poll_list extends AppCompatActivity {
         card2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this, Multiple_type_response.class);
+                Intent intent = new Intent(Poll_list.this, Multiple_type_poll.class);
                 startActivity(intent);
             }
         });
