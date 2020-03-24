@@ -28,7 +28,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -154,7 +157,9 @@ public class Ranking_type_poll extends AppCompatActivity {
                             map.put(v.getText().toString().trim(),0);
                         }
                         polldetails.setMap(map);
-                        firebaseFirestore.collection("Polls").document().set(polldetails)
+                        polldetails.setPoll_type("PRIORITY POLL");
+                        DocumentReference doc = firebaseFirestore.collection("Polls").document();
+                        doc.set(polldetails)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -165,6 +170,22 @@ public class Ranking_type_poll extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Toast.makeText(Ranking_type_poll.this, "Please try again", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        String name_doc = doc.getId();
+                        Map<String,Integer> mapi = new HashMap<>();
+                        mapi.put(name_doc,0);
+                        firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created").document().set(mapi)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(Ranking_type_poll.this, "document added to users", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(Ranking_type_poll.this, "Failed to add document", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }

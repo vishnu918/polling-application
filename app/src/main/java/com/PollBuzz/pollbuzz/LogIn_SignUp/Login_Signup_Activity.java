@@ -1,4 +1,4 @@
-package com.PollBuzz.pollbuzz;
+package com.PollBuzz.pollbuzz.LogIn_SignUp;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
+
+import com.PollBuzz.pollbuzz.R;
 
 public class Login_Signup_Activity extends AppCompatActivity {
     Button login,signup;
@@ -26,8 +28,8 @@ public class Login_Signup_Activity extends AppCompatActivity {
         login=findViewById(R.id.login);
         signup=findViewById(R.id.signup);
         getSupportActionBar().hide();
-        login_frag=Login_Fragment.newInstance("Login");
-        signup_frag=Signup_Fragment.newInstance("Signup ");
+        login_frag= Login_Fragment.newInstance("Login");
+        signup_frag= Signup_Fragment.newInstance("Signup ");
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         login.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         login.setTextColor(getResources().getColor(R.color.white));

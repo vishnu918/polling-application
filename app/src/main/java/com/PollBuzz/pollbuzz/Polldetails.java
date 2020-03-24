@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Polldetails {
 
-    private String title, question, created_date, expiry_date;
+    private String title, question, created_date, expiry_date,poll_type;
     private Map<String,Integer> map;
 
     public Map<String, Integer> getMap() {
@@ -45,5 +45,13 @@ public class Polldetails {
 
     public void setExpiry_date(String expiry_date) {
         this.expiry_date = expiry_date;
+    }
+
+    public String getPoll_type() {
+        return poll_type;
+    }
+
+    public void setPoll_type(String poll_type) {
+        this.poll_type = poll_type;
     }
 }

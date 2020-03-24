@@ -1,4 +1,4 @@
-package com.PollBuzz.pollbuzz;
+package com.PollBuzz.pollbuzz.LogIn_SignUp;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -14,6 +14,8 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.karumi.dexter.Dexter;
