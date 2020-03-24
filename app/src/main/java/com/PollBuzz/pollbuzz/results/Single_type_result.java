@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
@@ -73,6 +75,8 @@ public class Single_type_result extends AppCompatActivity {
         key= "HuIbrwZXR6piG0uSBWWc";
         uid="3fpFZ9pGKASP570h8BVBFn5UBDH2";
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
+        dialog=new Dialog(Single_type_result.this);
+        showDialog();
         auth = FirebaseAuth.getInstance();
         listener=new FirebaseAuth.AuthStateListener() {
             @Override
@@ -87,6 +91,21 @@ public class Single_type_result extends AppCompatActivity {
             }
         };
 
+    }
+    private void showDialog()
+    {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.loading_dialog);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+
+        dialog.setCancelable(false);
+        dialog.show();
+        window.setAttributes(lp);
     }
     @Override
     protected void onStart() {
