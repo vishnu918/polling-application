@@ -148,6 +148,8 @@ public class Login_Fragment extends Fragment {
                                         DocumentSnapshot dS = task.getResult();
                                         if (dS != null && dS.exists()) {
                                             Utils.helper.setProfileSetUpPref(getContext(),true);
+                                            Utils.helper.setpPicPref(getContext(), String.valueOf(dS.get("pic")));
+                                            Utils.helper.setusernamePref(getContext(), String.valueOf(dS.get("username")));
                                             Intent i = new Intent(getActivity(), MainActivity.class);
                                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(i);
@@ -220,6 +222,8 @@ public class Login_Fragment extends Fragment {
                                         DocumentSnapshot dS = task.getResult();
                                         if (dS != null && dS.exists()) {
                                             Utils.helper.setProfileSetUpPref(getContext(),true);
+                                            Utils.helper.setpPicPref(getContext(), String.valueOf(dS.get("pic")));
+                                            Utils.helper.setusernamePref(getContext(), String.valueOf(dS.get("username")));
                                             Intent i = new Intent(getActivity(), MainActivity.class);
                                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(i);
