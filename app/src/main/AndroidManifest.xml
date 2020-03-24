@@ -19,6 +19,7 @@
             tools:targetApi="q">
         <activity android:name=".navFragments.HomeFeed"></activity>
         <activity android:name=".responses.Multiple_type_response" />
+        <activity android:name=".responses.Descriptive_type_response"/>
         <activity android:name=".LogIn_SignUp.ProfileSetUp" />
         <activity android:name=".responses.Single_type_response" />
         <activity android:name="Utils.ImagePickerActivity" />
