@@ -1,8 +1,12 @@
-package com.PollBuzz.pollbuzz;
+package Utils;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
+import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.LogIn_SignUp.ProfileSetUp;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,7 +24,7 @@ public class AuthCheck extends AppCompatActivity {
         if(auth.getCurrentUser()==null)
         {
             Utils.helper.removeProfileSetUpPref(getApplicationContext());
-            Intent i=new Intent(AuthCheck.this,Login_Signup_Activity.class);
+            Intent i=new Intent(AuthCheck.this, Login_Signup_Activity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
         }

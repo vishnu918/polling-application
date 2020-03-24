@@ -1,4 +1,4 @@
-package com.PollBuzz.pollbuzz;
+package com.PollBuzz.pollbuzz.polls;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -14,11 +15,14 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.Polldetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,7 +30,11 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,55 +42,69 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Multiple_type_poll extends AppCompatActivity {
+public class Ranking_type_poll extends AppCompatActivity {
     Button add;
-    MaterialButton post_multi;
-    TextInputEditText title_multi,question_multi;
     LinearLayout group;
     String name;
+    TextInputEditText title_ranking, question_ranking;
+    MaterialButton post_ranking;
     int c;
     RadioButton b;
+    TextView page_title;
     FirebaseAuth auth;
+    ImageButton home,logout;
+    FirebaseAuth.AuthStateListener listener;
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     Date date = Calendar.getInstance().getTime();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_multiple_type_poll);
+        setContentView(R.layout.activity_ranking_type);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
-        View view =getSupportActionBar().getCustomView();
-        group=findViewById(R.id.options);
-        add=findViewById(R.id.add);
-        c=group.getChildCount();
-        post_multi = findViewById(R.id.post_multi);
-        title_multi = findViewById(R.id.title_multi);
-        question_multi = findViewById(R.id.question_multi);
-        auth = FirebaseAuth.getInstance();
-
+        View view = getSupportActionBar().getCustomView();
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Ranking_type_poll.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                auth.signOut();
+            }
+        });
+        page_title = view.findViewById(R.id.page_title);
+        //page_title.setText("Ranking Type Poll");
+        group = findViewById(R.id.options);
+        add = findViewById(R.id.add);
+        c = group.getChildCount();
+        title_ranking = findViewById(R.id.title_ranking);
+        question_ranking = findViewById(R.id.question_ranking);
+        post_ranking = findViewById(R.id.post_ranking);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         final String formatteddate = dateFormat.format(date);
-
-        if(group.getChildCount()==0)
+        if (group.getChildCount() == 0)
             group.setVisibility(View.INVISIBLE);
+
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final RadioButton button=new RadioButton(getApplicationContext());
-                button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-                String t="Option"+(c+1);
+                final RadioButton button = new RadioButton(getApplicationContext());
+                button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                String t = "Option" + (c + 1);
                 //
-                showDialog(Multiple_type_poll.this, button);
+                showDialog(Ranking_type_poll.this, button);
 
                 button.setTag(t.toLowerCase());
-
-                //group.removeAllViews();
                 group.removeView(findViewById(R.id.option1));
                 group.removeView(findViewById(R.id.option2));
-
-                //button.setText(name);
                 group.addView(button);
                 group.setVisibility(View.VISIBLE);
                 registerForContextMenu(button);
@@ -95,57 +117,85 @@ public class Multiple_type_poll extends AppCompatActivity {
                 });
 
 
-
             }
         });
+        auth = FirebaseAuth.getInstance();
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Ranking_type_poll.this, Login_Signup_Activity.class);
+                    startActivity(i);
+                }
 
-        post_multi.setOnClickListener(new View.OnClickListener() {
+            }
+        };
+
+        post_ranking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(title_multi.getText().toString().isEmpty())
-                {
-                    title_multi.setError("Please enter the title");
-                    title_multi.requestFocus();
+                if(title_ranking.getText().toString().isEmpty()){
+                    title_ranking.setError("Please enter the question");
+                    title_ranking.requestFocus();
                 }
-                else if(question_multi.getText().toString().isEmpty())
+                else if(question_ranking.getText().toString().isEmpty())
                 {
-                    question_multi.setError("Please enter the question");
-                    question_multi.requestFocus();
+                    question_ranking.setError("Please enter the question");
+                    question_ranking.requestFocus();
                 }
-                else if(group.getChildCount()==0)
+                else
                 {
-                    Toast.makeText(Multiple_type_poll.this, "Please enter atleast two options", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    if (auth.getCurrentUser() != null) {
+                    if(auth.getCurrentUser() != null)
+                    {
                         Polldetails polldetails = new Polldetails();
-                        polldetails.setTitle(title_multi.getText().toString().trim());
-                        polldetails.setQuestion(question_multi.getText().toString().trim());
+                        polldetails.setTitle(title_ranking.getText().toString().trim());
+                        polldetails.setQuestion(question_ranking.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
-                        Map<String, Integer> map = new HashMap<>();
-                        for (int i = 0; i < group.getChildCount(); i++) {
-                            RadioButton v = (RadioButton) group.getChildAt(i);
-                            map.put(v.getText().toString().trim(), 0);
+                        Map<String,Integer> map = new HashMap<>();
+                        for(int i=0;i<group.getChildCount();i++)
+                        {
+                            RadioButton v = (RadioButton)group.getChildAt(i);
+                            map.put(v.getText().toString().trim(),0);
                         }
                         polldetails.setMap(map);
-                        firebaseFirestore.collection("Polls").document().set(polldetails)
+                        polldetails.setPoll_type("PRIORITY POLL");
+                        DocumentReference doc = firebaseFirestore.collection("Polls").document();
+                        doc.set(polldetails)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Toast.makeText(Multiple_type_poll.this, "Added to Database", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Ranking_type_poll.this, "Added Successfully", Toast.LENGTH_SHORT).show();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(Multiple_type_poll.this, "Unable to add try again later", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Ranking_type_poll.this, "Please try again", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        String name_doc = doc.getId();
+                        Map<String,Integer> mapi = new HashMap<>();
+                        mapi.put(name_doc,0);
+                        firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created").document().set(mapi)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(Ranking_type_poll.this, "document added to users", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(Ranking_type_poll.this, "Failed to add document", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }
                 }
+
             }
         });
-
 
     }
     public void showDialog(Activity activity, final RadioButton button){
@@ -175,15 +225,14 @@ public class Multiple_type_poll extends AppCompatActivity {
                 name=text.getEditText().getText().toString();
                 if(name.isEmpty())
                 {
-                   text.setError("Please enter tit");
-                   text.requestFocus();
+                    text.setError("Please enter tit");
+                    text.requestFocus();
                 }
                 else {
                     button.setText(name);
                     Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
                     dialog.dismiss();
                 }
-
             }
         });
 
@@ -203,7 +252,7 @@ public class Multiple_type_poll extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item){
         if(item.getItemId()==R.id.edit){
             //Toast.makeText(getApplicationContext(),"calling code",Toast.LENGTH_LONG).show();
-            showDialog(Multiple_type_poll.this,b);
+            showDialog(Ranking_type_poll.this,b);
         }
         else if(item.getItemId()==R.id.delete){
             group.removeView(b);
@@ -213,5 +262,12 @@ public class Multiple_type_poll extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(listener);
+
     }
 }
