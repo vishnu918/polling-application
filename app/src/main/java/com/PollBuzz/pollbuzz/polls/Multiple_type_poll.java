@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -19,6 +20,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.Polldetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -158,6 +160,8 @@ public class Multiple_type_poll extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         Toast.makeText(Multiple_type_poll.this, "document added to users", Toast.LENGTH_SHORT).show();
+                                        Intent i=new Intent(Multiple_type_poll.this, MainActivity.class);
+                                        startActivity(i);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
