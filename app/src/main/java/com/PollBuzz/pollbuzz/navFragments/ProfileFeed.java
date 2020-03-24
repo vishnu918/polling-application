@@ -1,19 +1,28 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.karumi.dexter.Dexter;
@@ -45,6 +54,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import Utils.ImagePickerActivity;
@@ -53,17 +63,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ProfileFeed extends Fragment {
     MaterialTextView Uname;
     ImageView pPic;
     ImageButton edit;
-    FirebaseFirestore db;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     StorageReference mStorage;
     Uri uri;
-
+    RecyclerView profileRV;
+    ProfileFeedAdapter mAdapter;
+    ArrayList<Polldetails> mArrayList;
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private CollectionReference userColRef, pollsColRef;
+    private DocumentReference userDocRef;
     public ProfileFeed() {
         // Required empty public constructor
     }
@@ -87,14 +103,50 @@ public class ProfileFeed extends Fragment {
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        db = FirebaseFirestore.getInstance();
+
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        userDocRef = firebaseFirestore.collection("Users").document(mUser.getUid());
+        userColRef = userDocRef.collection("Created");
+        pollsColRef = firebaseFirestore.collection("Polls");
         mStorage = FirebaseStorage.getInstance().getReference();
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);
         pPic = view.findViewById(R.id.profilePic);
+        profileRV = view.findViewById(R.id.profileRV);
+        mArrayList = new ArrayList<>();
+        mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        profileRV.setAdapter(mAdapter);
+        profileRV.setLayoutManager(linearLayoutManager);
+        userColRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    for (QueryDocumentSnapshot dS : task.getResult()) {
+                        if (dS.get("pollId") != null)
+                            pollsColRef.document(dS.get("pollId").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        DocumentSnapshot dS1 = task.getResult();
+                                        if (dS1.exists()) {
+                                            Polldetails polldetails = dS1.toObject(Polldetails.class);
+                                            mArrayList.add(polldetails);
+                                            mAdapter.notifyDataSetChanged();
+                                        }
+                                    } else {
+                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                    }
+                }
+            }
+        });
         String imagePath = Utils.helper.getpPicPref(getContext());
+        Log.d("imagePAth", imagePath);
         if (imagePath != null) {
             Glide.with(this)
                     .load(imagePath)
@@ -158,9 +210,11 @@ public class ProfileFeed extends Fragment {
                     .transform(new CircleCrop())
                     .into(pPic);
             Utils.helper.setpPicPref(getContext(), mUser.getPhotoUrl().toString());
+            userDocRef.update("pic", mUser.getPhotoUrl().toString());
         } else {
             pPic.setImageResource(R.drawable.ic_person_black_24dp);
             Utils.helper.setpPicPref(getContext(), null);
+            userDocRef.update("pic", null);
         }
         StorageReference mRef = mStorage.child("images/" + mUser.getUid());
         mRef.delete();
@@ -240,6 +294,7 @@ public class ProfileFeed extends Fragment {
                                         .transform(new CircleCrop())
                                         .into(pPic);
                                 helper.setpPicPref(getContext(), imagePath);
+                                userDocRef.update("pic", imagePath);
                             }
                         });
                     }

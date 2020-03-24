@@ -1,14 +1,22 @@
 package com.PollBuzz.pollbuzz.polls;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.R;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,11 +41,14 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Single_type_poll extends AppCompatActivity {
     Button add;
@@ -137,11 +148,15 @@ public class Single_type_poll extends AppCompatActivity {
                         polldetails.setMap(map);
                         polldetails.setPoll_type("SINGLE ANSWER POLL");
                         polldetails.setCreated_date(formattedDate);
+                        CollectionReference docCreated = fb.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created");
                         DocumentReference doc = fb.collection("Polls").document();
                         doc.set(polldetails)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+                                        Map<String,String> m=new HashMap<>();
+                                        m.put("pollId",doc.getId());
+                                        docCreated.document().set(m);
                                         Toast.makeText(Single_type_poll.this, "Added to database", Toast.LENGTH_SHORT).show();
                                     }
                                 })

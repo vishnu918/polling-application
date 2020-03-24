@@ -31,6 +31,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -161,11 +162,15 @@ public class Ranking_type_poll extends AppCompatActivity {
                         }
                         polldetails.setMap(map);
                         polldetails.setPoll_type("PRIORITY POLL");
+                        CollectionReference docCreated = firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created");
                         DocumentReference doc = firebaseFirestore.collection("Polls").document();
                         doc.set(polldetails)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
+                                        Map<String,String> m=new HashMap<>();
+                                        m.put("pollId",doc.getId());
+                                        docCreated.document().set(m);
                                         Toast.makeText(Ranking_type_poll.this, "Added Successfully", Toast.LENGTH_SHORT).show();
                                     }
                                 })

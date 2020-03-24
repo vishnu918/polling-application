@@ -17,7 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".results.Single_type_result"></activity>
+        <activity android:name=".results.Single_type_result"/>
+        <activity android:name=".navFragments.VotedFeed"/>
         <activity android:name=".navFragments.HomeFeed" />
         <activity android:name=".responses.Multiple_type_response" />
         <activity android:name=".responses.Descriptive_type_response" />

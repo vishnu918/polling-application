@@ -1,24 +1,14 @@
 package com.PollBuzz.pollbuzz;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import com.PollBuzz.pollbuzz.navFragments.HomeFeed;
+import com.PollBuzz.pollbuzz.navFragments.ProfileFeed;
+import com.PollBuzz.pollbuzz.navFragments.VotedFeed;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -37,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
         auth=FirebaseAuth.getInstance();
         bottomBar = findViewById(R.id.bottom);
         container=findViewById(R.id.container);
-        HomeFeed homeFeed=new HomeFeed();
         openFragment(new HomeFeed());
         bottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
@@ -47,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
                         openFragment(new HomeFeed());
                         break;
                     case 1:
-//                        openFragment(new com.PollBuzz.pollbuzz.ProfileFeed());
+                        openFragment(new VotedFeed());
                         break;
                     case 2:
-                        openFragment(new com.PollBuzz.pollbuzz.navFragments.ProfileFeed());
+                        openFragment(new ProfileFeed());
                         break;
                 }
             }
@@ -60,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     public void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, fragment);
-        transaction.addToBackStack(null);
         transaction.commit();
     }
 }
