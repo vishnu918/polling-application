@@ -10,10 +10,13 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -30,6 +33,7 @@ public class Descriptive_type_response extends AppCompatActivity {
     FirebaseAuth.AuthStateListener listener;
     FirebaseFirestore db;
     CollectionReference ref;
+    TextInputLayout answer;
 
 
 
@@ -61,8 +65,10 @@ public class Descriptive_type_response extends AppCompatActivity {
         title=findViewById(R.id.title);
         submit=findViewById(R.id.submit);
         query=findViewById(R.id.query);
+        answer=findViewById(R.id.answer);
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Descriptive_type_response.this);
+        showDialog();
         listener=new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -77,6 +83,21 @@ public class Descriptive_type_response extends AppCompatActivity {
         };
 
 
+    }
+    private void showDialog()
+    {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.loading_dialog);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+
+        dialog.setCancelable(false);
+        dialog.show();
+        window.setAttributes(lp);
     }
     @Override
     protected void onStart() {
