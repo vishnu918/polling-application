@@ -7,6 +7,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
@@ -14,18 +15,24 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
 import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.Polldetails;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.responses.Single_type_response;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +49,8 @@ public class Single_type_result extends AppCompatActivity {
     FirebaseAuth auth;
     ImageButton home,logout;
     FirebaseAuth.AuthStateListener listener;
-    Map<String,Integer> response;
+    Map<String, Object> response;
+    ArrayList<String> answers;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +80,9 @@ public class Single_type_result extends AppCompatActivity {
         db=FirebaseFirestore.getInstance();
         options=new HashMap<>();
         response=new HashMap<>();
-        key= "HuIbrwZXR6piG0uSBWWc";
+        key= "XPkv84bvWMRXX4mEM97j";
         uid="3fpFZ9pGKASP570h8BVBFn5UBDH2";
+
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Single_type_result.this);
         showDialog();
@@ -90,6 +99,48 @@ public class Single_type_result extends AppCompatActivity {
 
             }
         };
+        db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                             @Override
+                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+
+
+                                                                                 if (task.isSuccessful()) {
+
+                                                                                     DocumentSnapshot data = task.getResult();
+                                                                                     if(data.exists())
+                                                                                     {   group.removeAllViews();
+                                                                                         dialog.dismiss();
+                                                                                         Polldetails polldetails=data.toObject(Polldetails.class);
+                                                                                         title.setText(polldetails.getTitle());
+                                                                                         title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+                                                                                         query.setText(polldetails.getQuestion());
+                                                                                         options=polldetails.getMap();
+                                                                                         db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                             @Override
+                                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                                 if(task.isSuccessful())
+                                                                                                 {
+                                                                                                     DocumentSnapshot data = task.getResult();
+                                                                                                     if(data.exists())
+                                                                                                     {
+                                                                                                         response=data.getData();
+                                                                                                         setOptions();
+                                                                                                     }
+                                                                                                 }
+
+                                                                                             }
+                                                                                         });
+
+
+
+                                                                                     }
+                                                                                 }
+
+                                                                             }
+                                                                         }
+                                                                         );
+
 
     }
     private void showDialog()
@@ -112,5 +163,49 @@ public class Single_type_result extends AppCompatActivity {
         super.onStart();
         auth.addAuthStateListener(listener);
 
+    }
+    private void setOptions()
+    {
+
+        for(Map.Entry<String,Object> entry: response.entrySet())
+        {
+            String key=entry.getKey();
+            if(options.containsKey(key))
+            {
+                options.remove(key);
+                options.put(key,1);
+            }
+        }
+        for(Map.Entry<String,Integer> entry : options.entrySet())
+        {
+            RadioButton button=new RadioButton(getApplicationContext());
+            RadioGroup.LayoutParams layoutParams=new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,RadioGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(5,20,5,20);
+            button.setLayoutParams(layoutParams);
+            button.setTypeface(typeface);
+            button.setText(entry.getKey());
+            button.setTextSize(20.0f);
+            group.addView(button);
+            if(entry.getValue()==1)
+                button.setChecked(true);
+            else
+                button.setEnabled(false);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    RadioButton b=(RadioButton)v;
+                    if(entry.getValue()==1)
+                    {
+                        b.setChecked(true);
+                        if(b.isChecked()==false)
+                            b.setChecked(true);
+                    }
+
+                        else
+                            b.setChecked(false);
+                }
+            });
+        }
+        dialog.dismiss();
     }
 }
