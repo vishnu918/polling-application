@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -59,6 +60,7 @@ public class Multiple_type_response extends AppCompatActivity {
         View view =getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
+        key="AKG63rW1U4GlYySL0OPB";
         c=0;
         home.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,17 +108,19 @@ public class Multiple_type_response extends AppCompatActivity {
 
                     DocumentSnapshot data = task.getResult();
                     if(data.exists())
-                    {   group.removeAllViews();
+                    {
+
                     dialog.dismiss();
                     Polldetails polldetails=data.toObject(Polldetails.class);
                     title.setText(polldetails.getTitle());
                     title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                     query.setText(polldetails.getQuestion());
                     options=polldetails.getMap();
-
+                    group.removeAllViews();
+                        response.clear();
                     for(Map.Entry<String,Integer> entry : options.entrySet())
                     {
-                        RadioButton button=new RadioButton(getApplicationContext());
+                        CheckBox button=new CheckBox(getApplicationContext());
                         LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
                         layoutParams.setMargins(5,20,5,20);
                         button.setLayoutParams(layoutParams);
@@ -128,7 +132,7 @@ public class Multiple_type_response extends AppCompatActivity {
                         button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                RadioButton b=(RadioButton)v;
+                                CheckBox b=(CheckBox) v;
                                 if(b.isChecked())
                                     response.put(b.getText().toString(),0);
                                 else
