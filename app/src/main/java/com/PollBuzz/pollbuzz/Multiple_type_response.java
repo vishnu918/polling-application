@@ -80,7 +80,7 @@ public class Multiple_type_response extends AppCompatActivity {
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Multiple_type_response.this);
-       // showDialog();
+        //showDialog();
         auth = FirebaseAuth.getInstance();
         listener=new FirebaseAuth.AuthStateListener() {
             @Override
@@ -163,6 +163,12 @@ public class Multiple_type_response extends AppCompatActivity {
 
 
 
+
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(listener);
 
     }
 }
