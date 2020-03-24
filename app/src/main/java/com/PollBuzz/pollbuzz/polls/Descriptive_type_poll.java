@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.Polldetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -98,6 +100,8 @@ public class Descriptive_type_poll extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         Toast.makeText(Descriptive_type_poll.this, "document added to users", Toast.LENGTH_SHORT).show();
+                                        Intent i=new Intent(Descriptive_type_poll.this, MainActivity.class);
+                                        startActivity(i);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
