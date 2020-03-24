@@ -1,14 +1,18 @@
 package com.PollBuzz.pollbuzz;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.card.MaterialCardView;
+
+import com.PollBuzz.pollbuzz.polls.Image_type_poll;
+import com.PollBuzz.pollbuzz.responses.Multiple_type_response;
+import com.PollBuzz.pollbuzz.responses.Single_type_response;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.material.card.MaterialCardView;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Poll_list extends AppCompatActivity {
 
@@ -34,7 +38,7 @@ public class Poll_list extends AppCompatActivity {
         card1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this,Single_type_poll.class);
+                Intent intent = new Intent(Poll_list.this, Single_type_response.class);
                 startActivity(intent);
             }
         });
@@ -42,7 +46,7 @@ public class Poll_list extends AppCompatActivity {
         card2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this,Multiple_type_poll.class);
+                Intent intent = new Intent(Poll_list.this, Multiple_type_response.class);
                 startActivity(intent);
             }
         });
@@ -58,7 +62,7 @@ public class Poll_list extends AppCompatActivity {
         card4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this,Ranking_type_poll.class);
+                Intent intent = new Intent(Poll_list.this, Ranking_type_poll.class);
                 startActivity(intent);
             }
         });
@@ -66,7 +70,7 @@ public class Poll_list extends AppCompatActivity {
         card5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Poll_list.this,Image_type_poll.class);
+                Intent intent = new Intent(Poll_list.this, Image_type_poll.class);
                 startActivity(intent);
             }
         });

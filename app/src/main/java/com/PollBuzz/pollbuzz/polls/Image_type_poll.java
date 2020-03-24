@@ -1,10 +1,9 @@
-package com.PollBuzz.pollbuzz;
+package com.PollBuzz.pollbuzz.polls;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,13 +13,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.squareup.picasso.Picasso;
 
-import java.io.File;
+import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.R;
+import com.squareup.picasso.Picasso;
 
 public class Image_type_poll extends AppCompatActivity {
     Button add;

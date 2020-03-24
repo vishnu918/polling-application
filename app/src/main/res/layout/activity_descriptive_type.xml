@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Descriptive_type_poll"
+    tools:context=".polls.Descriptive_type_poll"
     android:orientation="vertical">
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

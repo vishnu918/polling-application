@@ -8,57 +8,59 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.PollBuzz.pollbuzz.navFragments.HomeFeed;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import me.ibrahimsn.lib.OnItemSelectedListener;
+import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseAuth auth;
-    MaterialButton button;
+    SmoothBottomBar bottomBar;
+    FrameLayout container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         auth=FirebaseAuth.getInstance();
-        button = findViewById(R.id.click);
-
-        button.setOnClickListener(new View.OnClickListener() {
+        bottomBar = findViewById(R.id.bottom);
+        container=findViewById(R.id.container);
+        HomeFeed homeFeed=new HomeFeed();
+        openFragment(new HomeFeed());
+        bottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                Intent i=new Intent(MainActivity.this,Poll_list.class);
-                startActivity(i);
+            public void onItemSelect(int i) {
+                switch (i) {
+                    case 0:
+                        openFragment(new HomeFeed());
+                        break;
+                    case 1:
+//                        openFragment(new com.PollBuzz.pollbuzz.ProfileFeed());
+                        break;
+                    case 2:
+                        openFragment(new com.PollBuzz.pollbuzz.ProfileFeed());
+                        break;
+                }
             }
         });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
-        return true;
     }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==R.id.logOut){
-            logOut();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void logOut() {
-        if(auth.getCurrentUser()!=null) {
-            Utils.helper.removeProfileSetUpPref(getApplicationContext());
-            auth.signOut();
-            Intent i=new Intent(this,Login_Signup_Activity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-        }
+    public void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }
