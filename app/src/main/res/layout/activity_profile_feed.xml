@@ -20,26 +20,25 @@
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|snap"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
                 app:titleEnabled="false">
 
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="45dp">
+                    android:orientation="vertical">
 
-<!--                <com.google.android.material.textview.MaterialTextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginStart="15dp"-->
-<!--                        android:layout_marginLeft="15dp"-->
-<!--                        android:layout_marginTop="10dp"-->
-<!--                        android:fontFamily="@font/maven_pro"-->
-<!--                        android:text="Profile"-->
-<!--                        android:textColor="@color/white"-->
-<!--                        android:textSize="22sp"-->
-<!--                        android:textStyle="bold" />-->
+                <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/maven_pro"
+                        android:text="Profile"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
                 <RelativeLayout
                         android:id="@+id/relativeL"
@@ -86,28 +85,28 @@
                         android:textSize="20sp"
                         android:textStyle="bold" />
             </LinearLayout>
-                        <androidx.appcompat.widget.Toolbar
-                                android:id="@+id/htab_toolbar"
-                                android:layout_width="match_parent"
-                                android:layout_height="?actionBarSize"
-                                android:layout_gravity="top"
-                                app:layout_collapseMode="parallax"
-                                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                                app:title="Profile"/>
+            <!--            <androidx.appcompat.widget.Toolbar-->
+            <!--                    android:id="@+id/htab_toolbar"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="?actionBarSize"-->
+            <!--                    android:minHeight="0dp"-->
+            <!--                    android:layout_gravity="top"-->
+            <!--                    app:layout_collapseMode="parallax"-->
+            <!--                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
+            <!--                    app:title="Profile"/>-->
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         <androidx.appcompat.widget.Toolbar
-                android:id="@+id/htab_toolbar2"
+                android:id="@+id/htab_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="?attr/actionBarSize"
                 android:layout_gravity="top"
                 app:layout_collapseMode="parallax"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:title="Your Polls" />
+                app:title="Voted Polls" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
-            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"

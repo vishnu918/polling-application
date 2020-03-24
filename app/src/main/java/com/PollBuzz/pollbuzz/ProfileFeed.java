@@ -22,6 +22,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -29,12 +30,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -48,10 +44,9 @@ import Utils.ImagePickerActivity;
 import Utils.helper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class ProfileFeed extends Fragment {
+public class ProfileFeed extends AppCompatActivity {
     MaterialTextView Uname;
     ImageView pPic;
     ImageButton edit;
@@ -61,46 +56,36 @@ public class ProfileFeed extends Fragment {
     StorageReference mStorage;
     Uri uri;
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.activity_profile_feed, container, false);
-        return v;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(true);
-//        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Your Polls");
-        Toolbar toolbar = view.findViewById(R.id.htab_toolbar);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile_feed);
+//        Toolbar toolbar=findViewById(R.id.htab_toolbar);
 //        setSupportActionBar(toolbar);
-        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
-
-        if (((MainActivity) getActivity()).getSupportActionBar() != null) {
-            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-            ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+//        if(getSupportActionBar()!=null){
+//            getSupportActionBar().setDisplayShowHomeEnabled(true);
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        }
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mStorage = FirebaseStorage.getInstance().getReference();
-        Uname = view.findViewById(R.id.username);
-        edit = view.findViewById(R.id.edit);
-        pPic = view.findViewById(R.id.profilePic);
-        String imagePath = Utils.helper.getpPicPref(getContext());
+        Uname = findViewById(R.id.username);
+        edit = findViewById(R.id.edit);
+        pPic = findViewById(R.id.profilePic);
+        String imagePath=Utils.helper.getpPicPref(getApplicationContext());
         if (imagePath != null) {
             Glide.with(this)
                     .load(imagePath)
                     .transform(new CircleCrop())
                     .into(pPic);
         }
-        Uname.setText(Utils.helper.getusernamePref(getContext()));
+        Uname.setText(Utils.helper.getusernamePref(getApplicationContext()));
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    Dexter.withActivity(getActivity())
+                    Dexter.withActivity(ProfileFeed.this)
                             .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             .withListener(new MultiplePermissionsListener() {
                                 @Override
@@ -125,9 +110,8 @@ public class ProfileFeed extends Fragment {
             }
         });
     }
-
     private void showImagePickerOptions() {
-        ImagePickerActivity.showImagePickerOptions(getContext(), new ImagePickerActivity.PickerOptionListener() {
+        ImagePickerActivity.showImagePickerOptions(this, new ImagePickerActivity.PickerOptionListener() {
             @Override
             public void onTakeCameraSelected() {
                 launchCameraIntent();
@@ -151,17 +135,17 @@ public class ProfileFeed extends Fragment {
                     .load(mUser.getPhotoUrl())
                     .transform(new CircleCrop())
                     .into(pPic);
-            Utils.helper.setpPicPref(getContext(), mUser.getPhotoUrl().toString());
+            Utils.helper.setpPicPref(getApplicationContext(), mUser.getPhotoUrl().toString());
         } else {
             pPic.setImageResource(R.drawable.ic_person_black_24dp);
-            Utils.helper.setpPicPref(getContext(), null);
+            Utils.helper.setpPicPref(getApplicationContext(), null);
         }
         StorageReference mRef = mStorage.child("images/" + mUser.getUid());
         mRef.delete();
     }
 
     private void launchCameraIntent() {
-        Intent intent = new Intent(getActivity(), ImagePickerActivity.class);
+        Intent intent = new Intent(ProfileFeed.this, ImagePickerActivity.class);
         intent.putExtra(ImagePickerActivity.INTENT_IMAGE_PICKER_OPTION, ImagePickerActivity.REQUEST_IMAGE_CAPTURE);
 
         // setting aspect ratio
@@ -178,7 +162,7 @@ public class ProfileFeed extends Fragment {
     }
 
     private void launchGalleryIntent() {
-        Intent intent = new Intent(getActivity(), ImagePickerActivity.class);
+        Intent intent = new Intent(ProfileFeed.this, ImagePickerActivity.class);
         intent.putExtra(ImagePickerActivity.INTENT_IMAGE_PICKER_OPTION, ImagePickerActivity.REQUEST_GALLERY_IMAGE);
 
         // setting aspect ratio
@@ -189,14 +173,14 @@ public class ProfileFeed extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
             if (resultCode == Activity.RESULT_OK) {
                 uri = data.getParcelableExtra("path");
                 try {
                     // You can update this bitmap to your server
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
                     // loading profile image from local cache
 
                     loadProfile(uri);
@@ -212,7 +196,7 @@ public class ProfileFeed extends Fragment {
         Bitmap bmp = null;
         byte[] dataCompressed = new byte[0];
         try {
-            bmp = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
+            bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bmp.compress(Bitmap.CompressFormat.JPEG, 40, baos);
             dataCompressed = baos.toByteArray();
@@ -233,7 +217,7 @@ public class ProfileFeed extends Fragment {
                                         .load(imagePath)
                                         .transform(new CircleCrop())
                                         .into(pPic);
-                                helper.setpPicPref(getContext(), imagePath);
+                                helper.setpPicPref(getApplicationContext(),imagePath);
                             }
                         });
                     }
@@ -242,7 +226,7 @@ public class ProfileFeed extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         exception.printStackTrace();
-                        Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfileFeed.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
                         Log.d("Exception", exception.toString());
                     }
                 })
@@ -252,12 +236,12 @@ public class ProfileFeed extends Fragment {
                         double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                     }
                 });
-        deleteDir(getContext().getCacheDir());
-        deleteDir(getContext().getExternalCacheDir());
+        deleteDir(getApplicationContext().getCacheDir());
+        deleteDir(getApplicationContext().getExternalCacheDir());
     }
 
     private void showSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProfileFeed.this);
         builder.setTitle("Grant Permissions");
         builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.");
         builder.setPositiveButton("Go to settings", (dialog, which) -> {
@@ -272,7 +256,7 @@ public class ProfileFeed extends Fragment {
     // navigating user to app settings
     private void openSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
         intent.setData(uri);
         startActivityForResult(intent, 101);
     }
@@ -296,30 +280,6 @@ public class ProfileFeed extends Fragment {
             return dir.delete();
         } else {
             return false;
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        menu.clear();
-        inflater.inflate(R.menu.main_menu,menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.logOut) {
-            logOut();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void logOut() {
-        if (mAuth.getCurrentUser() != null) {
-            Utils.helper.removeProfileSetUpPref(getContext());
-            mAuth.signOut();
-            Intent i = new Intent(getActivity(), Login_Signup_Activity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
         }
     }
 }
