@@ -154,11 +154,9 @@ public class Multiple_type_response extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println(response);
-
+                Toast.makeText(Multiple_type_response.this, "Your answers are submitted", Toast.LENGTH_SHORT).show();
 
                 ref.document(auth.getCurrentUser().getUid()).set(response);
-
                 db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
                 Intent i=new Intent(Multiple_type_response.this,MainActivity.class);
                 startActivity(i);
