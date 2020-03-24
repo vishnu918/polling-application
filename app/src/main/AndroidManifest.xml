@@ -18,9 +18,8 @@
         android:theme="@style/AppTheme"
         tools:targetApi="q">
         <activity android:name=".Multiple_type_response"></activity>
-        <activity
-            android:name=".ProfileFeed"
-            android:theme="@style/NoActionBar"></activity>
+        <activity android:name=".ProfileFeed">
+        </activity>
         <activity android:name=".Single_type_response" />
         <activity android:name="Utils.ImagePickerActivity" />
         <activity android:name=".AuthCheck">
@@ -37,7 +36,7 @@
         <activity android:name=".Poll_list" />
         <activity android:name=".Single_type_poll" />
         <activity android:name=".ProfileSetUp" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity" android:theme="@style/NoActionBar"/>
         <activity android:name=".Login_Signup_Activity" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
