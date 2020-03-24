@@ -67,7 +67,6 @@ public class ProfileSetUp extends AppCompatActivity {
     int flag = 1;
     int age = 0;
     String gender = null;
-    String imagePath = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +89,6 @@ public class ProfileSetUp extends AppCompatActivity {
                     .load(mUser.getPhotoUrl())
                     .transform(new CircleCrop())
                     .into(pPic);
-            imagePath = mUser.getPhotoUrl().getPath();
         }
         male = findViewById(R.id.male);
         female = findViewById(R.id.female);
@@ -224,10 +222,8 @@ public class ProfileSetUp extends AppCompatActivity {
                     .load(mUser.getPhotoUrl())
                     .transform(new CircleCrop())
                     .into(pPic);
-            imagePath = mUser.getPhotoUrl().getPath();
         } else {
             pPic.setImageResource(R.drawable.ic_person_black_24dp);
-            imagePath = null;
         }
     }
 
@@ -314,7 +310,10 @@ public class ProfileSetUp extends AppCompatActivity {
             data.put("age", String.valueOf(age));
             data.put("gender", gender);
             if (uri == null) {
-                data.put("pic", null);
+                if (mUser.getPhotoUrl() == null)
+                    data.put("pic", null);
+                else
+                    data.put("pic", mUser.getPhotoUrl().toString());
                 db.collection("Users")
                         .document(mUser.getUid())
                         .set(data)
@@ -323,6 +322,11 @@ public class ProfileSetUp extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Utils.helper.setProfileSetUpPref(getApplicationContext(), true);
+                                    if (mUser.getPhotoUrl() == null)
+                                        Utils.helper.setpPicPref(getApplicationContext(), null);
+                                    else
+                                        Utils.helper.setpPicPref(getApplicationContext(), mUser.getPhotoUrl().toString());
+                                    Utils.helper.setusernamePref(getApplicationContext(), UnameS);
                                     progressDialog.dismiss();
                                     Intent i = new Intent(ProfileSetUp.this, MainActivity.class);
                                     i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -354,7 +358,7 @@ public class ProfileSetUp extends AppCompatActivity {
                                 mRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
-                                        imagePath = uri.toString();
+                                        String imagePath = uri.toString();
                                         data.put("pic", imagePath);
                                         db.collection("Users")
                                                 .document(mUser.getUid())
@@ -364,9 +368,10 @@ public class ProfileSetUp extends AppCompatActivity {
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
                                                             Utils.helper.setProfileSetUpPref(getApplicationContext(), true);
+                                                            Utils.helper.setpPicPref(getApplicationContext(), imagePath);
+                                                            Utils.helper.setusernamePref(getApplicationContext(), UnameS);
                                                             deleteDir(getApplicationContext().getCacheDir());
                                                             deleteDir(getApplicationContext().getExternalCacheDir());
-                                                            progressDialog.dismiss();
                                                             Intent i = new Intent(ProfileSetUp.this, MainActivity.class);
                                                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                                             startActivity(i);
@@ -393,6 +398,7 @@ public class ProfileSetUp extends AppCompatActivity {
                                 double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                             }
                         });
+                progressDialog.dismiss();
             }
         }
     }
