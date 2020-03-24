@@ -11,6 +11,8 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -80,7 +82,7 @@ public class Multiple_type_response extends AppCompatActivity {
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Multiple_type_response.this);
-        //showDialog();
+        showDialog();
         auth = FirebaseAuth.getInstance();
         listener=new FirebaseAuth.AuthStateListener() {
             @Override
@@ -164,6 +166,21 @@ public class Multiple_type_response extends AppCompatActivity {
 
 
 
+    }
+    private void showDialog()
+    {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.loading_dialog);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+
+        dialog.setCancelable(false);
+        dialog.show();
+        window.setAttributes(lp);
     }
     @Override
     protected void onStart() {
