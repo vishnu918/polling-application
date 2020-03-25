@@ -1,9 +1,17 @@
 package com.PollBuzz.pollbuzz.results;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.R;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -13,28 +21,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
-import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.responses.Single_type_response;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 public class Single_type_result extends AppCompatActivity {
     TextView title, query;
@@ -99,49 +98,36 @@ public class Single_type_result extends AppCompatActivity {
 
             }
         };
-        db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                             @Override
-                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+        db.collection("Polls")
+                .document(key).get()
+                .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot data = task.getResult();
+                                if (data.exists()) {
+                                    group.removeAllViews();
+                                    dialog.dismiss();
+                                    Polldetails polldetails = data.toObject(Polldetails.class);
+                                    title.setText(polldetails.getTitle());
+                                    title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                                    query.setText(polldetails.getQuestion());
+                                    options = polldetails.getMap();
+                                    db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot data = task.getResult();
+                                                if (data.exists()) {
+                                                    response = data.getData();
+                                                    setOptions();
+                                                }
+                                            }
 
-
-
-                                                                                 if (task.isSuccessful()) {
-
-                                                                                     DocumentSnapshot data = task.getResult();
-                                                                                     if(data.exists())
-                                                                                     {   group.removeAllViews();
-                                                                                         dialog.dismiss();
-                                                                                         Polldetails polldetails=data.toObject(Polldetails.class);
-                                                                                         title.setText(polldetails.getTitle());
-                                                                                         title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-                                                                                         query.setText(polldetails.getQuestion());
-                                                                                         options=polldetails.getMap();
-                                                                                         db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                                             @Override
-                                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                                                 if(task.isSuccessful())
-                                                                                                 {
-                                                                                                     DocumentSnapshot data = task.getResult();
-                                                                                                     if(data.exists())
-                                                                                                     {
-                                                                                                         response=data.getData();
-                                                                                                         setOptions();
-                                                                                                     }
-                                                                                                 }
-
-                                                                                             }
-                                                                                         });
-
-
-
-                                                                                     }
-                                                                                 }
-
-                                                                             }
-                                                                         }
-                                                                         );
-
-
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                );
     }
     private void showDialog()
     {

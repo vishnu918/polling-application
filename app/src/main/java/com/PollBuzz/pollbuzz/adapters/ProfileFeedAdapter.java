@@ -1,7 +1,12 @@
 package com.PollBuzz.pollbuzz.adapters;
 
+import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.results.ResultActivity;
+import com.PollBuzz.pollbuzz.results.Single_type_result;
+
 import android.content.Context;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +15,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.PollBuzz.pollbuzz.Polldetails;
-import com.PollBuzz.pollbuzz.R;
 
 public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.ProfileViewHolder> {
 
@@ -44,6 +47,16 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
         holder.card_author.setText("hello");
         if(mPolldetails.get(position).getCreated_date()!=null)
             holder.card_date.setText(mPolldetails.get(position).getCreated_date().trim());
+
+        holder.cardV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, ResultActivity.class);
+                intent.putExtra("UID", mPolldetails.get(position).getUID());
+                intent.putExtra("type",mPolldetails.get(position).getPoll_type());
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -53,10 +66,12 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
 
     public static class ProfileViewHolder extends RecyclerView.ViewHolder {
 
+        private CardView cardV;
         public TextView card_title, card_type, card_query, card_author, card_date;
 
         public ProfileViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardV = itemView.findViewById(R.id.cardV);
             card_title = itemView.findViewById(R.id.card_title);
             card_type = itemView.findViewById(R.id.card_type);
             card_query = itemView.findViewById(R.id.card_query);

@@ -4,7 +4,21 @@ import java.util.Map;
 
 public class Polldetails {
 
-    private String title, question, created_date, expiry_date,poll_type;
+    private String UID;
+
+    public void setUID(String UID) {
+        this.UID = UID;
+    }
+
+    public String getUID() {
+        return UID;
+    }
+
+    private String title;
+    private String question;
+    private String created_date;
+    private String expiry_date;
+    private String poll_type;
     private Map<String,Integer> map;
 
     public Map<String, Integer> getMap() {

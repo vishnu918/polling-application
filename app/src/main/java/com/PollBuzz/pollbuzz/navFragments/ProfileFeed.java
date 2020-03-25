@@ -56,6 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import Utils.ImagePickerActivity;
 import Utils.helper;
@@ -133,6 +134,7 @@ public class ProfileFeed extends Fragment {
                                         DocumentSnapshot dS1 = task.getResult();
                                         if (dS1.exists()) {
                                             Polldetails polldetails = dS1.toObject(Polldetails.class);
+                                            polldetails.setUID(dS1.getId());
                                             mArrayList.add(polldetails);
                                             mAdapter.notifyDataSetChanged();
                                         }
