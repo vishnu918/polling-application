@@ -152,24 +152,6 @@ public class Multiple_type_poll extends AppCompatActivity {
                                         Toast.makeText(Multiple_type_poll.this, "Unable to add try again later", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                        String name_doc = doc.getId();
-                        Map<String,Integer> mapi = new HashMap<>();
-                        mapi.put(name_doc,0);
-                        firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created").document().set(mapi)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(Multiple_type_poll.this, "document added to users", Toast.LENGTH_SHORT).show();
-                                        Intent i=new Intent(Multiple_type_poll.this, MainActivity.class);
-                                        startActivity(i);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(Multiple_type_poll.this, "Failed to add document", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
                     }
                 }
             }
