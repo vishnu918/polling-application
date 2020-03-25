@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".results.Descriptive_type_result"></activity>
+        <activity android:name=".responses.Image_type_responses"></activity>
+        <activity android:name=".responses.Ranking_type_response" />
+        <activity android:name=".results.Descriptive_type_result" />
         <activity android:name=".results.Multiple_type_result" />
         <activity android:name=".results.Single_type_result" />
         <activity android:name=".navFragments.VotedFeed" />
@@ -25,9 +27,9 @@
         <activity android:name=".responses.Multiple_type_response" />
         <activity android:name=".responses.Descriptive_type_response" />
         <activity android:name=".LogIn_SignUp.ProfileSetUp" />
-        <activity android:name=".responses.Single_type_response" />
+        <activity android:name="Utils.AuthCheck" />
         <activity android:name="Utils.ImagePickerActivity" />
-        <activity android:name="Utils.AuthCheck">
+        <activity android:name=".responses.Single_type_response">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
