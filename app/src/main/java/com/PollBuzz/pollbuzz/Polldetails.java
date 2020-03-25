@@ -4,7 +4,16 @@ import java.util.Map;
 
 public class Polldetails {
 
-    private String title, question, created_date, expiry_date,poll_type;
+    private String title, question, created_date, expiry_date,poll_type, author;
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     private Map<String,Integer> map;
 
     public Map<String, Integer> getMap() {

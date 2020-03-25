@@ -50,6 +50,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import Utils.helper;
+
 public class Single_type_poll extends AppCompatActivity {
     Button add;
     RadioGroup group;
@@ -61,6 +63,7 @@ public class Single_type_poll extends AppCompatActivity {
     Date date = Calendar.getInstance().getTime();
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseFirestore fb = FirebaseFirestore.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,7 @@ public class Single_type_poll extends AppCompatActivity {
         title = findViewById(R.id.title1);
         button = findViewById(R.id.post);
         question = findViewById(R.id.question);
+
 
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         final String formattedDate = df.format(date);
@@ -139,6 +143,7 @@ public class Single_type_poll extends AppCompatActivity {
                         Polldetails polldetails = new Polldetails();
                         polldetails.setTitle(title.getText().toString());
                         polldetails.setQuestion(question.getText().toString());
+                        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                         Map<String,Integer> map = new HashMap<>();
                         for(int i=0; i<group.getChildCount();i++)
                         {
@@ -191,6 +196,8 @@ public class Single_type_poll extends AppCompatActivity {
         });
 
     }
+
+
     public void showDialog(Activity activity, final RadioButton button){
         final Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);

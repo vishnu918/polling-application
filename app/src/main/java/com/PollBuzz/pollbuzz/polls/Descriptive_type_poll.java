@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.helper;
+
 public class Descriptive_type_poll extends AppCompatActivity {
     MaterialButton post_descriptive;
     TextInputLayout title, query;
@@ -74,6 +76,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
                         polldetails.setQuestion(question_descriptive.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
                         polldetails.setPoll_type("DESCRIPTIVE POLL");
+                        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                         CollectionReference docCreated = firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created");
                         DocumentReference doc = firebaseFirestore.collection("Polls").document();
                         doc.set(polldetails)

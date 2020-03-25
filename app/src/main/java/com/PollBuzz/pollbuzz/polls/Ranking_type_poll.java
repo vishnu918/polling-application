@@ -43,6 +43,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.helper;
+
 public class Ranking_type_poll extends AppCompatActivity {
     Button add;
     LinearLayout group;
@@ -154,6 +156,7 @@ public class Ranking_type_poll extends AppCompatActivity {
                         polldetails.setTitle(title_ranking.getText().toString().trim());
                         polldetails.setQuestion(question_ranking.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
+                        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                         Map<String,Integer> map = new HashMap<>();
                         for(int i=0;i<group.getChildCount();i++)
                         {

@@ -39,6 +39,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.helper;
+
 public class Multiple_type_poll extends AppCompatActivity {
     Button add;
     MaterialButton post_multi;
@@ -128,6 +130,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                         polldetails.setQuestion(question_multi.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
                         polldetails.setPoll_type("MULTI ANSWER POLL");
+                        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                         Map<String, Integer> map = new HashMap<>();
                         for (int i = 0; i < group.getChildCount(); i++) {
                             RadioButton v = (RadioButton) group.getChildAt(i);

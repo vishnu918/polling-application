@@ -41,7 +41,9 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.HomeVi
             holder.card_type.setText(mPolldetails.get(position).getPoll_type());
         if(mPolldetails.get(position).getQuestion()!=null)
             holder.card_query.setText(mPolldetails.get(position).getQuestion().trim());
-        holder.card_author.setText("hello");
+        if(mPolldetails.get(position).getAuthor()!=null)
+            holder.card_author.setText((mPolldetails.get(position).getAuthor().trim()));
+
         if(mPolldetails.get(position).getCreated_date()!=null)
         holder.card_date.setText(mPolldetails.get(position).getCreated_date().trim());
     }
