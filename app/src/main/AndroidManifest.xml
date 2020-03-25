@@ -27,16 +27,14 @@
         <activity android:name=".responses.Multiple_type_response" />
         <activity android:name=".responses.Descriptive_type_response" />
         <activity android:name=".LogIn_SignUp.ProfileSetUp" />
-        <activity android:name="Utils.AuthCheck" >
+        <activity android:name="Utils.AuthCheck" />
+        <activity android:name="Utils.ImagePickerActivity" />
+        <activity android:name=".responses.Single_type_response">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name="Utils.ImagePickerActivity" />
-        <activity android:name=".responses.Single_type_response">
-
         </activity>
         <activity android:name=".polls.Image_type_poll" />
         <activity android:name=".polls.Ranking_type_poll" />
