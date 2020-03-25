@@ -13,17 +13,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -91,7 +88,7 @@ public class Ranking_type_response extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Ranking_type_response.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Ranking_type_response.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -107,7 +104,7 @@ public class Ranking_type_response extends AppCompatActivity {
                     if(data.exists())
                     {   group.removeAllViews();
                         dialog.dismiss();
-                        Polldetails polldetails=data.toObject(Polldetails.class);
+                        PollDetails polldetails=data.toObject(PollDetails.class);
                         title_ranking.setText(polldetails.getTitle());
                         title_ranking.setPaintFlags(title_ranking.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                         query_ranking.setText(polldetails.getQuestion());

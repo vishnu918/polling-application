@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -23,7 +23,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.R;
 import com.google.firebase.firestore.CollectionReference;
@@ -125,7 +125,7 @@ public class Image_type_poll extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user == null) {
-                    Intent i = new Intent(Image_type_poll.this, Login_Signup_Activity.class);
+                    Intent i = new Intent(Image_type_poll.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -142,7 +142,7 @@ public class Image_type_poll extends AppCompatActivity {
                     question_image.requestFocus();
                 } else {
                     if (auth.getCurrentUser() != null) {
-                        Polldetails polldetails = new Polldetails();
+                        PollDetails polldetails = new PollDetails();
                         polldetails.setTitle(title_image.getText().toString().trim());
                         polldetails.setQuestion(question_image.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);

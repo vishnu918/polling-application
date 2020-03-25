@@ -28,9 +28,9 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class Multiple_type_response extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Multiple_type_response.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Multiple_type_response.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -113,7 +113,7 @@ public class Multiple_type_response extends AppCompatActivity {
                     {
 
                     dialog.dismiss();
-                    Polldetails polldetails=data.toObject(Polldetails.class);
+                    PollDetails polldetails=data.toObject(PollDetails.class);
                     title.setText(polldetails.getTitle());
                     title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                     query.setText(polldetails.getQuestion());

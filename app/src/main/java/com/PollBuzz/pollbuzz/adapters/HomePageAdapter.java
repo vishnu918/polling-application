@@ -1,7 +1,9 @@
 package com.PollBuzz.pollbuzz.adapters;
 
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +14,14 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.PollBuzz.pollbuzz.Polldetails;
-import com.PollBuzz.pollbuzz.R;
-
 public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.HomeViewHolder> {
 
-    private ArrayList<Polldetails> mPolldetails;
+    private ArrayList<PollDetails> mPollDetails;
     Context mContext;
 
-    public HomePageAdapter(Context mContext, ArrayList<Polldetails> mPolldetails) {
+    public HomePageAdapter(Context mContext, ArrayList<PollDetails> mPollDetails) {
         this.mContext = mContext;
-        this.mPolldetails = mPolldetails;
+        this.mPollDetails = mPollDetails;
     }
 
     @NonNull
@@ -35,22 +34,21 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.HomeVi
 
     @Override
     public void onBindViewHolder(@NonNull HomeViewHolder holder, int position) {
-        if(mPolldetails.get(position).getTitle()!=null)
-        holder.card_title.setText(mPolldetails.get(position).getTitle().trim());
-        if(mPolldetails.get(position).getPoll_type()!=null)
-            holder.card_type.setText(mPolldetails.get(position).getPoll_type());
-        if(mPolldetails.get(position).getQuestion()!=null)
-            holder.card_query.setText(mPolldetails.get(position).getQuestion().trim());
-        if(mPolldetails.get(position).getAuthor()!=null)
-            holder.card_author.setText((mPolldetails.get(position).getAuthor().trim()));
-
-        if(mPolldetails.get(position).getCreated_date()!=null)
-        holder.card_date.setText(mPolldetails.get(position).getCreated_date().trim());
+        if (mPollDetails.get(position).getTitle() != null)
+            holder.card_title.setText(mPollDetails.get(position).getTitle().trim());
+        if (mPollDetails.get(position).getPoll_type() != null)
+            holder.card_type.setText(mPollDetails.get(position).getPoll_type());
+        if (mPollDetails.get(position).getQuestion() != null)
+            holder.card_query.setText(mPollDetails.get(position).getQuestion().trim());
+        if (mPollDetails.get(position).getAuthor() != null)
+            holder.card_author.setText((mPollDetails.get(position).getAuthor().trim()));
+        if (mPollDetails.get(position).getCreated_date() != null)
+            holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
     }
 
     @Override
     public int getItemCount() {
-        return mPolldetails.size();
+        return mPollDetails.size();
     }
 
     public static class HomeViewHolder extends RecyclerView.ViewHolder {

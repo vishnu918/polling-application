@@ -10,12 +10,11 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -27,18 +26,6 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
-import com.PollBuzz.pollbuzz.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -140,7 +127,7 @@ public class Single_type_poll extends AppCompatActivity {
                 else
                 {
                     if(auth.getCurrentUser()!=null) {
-                        Polldetails polldetails = new Polldetails();
+                        PollDetails polldetails = new PollDetails();
                         polldetails.setTitle(title.getText().toString());
                         polldetails.setQuestion(question.getText().toString());
                         polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));

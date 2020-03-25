@@ -5,7 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
-        tools:context="com.PollBuzz.pollbuzz.LogIn_SignUp.ProfileSetUp">
+        tools:context="com.PollBuzz.pollbuzz.LoginSignup.ProfileSetUp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

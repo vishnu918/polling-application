@@ -13,16 +13,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -91,7 +89,7 @@ public class Multiple_type_result extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Multiple_type_result.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Multiple_type_result.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -109,7 +107,7 @@ public class Multiple_type_result extends AppCompatActivity {
                                                                                      if(data.exists())
                                                                                      {   group.removeAllViews();
                                                                                          dialog.dismiss();
-                                                                                         Polldetails polldetails=data.toObject(Polldetails.class);
+                                                                                         PollDetails polldetails=data.toObject(PollDetails.class);
                                                                                          title.setText(polldetails.getTitle());
                                                                                          title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                                                                                          query.setText(polldetails.getQuestion());

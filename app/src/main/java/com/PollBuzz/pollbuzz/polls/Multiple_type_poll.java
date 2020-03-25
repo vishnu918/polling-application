@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -17,11 +16,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -125,7 +122,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                 }
                 else {
                     if (auth.getCurrentUser() != null) {
-                        Polldetails polldetails = new Polldetails();
+                        PollDetails polldetails = new PollDetails();
                         polldetails.setTitle(title_multi.getText().toString().trim());
                         polldetails.setQuestion(question_multi.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);

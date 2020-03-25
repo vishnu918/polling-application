@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.PollBuzz.pollbuzz.Poll_list"
+    tools:context="com.PollBuzz.pollbuzz.PollList"
     android:orientation="vertical"
     android:padding="0dp"
     android:background="@drawable/bg_gradient">
