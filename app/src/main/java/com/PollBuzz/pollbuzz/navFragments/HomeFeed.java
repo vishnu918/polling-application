@@ -1,5 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,6 +19,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -56,6 +60,12 @@ public class HomeFeed extends Fragment {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         adapter = new com.PollBuzz.pollbuzz.adapters.HomePageAdapter(getContext(),arrayList);
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
+        YoYo.with(Techniques.RollIn).duration(1100).playOn(view.findViewById(R.id.text));
+        YoYo.with(Techniques.RollIn).duration(1100).playOn(fab);
+
+
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
@@ -73,7 +83,9 @@ public class HomeFeed extends Fragment {
                     for (QueryDocumentSnapshot dS : task.getResult()) {
                         Polldetails polldetails = dS.toObject(Polldetails.class);
                         arrayList.add(polldetails);
+                        recyclerView.setLayoutAnimation(controller);
                         adapter.notifyDataSetChanged();
+                        recyclerView.scheduleLayoutAnimation();
                     }
                 } else {
                     Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
