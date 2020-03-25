@@ -37,6 +37,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.helper;
+
 public class Image_type_poll extends AppCompatActivity {
     Button add;
     LinearLayout l1,l2,group;
@@ -145,6 +147,7 @@ public class Image_type_poll extends AppCompatActivity {
                         polldetails.setQuestion(question_image.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
                         polldetails.setPoll_type("IMAGE POLL");
+                        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                         Map<String,Integer> map = new HashMap<>();
                         map.put(view1.getTag().toString(),0);
                         map.put(view2.getTag().toString(),0);
