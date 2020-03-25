@@ -7,6 +7,9 @@ public class Userdetails {
     private String Username;
     private int age;
 
+    public Userdetails() {
+    }
+
     public Userdetails(String name, String username, int age) {
         Name = name;
         Username = username;
