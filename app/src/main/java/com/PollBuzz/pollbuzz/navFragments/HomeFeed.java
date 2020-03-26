@@ -1,5 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -13,6 +15,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ public class HomeFeed extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private FloatingActionButton fab;
     private firebase fb;
+    private LayoutAnimationController controller;
 
     public HomeFeed() {
     }
@@ -75,6 +80,10 @@ public class HomeFeed extends Fragment {
         adapter = new HomePageAdapter(getContext(), arrayList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
+        YoYo.with(Techniques.RollIn).duration(1100).playOn(view.findViewById(R.id.text));
+        YoYo.with(Techniques.RollIn).duration(1100).playOn(fab);
         fb = new firebase();
     }
 }
