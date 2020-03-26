@@ -50,7 +50,7 @@ public class Multiple_type_response extends AppCompatActivity {
     FirebaseAuth.AuthStateListener listener;
     Button submit;
     int c;
-    Map<String,Integer> response;
+    Map<String,String> response;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +120,8 @@ public class Multiple_type_response extends AppCompatActivity {
                     options=polldetails.getMap();
                     group.removeAllViews();
                         response.clear();
+
+                        int i=0;
                     for(Map.Entry<String,Integer> entry : options.entrySet())
                     {
                         CheckBox button=new CheckBox(getApplicationContext());
@@ -131,18 +133,20 @@ public class Multiple_type_response extends AppCompatActivity {
                         button.setText(entry.getKey());
                         button.setTextSize(20.0f);
                         group.addView(button);
+                        int finalI = i;
                         button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 CheckBox b=(CheckBox) v;
                                 if(b.isChecked())
-                                    response.put(b.getText().toString(),0);
+                                    response.put("option"+ finalI,b.getText().toString());
                                 else
                                     response.remove(b.getText().toString());
 
 
                             }
                         });
+                        i++;
                     }
                     }
                 }

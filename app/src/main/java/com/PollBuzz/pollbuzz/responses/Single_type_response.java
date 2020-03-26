@@ -51,7 +51,7 @@ public class Single_type_response extends AppCompatActivity {
     FirebaseAuth.AuthStateListener listener;
     Button submit;
     int c;
-    Map<String,Integer> response;
+    Map<String,String> response;
     int b_id;
     String resp;
 
@@ -158,12 +158,11 @@ public class Single_type_response extends AppCompatActivity {
             public void onClick(View v) {
                 RadioButton button=findViewById(b_id);
                 Toast.makeText(getApplicationContext(),resp+" Opted",Toast.LENGTH_LONG).show();
-                options.clear();
-                options.put(resp,0);
+                response.put("option",resp);
 
-                ref.document(auth.getCurrentUser().getUid()).set(options);
+                ref.document(auth.getCurrentUser().getUid()).set(response);
 
-               db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(options);
+               db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
                 Intent i=new Intent(Single_type_response.this,MainActivity.class);
                 startActivity(i);
 

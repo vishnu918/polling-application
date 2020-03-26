@@ -36,7 +36,7 @@ import java.util.Map;
 public class Descriptive_type_response extends AppCompatActivity {
     Button submit;
     TextView title,query;
-    Map<String,Integer> response;
+    Map<String,String> response;
     Typeface typeface;
     Dialog dialog;
     FirebaseAuth auth;
@@ -117,7 +117,7 @@ public class Descriptive_type_response extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 response.put(answer.getEditText().getText().toString(),0);
+                 response.put("option",answer.getEditText().getText().toString());
 
                 System.out.println(response);
 

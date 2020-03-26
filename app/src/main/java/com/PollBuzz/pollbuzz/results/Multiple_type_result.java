@@ -162,13 +162,14 @@ public class Multiple_type_result extends AppCompatActivity {
     private void setOptions()
     {
 
+        int i=0;
         for(Map.Entry<String,Object> entry: response.entrySet())
         {
-            String key=entry.getKey();
+            String key=entry.getValue().toString();
             if(options.containsKey(key))
             {
                 options.remove(key);
-                options.put(key,1);
+                options.put(entry.getValue().toString(),1);
             }
         }
         for(Map.Entry<String,Integer> entry : options.entrySet())

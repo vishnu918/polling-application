@@ -1,12 +1,15 @@
 package com.PollBuzz.pollbuzz.polls;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -15,44 +18,59 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import Utils.ImagePickerActivity;
+import Utils.firebase;
 import Utils.helper;
 
 public class Image_type_poll extends AppCompatActivity {
     Button add;
-    LinearLayout l1,l2,group;
+    LinearLayout l1, l2, group;
     int c;
-    FirebaseAuth auth;
-    FirebaseAuth.AuthStateListener listener;
-    ImageButton home,logout;
-    Uri uri;
-    ImageView view1,view2;
-    RadioButton b1,b2;
+    ImageButton home, logout;
+    Uri uri1, uri2;
+    ImageView view1, view2;
+    RadioButton b1, b2;
     MaterialButton post_image;
-    TextInputEditText title_image , question_image;
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    TextInputEditText title_image, question_image;
+    firebase fb;
     Date date = Calendar.getInstance().getTime();
+    private int requestCode = 0;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    final String formatteddate = dateFormat.format(date);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +80,7 @@ public class Image_type_poll extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
+        fb = new firebase();
         l1 = findViewById(R.id.l1);
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
@@ -79,8 +98,6 @@ public class Image_type_poll extends AppCompatActivity {
         c = group.getChildCount();
         registerForContextMenu(b1);
         registerForContextMenu(b1);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        final String formatteddate = dateFormat.format(date);
 
         home.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +109,7 @@ public class Image_type_poll extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                auth.signOut();
+                fb.signOut();
             }
         });
         b1.setOnClickListener(new View.OnClickListener() {
@@ -100,10 +117,31 @@ public class Image_type_poll extends AppCompatActivity {
             public void onClick(View v) {
                 v.showContextMenu();
                 b1.setChecked(false);
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                try {
+                    requestCode = 100;
+                    Dexter.withActivity(Image_type_poll.this)
+                            .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            .withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                    if (report.areAllPermissionsGranted()) {
+                                        showImagePickerOptions();
+                                    }
+
+                                    if (report.isAnyPermissionPermanentlyDenied()) {
+                                        showSettingsDialog();
+                                    }
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ;
             }
         });
         b2.setOnClickListener(new View.OnClickListener() {
@@ -111,26 +149,32 @@ public class Image_type_poll extends AppCompatActivity {
             public void onClick(View v) {
                 v.showContextMenu();
                 b2.setChecked(false);
-                Intent intent = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                try {
+                    requestCode = 200;
+                    Dexter.withActivity(Image_type_poll.this)
+                            .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            .withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                    if (report.areAllPermissionsGranted()) {
+                                        showImagePickerOptions();
+                                    }
 
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
+                                    if (report.isAnyPermissionPermanentlyDenied()) {
+                                        showSettingsDialog();
+                                    }
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
-        auth = FirebaseAuth.getInstance();
-        listener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user == null) {
-                    Intent i = new Intent(Image_type_poll.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
         post_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,71 +185,211 @@ public class Image_type_poll extends AppCompatActivity {
                     question_image.setError("Please enter the question");
                     question_image.requestFocus();
                 } else {
-                    if (auth.getCurrentUser() != null) {
-                        PollDetails polldetails = new PollDetails();
-                        polldetails.setTitle(title_image.getText().toString().trim());
-                        polldetails.setQuestion(question_image.getText().toString().trim());
-                        polldetails.setCreated_date(formatteddate);
-                        polldetails.setPoll_type("IMAGE POLL");
-                        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
-                        Map<String,Integer> map = new HashMap<>();
-                        map.put(view1.getTag().toString(),0);
-                        map.put(view2.getTag().toString(),0);
-                        polldetails.setMap(map);
-                        CollectionReference docCreated = firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created");
-                        DocumentReference doc = firebaseFirestore.collection("Polls").document();
-                        doc.set(polldetails)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Map<String, String> m = new HashMap<>();
-                                        m.put("pollId", doc.getId());
-                                        docCreated.document().set(m);
-                                        Toast.makeText(Image_type_poll.this, "Added successfully", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(Image_type_poll.this, "Unable to add try again", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
+                   addToStorage();
                 }
             }
         });
-
     }
+    private void showImagePickerOptions() {
+        ImagePickerActivity.showImagePickerOptions(this, new ImagePickerActivity.PickerOptionListener() {
+            @Override
+            public void onTakeCameraSelected() {
+                launchCameraIntent();
+            }
+
+            @Override
+            public void onChooseGallerySelected() {
+                launchGalleryIntent();
+            }
+
+            @Override
+            public void defaultPic() {
+                if (requestCode == 100)
+                    loadProfilePic(view1, null);
+                else
+                    loadProfilePic(view2, null);
+            }
+        });
+    }
+
+    private void launchCameraIntent() {
+        Intent intent = new Intent(Image_type_poll.this, ImagePickerActivity.class);
+        intent.putExtra(ImagePickerActivity.INTENT_IMAGE_PICKER_OPTION, ImagePickerActivity.REQUEST_IMAGE_CAPTURE);
+
+        // setting aspect ratio
+        intent.putExtra(ImagePickerActivity.INTENT_LOCK_ASPECT_RATIO, true);
+        intent.putExtra(ImagePickerActivity.INTENT_ASPECT_RATIO_X, 1); // 16x9, 1x1, 3:4, 3:2
+        intent.putExtra(ImagePickerActivity.INTENT_ASPECT_RATIO_Y, 1);
+
+        // setting maximum bitmap width and height
+        intent.putExtra(ImagePickerActivity.INTENT_SET_BITMAP_MAX_WIDTH_HEIGHT, true);
+        intent.putExtra(ImagePickerActivity.INTENT_BITMAP_MAX_WIDTH, 1000);
+        intent.putExtra(ImagePickerActivity.INTENT_BITMAP_MAX_HEIGHT, 1000);
+
+        startActivityForResult(intent, requestCode);
+    }
+
+    private void launchGalleryIntent() {
+        Intent intent = new Intent(Image_type_poll.this, ImagePickerActivity.class);
+        intent.putExtra(ImagePickerActivity.INTENT_IMAGE_PICKER_OPTION, ImagePickerActivity.REQUEST_GALLERY_IMAGE);
+
+        // setting aspect ratio
+        intent.putExtra(ImagePickerActivity.INTENT_LOCK_ASPECT_RATIO, true);
+        intent.putExtra(ImagePickerActivity.INTENT_ASPECT_RATIO_X, 1); // 16x9, 1x1, 3:4, 3:2
+        intent.putExtra(ImagePickerActivity.INTENT_ASPECT_RATIO_Y, 1);
+        startActivityForResult(intent, requestCode);
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bundle bundle=data.getExtras();
-        if(resultCode==RESULT_OK)
-        {  uri=data.getData();
-            if(requestCode==1) {
-                view1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                Picasso.get().load(uri).placeholder(R.drawable.place_holder).into(view1);
-                view1.setTag(uri);
-            }
-            if(requestCode==2) {
-                view2.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                Picasso.get().load(uri).fit().placeholder(R.drawable.place_holder).into(view2);
-                view2.setTag(uri);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 100) {
+                uri1 = data.getParcelableExtra("path");
+                loadProfilePic(view1, uri1.toString());
+            } else {
+                uri2 = data.getParcelableExtra("path");
+                loadProfilePic(view2, uri2.toString());
             }
         }
+    }
 
+    private void loadProfilePic(ImageView view, String url) {
+        view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        if (url != null) {
+            Glide.with(this)
+                    .load(url)
+                    .into(view);
+        } else {
+            view.setImageResource(R.drawable.place_holder);
         }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth.addAuthStateListener(listener);
+    }
+
+    private void addToStorage() {
+        PollDetails polldetails = new PollDetails();
+        polldetails.setTitle(title_image.getText().toString().trim());
+        polldetails.setQuestion(question_image.getText().toString().trim());
+        polldetails.setCreated_date(formatteddate);
+        polldetails.setPoll_type("IMAGE POLL");
+        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+        Map<String, Integer> map = new HashMap<>();
+        StorageReference mRef = fb.getStorageReference().child("polls/"+fb.getUserId()+"/option1");
+        Log.d("ImagePath",uri1.toString());
+        byte[] compressedImage = compressImage(uri1);
+        if (compressedImage != null) {
+            mRef.putBytes(compressedImage)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        mRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String imagePath = uri.toString();
+                            Log.d("ImagePath",imagePath);
+                            map.put(imagePath, 0);
+                            StorageReference mRef1 = fb.getStorageReference().child("polls/"+fb.getUserId()+"/option2");
+                            Log.d("ImagePath",uri2.toString());
+                            byte[] compressedImage1 = compressImage(uri2);
+                            if (compressedImage1 != null) {
+                                mRef1.putBytes(compressedImage1)
+                                        .addOnSuccessListener(taskSnapshot1 -> {
+                                            mRef1.getDownloadUrl().addOnSuccessListener(uri1 -> {
+                                                String imagePath1 = uri1.toString();
+                                                Log.d("ImagePath",imagePath1);
+                                                map.put(imagePath1, 0);
+                                                polldetails.setMap(map);
+                                                fb.getPollsCollection().add(polldetails)
+                                                        .addOnCompleteListener(task -> {
+                                                            if (task.isSuccessful()) {
+                                                                deleteCache();
+                                                                Intent i = new Intent(Image_type_poll.this, MainActivity.class);
+                                                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                startActivity(i);
+                                                            } else {
+                                                                Toast.makeText(Image_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                                Log.d("Exception", task.getException().toString());
+                                                            }
+                                                        });
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    exception.printStackTrace();
+                                                    Log.d("Exception", exception.toString());
+                                                }
+                                            });
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+                                                exception.printStackTrace();
+                                                Log.d("Exception", exception.toString());
+                                            }
+                                        })
+                                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                                                double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                            }
+                                        });
+                            }
+                        });
+                    });
+        }
 
     }
 
+    private void deleteCache() {
+        deleteDir(getApplicationContext().getCacheDir());
+        deleteDir(getApplicationContext().getExternalCacheDir());
+    }
 
-
-
-
+    private byte[] compressImage(Uri uri) {
+        try {
+            Bitmap bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 40, baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("Exception", e.toString());
+            return null;
         }
+    }
+
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Image_type_poll.this);
+        builder.setTitle("Grant Permissions");
+        builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.");
+        builder.setPositiveButton("Go to settings", (dialog, which) -> {
+            dialog.cancel();
+            openSettings();
+        });
+        builder.setNegativeButton(getString(android.R.string.cancel), (dialog, which) -> dialog.cancel());
+        builder.show();
+
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivityForResult(intent, 101);
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            if (children != null) {
+                for (String child : children) {
+                    boolean success = deleteDir(new File(dir, child));
+                    if (!success) {
+                        return false;
+                    }
+                }
+            }
+            return dir.delete();
+        } else if (dir != null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
+    }
+}
 
 

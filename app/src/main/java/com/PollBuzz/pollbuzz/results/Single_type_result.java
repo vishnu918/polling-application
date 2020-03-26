@@ -165,16 +165,13 @@ public class Single_type_result extends AppCompatActivity {
     }
     private void setOptions()
     {
+        String value="";
 
         for(Map.Entry<String,Object> entry: response.entrySet())
         {
-            String key=entry.getKey();
-            if(options.containsKey(key))
-            {
-                options.remove(key);
-                options.put(key,1);
-            }
+           value = entry.getValue().toString();
         }
+
         for(Map.Entry<String,Integer> entry : options.entrySet())
         {
             RadioButton button=new RadioButton(getApplicationContext());
@@ -185,7 +182,9 @@ public class Single_type_result extends AppCompatActivity {
             button.setText(entry.getKey());
             button.setTextSize(20.0f);
             group.addView(button);
-            if(entry.getValue()==1)
+            if(button.getText().toString().equals(value))
+                button.setChecked(true);
+         /*   if(entry.getValue()==1)
                 button.setChecked(true);
             else
                 button.setEnabled(false);
@@ -203,7 +202,7 @@ public class Single_type_result extends AppCompatActivity {
                         else
                             b.setChecked(false);
                 }
-            });
+            });*/
         }
         dialog.dismiss();
     }
