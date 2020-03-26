@@ -17,9 +17,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class Descriptive_type_response extends AppCompatActivity {
     Button submit;
     TextView title,query;
-    Map<String,Integer> response;
+    Map<String,String> response;
     Typeface typeface;
     Dialog dialog;
     FirebaseAuth auth;
@@ -89,7 +89,7 @@ public class Descriptive_type_response extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Descriptive_type_response.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Descriptive_type_response.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -105,7 +105,7 @@ public class Descriptive_type_response extends AppCompatActivity {
                     if(data.exists())
                     {
                         dialog.dismiss();
-                        Polldetails polldetails=data.toObject(Polldetails.class);
+                        PollDetails polldetails=data.toObject(PollDetails.class);
                         title.setText(polldetails.getTitle());
                         title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                         query.setText(polldetails.getQuestion());
@@ -117,7 +117,7 @@ public class Descriptive_type_response extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 response.put(answer.getEditText().getText().toString(),0);
+                 response.put("option",answer.getEditText().getText().toString());
 
                 System.out.println(response);
 

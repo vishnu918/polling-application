@@ -13,19 +13,20 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
@@ -44,9 +45,10 @@ public class Ranking_type_response extends AppCompatActivity {
     FirebaseAuth auth;
     MaterialButton submit;
     MaterialTextView title_ranking , query_ranking;
-    RadioGroup group;
+    LinearLayout group;
     CollectionReference ref;
-    Map<String,Integer> options,response;
+    Map<String,Integer> options;
+    Map<String,String> response;
     String key;
     Typeface typeface;
     Dialog dialog;
@@ -68,7 +70,7 @@ public class Ranking_type_response extends AppCompatActivity {
         group=findViewById(R.id.options);
         options=new HashMap<>();
         response=new HashMap<>();
-        key= "XPkv84bvWMRXX4mEM97j";
+        key= "8fVyr6eHM3KVrcERKelr";
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Ranking_type_response.this);
         showDialog();
@@ -91,7 +93,7 @@ public class Ranking_type_response extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Ranking_type_response.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Ranking_type_response.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -107,12 +109,12 @@ public class Ranking_type_response extends AppCompatActivity {
                     if(data.exists())
                     {   group.removeAllViews();
                         dialog.dismiss();
-                        Polldetails polldetails=data.toObject(Polldetails.class);
+                        PollDetails polldetails=data.toObject(PollDetails.class);
                         title_ranking.setText(polldetails.getTitle());
                         title_ranking.setPaintFlags(title_ranking.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                         query_ranking.setText(polldetails.getQuestion());
                         options=polldetails.getMap();
-
+                        int i=0;
                         for(Map.Entry<String,Integer> entry : options.entrySet())
                         {
                             RadioButton button=new RadioButton(getApplicationContext());
@@ -124,16 +126,17 @@ public class Ranking_type_response extends AppCompatActivity {
                             button.setText(entry.getKey());
                             button.setTextSize(20.0f);
                             group.addView(button);
-                            button.setOnClickListener(new View.OnClickListener() {
+                            int finalI = i;
+                            button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
-                                public void onClick(View v) {
-                                    RadioButton b=(RadioButton)v;
-                                    if(b.isChecked())
-                                        resp=b.getText().toString();
-
-
+                                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                    if(b)
+                                    {
+                                        response.put("option"+ finalI,button.getText().toString());
+                                    }
                                 }
                             });
+                              i++;
                         }
                     }
                 }
@@ -146,17 +149,36 @@ public class Ranking_type_response extends AppCompatActivity {
 
                 if(auth.getCurrentUser() != null)
                 {
+
+                    /*  for(int i=0;i<group.getChildCount();i++)
+                      {
+                          RadioButton bt = (RadioButton)group.getChildAt(i);
+                          if(bt.isChecked())
+                          {
+                              response.put("option"+i,bt.getText().toString());
+                          }
+
+                      }*/
                      ref = firebaseFirestore.collection("Polls").document(key).collection("Response");
                     RadioButton button=findViewById(b_id);
-                    Toast.makeText(getApplicationContext(),resp+" Opted",Toast.LENGTH_LONG).show();
-                    options.clear();
-                    options.put(resp,0);
 
-                    ref.document(auth.getCurrentUser().getUid()).set(options);
 
-                    firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(options);
-                    Intent i=new Intent(Ranking_type_response.this,MainActivity.class);
-                    startActivity(i);
+                    ref.document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
+                            firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
+                            Intent i=new Intent(Ranking_type_response.this,MainActivity.class);
+                            startActivity(i);
+                        }
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(Ranking_type_response.this, "Failde", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
                 }
             }
         });

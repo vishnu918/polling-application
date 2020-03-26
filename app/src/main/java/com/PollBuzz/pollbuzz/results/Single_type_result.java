@@ -13,17 +13,16 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.responses.Single_type_response;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -93,7 +92,7 @@ public class Single_type_result extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Single_type_result.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Single_type_result.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -111,7 +110,7 @@ public class Single_type_result extends AppCompatActivity {
                                                                                      if(data.exists())
                                                                                      {   group.removeAllViews();
                                                                                          dialog.dismiss();
-                                                                                         Polldetails polldetails=data.toObject(Polldetails.class);
+                                                                                         PollDetails polldetails=data.toObject(PollDetails.class);
                                                                                          title.setText(polldetails.getTitle());
                                                                                          title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                                                                                          query.setText(polldetails.getQuestion());
@@ -166,16 +165,13 @@ public class Single_type_result extends AppCompatActivity {
     }
     private void setOptions()
     {
+        String value="";
 
         for(Map.Entry<String,Object> entry: response.entrySet())
         {
-            String key=entry.getKey();
-            if(options.containsKey(key))
-            {
-                options.remove(key);
-                options.put(key,1);
-            }
+           value = entry.getValue().toString();
         }
+
         for(Map.Entry<String,Integer> entry : options.entrySet())
         {
             RadioButton button=new RadioButton(getApplicationContext());
@@ -186,7 +182,9 @@ public class Single_type_result extends AppCompatActivity {
             button.setText(entry.getKey());
             button.setTextSize(20.0f);
             group.addView(button);
-            if(entry.getValue()==1)
+            if(button.getText().toString().equals(value))
+                button.setChecked(true);
+         /*   if(entry.getValue()==1)
                 button.setChecked(true);
             else
                 button.setEnabled(false);
@@ -204,7 +202,7 @@ public class Single_type_result extends AppCompatActivity {
                         else
                             b.setChecked(false);
                 }
-            });
+            });*/
         }
         dialog.dismiss();
     }

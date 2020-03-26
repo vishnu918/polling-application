@@ -1,26 +1,16 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
 import com.bumptech.glide.Glide;
@@ -58,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Utils.ImagePickerActivity;
-import Utils.helper;
+import Utils.firebase;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -67,121 +57,103 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ProfileFeed extends Fragment {
-    MaterialTextView Uname;
-    ImageView pPic;
-    ImageButton edit;
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
-    StorageReference mStorage;
-    Uri uri;
-    RecyclerView profileRV;
-    ProfileFeedAdapter mAdapter;
-    ArrayList<Polldetails> mArrayList;
-    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    private CollectionReference userColRef, pollsColRef;
-    private DocumentReference userDocRef;
+    private MaterialTextView Uname;
+    private ImageView pPic;
+    private ImageButton edit;
+    private Uri uri;
+    private RecyclerView profileRV;
+    private ProfileFeedAdapter mAdapter;
+    private ArrayList<PollDetails> mArrayList;
+    private CollectionReference userCreatedCol;
+    private firebase fb;
+
     public ProfileFeed() {
-        // Required empty public constructor
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.activity_profile_feed, container, false);
-        return v;
+        return inflater.inflate(R.layout.activity_profile_feed, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(true);
-//        ((MainActivity) getActivity()).getSupportActionBar().setTitle("Your Polls");
-        Toolbar toolbar = view.findViewById(R.id.htab_toolbar);
-//        setSupportActionBar(toolbar);
-        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
+        setGlobals(view);
+        userCreatedCol.get().addOnCompleteListener(task -> {
+            getOwnedPolls(task);
+        });
+        edit.setOnClickListener(view1 -> {
+            try {
+                Dexter.withActivity(getActivity())
+                        .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if (report.areAllPermissionsGranted()) {
+                                    showImagePickerOptions();
+                                }
 
+                                if (report.isAnyPermissionPermanentlyDenied()) {
+                                    showSettingsDialog();
+                                }
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void getOwnedPolls(Task<QuerySnapshot> task) {
+        if (task.isSuccessful() && task.getResult() != null) {
+            for (QueryDocumentSnapshot dS : task.getResult()) {
+                if (dS.get("pollId") != null)
+                    fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful() && task1.getResult() != null) {
+                            DocumentSnapshot dS1 = task1.getResult();
+                            if (dS1.exists())
+                                addToRecyclerView(dS1);
+                        } else {
+                            Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            }
+        }
+    }
+
+    private void addToRecyclerView(DocumentSnapshot dS1) {
+        PollDetails polldetails = dS1.toObject(PollDetails.class);
+        mArrayList.add(polldetails);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void setGlobals(@NonNull View view) {
+        setHasOptionsMenu(true);
+        Toolbar toolbar = view.findViewById(R.id.htab_toolbar);
+        ((MainActivity) getActivity()).setSupportActionBar(toolbar);
         if (((MainActivity) getActivity()).getSupportActionBar() != null) {
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        userDocRef = firebaseFirestore.collection("Users").document(mUser.getUid());
-        userColRef = userDocRef.collection("Created");
-        pollsColRef = firebaseFirestore.collection("Polls");
-        mStorage = FirebaseStorage.getInstance().getReference();
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);
         pPic = view.findViewById(R.id.profilePic);
         profileRV = view.findViewById(R.id.profileRV);
         mArrayList = new ArrayList<>();
         mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
+        profileRV.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        profileRV.setAdapter(mAdapter);
         profileRV.setLayoutManager(linearLayoutManager);
-        userColRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    for (QueryDocumentSnapshot dS : task.getResult()) {
-                        if (dS.get("pollId") != null)
-                            pollsColRef.document(dS.get("pollId").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful() && task.getResult() != null) {
-                                        DocumentSnapshot dS1 = task.getResult();
-                                        if (dS1.exists()) {
-                                            Polldetails polldetails = dS1.toObject(Polldetails.class);
-                                            mArrayList.add(polldetails);
-                                            mAdapter.notifyDataSetChanged();
-                                        }
-                                    } else {
-                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                    }
-                }
-            }
-        });
-        String imagePath = Utils.helper.getpPicPref(getContext());
-        Log.d("imagePAth", imagePath);
-        if (imagePath != null) {
-            Glide.with(this)
-                    .load(imagePath)
-                    .transform(new CircleCrop())
-                    .into(pPic);
-        }
+        userCreatedCol = fb.getUserDocument().collection("Created");
+        loadProfilePic(Utils.helper.getpPicPref(getContext()));
         Uname.setText(Utils.helper.getusernamePref(getContext()));
-        edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Dexter.withActivity(getActivity())
-                            .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            .withListener(new MultiplePermissionsListener() {
-                                @Override
-                                public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                    if (report.areAllPermissionsGranted()) {
-                                        showImagePickerOptions();
-                                    }
-
-                                    if (report.isAnyPermissionPermanentlyDenied()) {
-                                        showSettingsDialog();
-                                    }
-                                }
-
-                                @Override
-                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                                    token.continuePermissionRequest();
-                                }
-                            }).check();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     private void showImagePickerOptions() {
@@ -204,20 +176,8 @@ public class ProfileFeed extends Fragment {
     }
 
     private void defaultIntent() {
-        if (mUser.getPhotoUrl() != null) {
-            Glide.with(this)
-                    .load(mUser.getPhotoUrl())
-                    .transform(new CircleCrop())
-                    .into(pPic);
-            Utils.helper.setpPicPref(getContext(), mUser.getPhotoUrl().toString());
-            userDocRef.update("pic", mUser.getPhotoUrl().toString());
-        } else {
-            pPic.setImageResource(R.drawable.ic_person_black_24dp);
-            Utils.helper.setpPicPref(getContext(), null);
-            userDocRef.update("pic", null);
-        }
-        StorageReference mRef = mStorage.child("images/" + mUser.getUid());
-        mRef.delete();
+        loadProfilePic(fb.getUser().getPhotoUrl().toString());
+        fb.getStorageReference().child("images/" + fb.getUserId()).delete();
     }
 
     private void launchCameraIntent() {
@@ -259,7 +219,7 @@ public class ProfileFeed extends Fragment {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
                     // loading profile image from local cache
 
-                    loadProfile(uri);
+                    addToStorage(uri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -267,52 +227,37 @@ public class ProfileFeed extends Fragment {
         }
     }
 
-    private void loadProfile(Uri uri) {
-        StorageReference mRef = mStorage.child("images/" + mUser.getUid());
+    private void addToStorage(Uri uri) {
+        StorageReference mRef = fb.getStorageReference().child("images/" + fb.getUserId());
         Bitmap bmp = null;
-        byte[] dataCompressed = new byte[0];
-        try {
-            bmp = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.JPEG, 40, baos);
-            dataCompressed = baos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("Exception", e.toString());
-        }
-        mRef.putBytes(dataCompressed)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        mRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                String imagePath = uri.toString();
-                                Glide.with(ProfileFeed.this)
-                                        .load(imagePath)
-                                        .transform(new CircleCrop())
-                                        .into(pPic);
-                                helper.setpPicPref(getContext(), imagePath);
-                                userDocRef.update("pic", imagePath);
-                            }
-                        });
-                    }
+        byte[] compressedImage = compressImage();
+        mRef.putBytes(compressedImage)
+                .addOnSuccessListener(taskSnapshot -> mRef.getDownloadUrl().addOnSuccessListener(uri1 -> loadProfilePic(uri1.toString())))
+                .addOnFailureListener(exception -> {
+                    exception.printStackTrace();
+                    Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("Exception", exception.toString());
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        exception.printStackTrace();
-                        Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("Exception", exception.toString());
-                    }
-                })
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    }
+                .addOnProgressListener(taskSnapshot -> {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                 });
+        deleteCache();
+    }
+
+    private void loadProfilePic(String url) {
+        if (url != null) {
+            Glide.with(this)
+                    .load(url)
+                    .transform(new CircleCrop())
+                    .into(pPic);
+        } else {
+            pPic.setImageResource(R.drawable.ic_person_black_24dp);
+        }
+        fb.getUserDocument().update("pic", url);
+        Utils.helper.setpPicPref(getContext(), url);
+    }
+
+    private void deleteCache() {
         deleteDir(getContext().getCacheDir());
         deleteDir(getContext().getExternalCacheDir());
     }
@@ -330,18 +275,14 @@ public class ProfileFeed extends Fragment {
 
     }
 
-    // navigating user to app settings
     private void openSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
         intent.setData(uri);
         startActivityForResult(intent, 101);
     }
-    /**
-     * Calling this will delete the images from cache directory
-     * useful to clear some memory
-     */
-    public static boolean deleteDir(File dir) {
+
+    private static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
             if (children != null) {
@@ -353,10 +294,23 @@ public class ProfileFeed extends Fragment {
                 }
             }
             return dir.delete();
-        } else if(dir!= null && dir.isFile()) {
+        } else if (dir != null && dir.isFile()) {
             return dir.delete();
         } else {
             return false;
+        }
+    }
+
+    private byte[] compressImage() {
+        try {
+            Bitmap bmp = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 40, baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("Exception", e.toString());
+            return null;
         }
     }
 
@@ -375,12 +329,12 @@ public class ProfileFeed extends Fragment {
     }
 
     private void logOut() {
-        if (mAuth.getCurrentUser() != null) {
             Utils.helper.removeProfileSetUpPref(getContext());
-            mAuth.signOut();
-            Intent i = new Intent(getActivity(), Login_Signup_Activity.class);
+        fb.signOut();
+        Intent i = new Intent(getActivity(), LoginSignupActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
-        }
+
     }
 }
+

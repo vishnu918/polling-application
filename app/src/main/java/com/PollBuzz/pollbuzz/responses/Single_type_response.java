@@ -29,9 +29,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 
 import java.util.HashMap;
@@ -51,7 +51,7 @@ public class Single_type_response extends AppCompatActivity {
     FirebaseAuth.AuthStateListener listener;
     Button submit;
     int c;
-    Map<String,Integer> response;
+    Map<String,String> response;
     int b_id;
     String resp;
 
@@ -98,7 +98,7 @@ public class Single_type_response extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Single_type_response.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Single_type_response.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -116,7 +116,7 @@ public class Single_type_response extends AppCompatActivity {
                    if(data.exists())
                    {   group.removeAllViews();
                    dialog.dismiss();
-                       Polldetails polldetails=data.toObject(Polldetails.class);
+                       PollDetails polldetails=data.toObject(PollDetails.class);
                        title.setText(polldetails.getTitle());
                        title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                        query.setText(polldetails.getQuestion());
@@ -158,12 +158,11 @@ public class Single_type_response extends AppCompatActivity {
             public void onClick(View v) {
                 RadioButton button=findViewById(b_id);
                 Toast.makeText(getApplicationContext(),resp+" Opted",Toast.LENGTH_LONG).show();
-                options.clear();
-                options.put(resp,0);
+                response.put("option",resp);
 
-                ref.document(auth.getCurrentUser().getUid()).set(options);
+                ref.document(auth.getCurrentUser().getUid()).set(response);
 
-               db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(options);
+               db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
                 Intent i=new Intent(Single_type_response.this,MainActivity.class);
                 startActivity(i);
 

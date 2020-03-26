@@ -17,8 +17,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".responses.Image_type_responses"></activity>
-        <activity android:name=".responses.Ranking_type_response" />
+        <activity android:name=".results.Image_type_result">
+
+        </activity>
+        <activity android:name=".results.Ranking_type_result" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".responses.Image_type_responses" >
+
+        </activity>
+        <activity android:name=".responses.Ranking_type_response" >
+
+        </activity>
+
         <activity android:name=".results.Descriptive_type_result" />
         <activity android:name=".results.Multiple_type_result" />
         <activity android:name=".results.Single_type_result" />
@@ -26,30 +43,28 @@
         <activity android:name=".navFragments.HomeFeed" />
         <activity android:name=".responses.Multiple_type_response" />
         <activity android:name=".responses.Descriptive_type_response" />
-        <activity android:name=".LogIn_SignUp.ProfileSetUp" />
-        <activity android:name="Utils.AuthCheck" />
-        <activity android:name="Utils.ImagePickerActivity" />
-        <activity android:name=".responses.Single_type_response">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".LoginSignup.ProfileSetUp" />
+        <activity android:name="Utils.AuthCheck">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
+        <activity android:name="Utils.ImagePickerActivity" />
+        <activity android:name=".responses.Single_type_response" />
         <activity android:name=".polls.Image_type_poll" />
         <activity android:name=".polls.Ranking_type_poll" />
         <activity android:name=".polls.Descriptive_type_poll" />
         <activity android:name=".polls.Multiple_type_poll" />
-        <activity android:name=".Poll_list" />
+        <activity android:name=".PollList" />
         <activity android:name=".polls.Single_type_poll" />
         <activity
             android:name=".MainActivity"
             android:theme="@style/NoActionBar" />
-        <activity android:name=".LogIn_SignUp.Login_Signup_Activity" />
+        <activity android:name=".LoginSignup.LoginSignupActivity" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="fullSensor"
-            android:theme="@style/NoActionBar" /> <!-- cache directory file provider paths -->
+            android:theme="@style/NoActionBar" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

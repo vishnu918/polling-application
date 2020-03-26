@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".responses.Image_type_responses">
+    tools:context=".results.Ranking_type_result">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -30,14 +30,14 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="IMAGE Poll"
+                    android:text="Priority Poll"
                     android:layout_margin="10dp"
                     android:textSize="30sp"
                     android:fontFamily="@font/maven_pro"
                     android:textStyle="bold"
                     />
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/title"
+                    android:id="@+id/title_ranking_result"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/didact_gothic"
@@ -49,7 +49,7 @@
                     android:textSize="30sp"
                     android:layout_margin="10dp"/>
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/query"
+                    android:id="@+id/query_ranking_result"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/didact_gothic"
@@ -71,78 +71,33 @@
                     />
 
 
-                <RadioGroup
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:id="@+id/options"
+                    android:id="@+id/options_ranking_result"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginVertical="10dp"
-
+                    android:background="@drawable/circle"
                     android:tag="Options"
                     >
-                    <LinearLayout
+                    <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginVertical="7dp"
-                        android:id="@+id/l1">
-                        <RadioButton
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Option 1"
-                            android:id="@+id/option1"/>
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            android:layout_marginVertical="3dp"
-                            android:background="@drawable/circle"
-                            android:id="@+id/image1"
-                            android:src="@drawable/place_holder"/>
-
-                    </LinearLayout>
-                    <LinearLayout
+                        android:text="Option1"
+                        android:id="@+id/option1"/>
+                    <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginVertical="7dp"
-                        android:id="@+id/l2">
-                        <RadioButton
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Option 2"
-                            android:id="@+id/option2"/>
-
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            android:background="@drawable/circle"
-                            android:layout_marginVertical="3dp"
-                            android:id="@+id/image2"
-                            android:src="@drawable/place_holder"/>
-                    </LinearLayout>
+                        android:text="Option 2"
+                        android:id="@+id/option2"/>
 
 
 
+                </LinearLayout>
 
-                </RadioGroup>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/submit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cornerRadius="20dp"
-                    android:layout_gravity="center"
-                    android:text="SUBMIT"
-                    android:fontFamily="@font/maven_pro"
-                    android:textStyle="bold"
-                    android:layout_marginTop="50dp"
-                    android:padding="10dp"
-                    android:textSize="15sp"
-                    android:stateListAnimator="@animator/button_anim"/>
 
 
             </LinearLayout>
@@ -150,6 +105,5 @@
 
 
     </com.google.android.material.card.MaterialCardView>
-
 
 </LinearLayout>
