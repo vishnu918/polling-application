@@ -68,7 +68,9 @@ public class HomeFeed extends Fragment {
     private void addToRecyclerView(QueryDocumentSnapshot dS) {
         PollDetails polldetails = dS.toObject(PollDetails.class);
         arrayList.add(polldetails);
+        recyclerView.setLayoutAnimation(controller);
         adapter.notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
     }
 
     private void setGlobals(@NonNull View view) {
