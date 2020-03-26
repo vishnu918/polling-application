@@ -98,7 +98,7 @@ public class LoginFragment extends Fragment {
                         });
                     }
                 } else {
-                    Toast.makeText(getActivity(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     password.getEditText().getText().clear();
                 }
             });
