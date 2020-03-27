@@ -203,9 +203,8 @@ public class Single_type_result extends AppCompatActivity {
             button.setText(entry.getKey());
             button.setTextSize(20.0f);
             group.addView(button);
+            final String val=value;
             if (button.getText().toString().equals(value))
-                button.setChecked(true);
-         /*   if(entry.getValue()==1)
                 button.setChecked(true);
             else
                 button.setEnabled(false);
@@ -213,17 +212,16 @@ public class Single_type_result extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     RadioButton b=(RadioButton)v;
-                    if(entry.getValue()==1)
+                    if(b.getText().toString().equals(val))
                     {
                         b.setChecked(true);
-                        if(b.isChecked()==false)
+                        if(!b.isChecked())
                             b.setChecked(true);
                     }
 
-                        else
-                            b.setChecked(false);
+
                 }
-            });*/
+            });
         }
         dialog.dismiss();
     }
