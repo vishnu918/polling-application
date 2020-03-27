@@ -84,7 +84,7 @@ public class HomeFeed extends Fragment {
         adapter = new HomePageAdapter(getContext(), arrayList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-        LayoutAnimationController controller =
+        controller =
                 AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         YoYo.with(Techniques.RollIn).duration(1100).playOn(view.findViewById(R.id.text));
         YoYo.with(Techniques.RollIn).duration(1100).playOn(fab);
