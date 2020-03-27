@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="Polls"
+        android:text="@string/home_feed_title"
         android:textColor="@color/colorPrimaryDark"
         android:fontFamily="@font/pacifico"
         android:textSize="40sp"
