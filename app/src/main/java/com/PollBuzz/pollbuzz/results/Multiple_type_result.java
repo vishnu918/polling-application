@@ -57,47 +57,24 @@ public class Multiple_type_result extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
-        home = view.findViewById(R.id.home);
-        logout = view.findViewById(R.id.logout);
+
         Intent intent = getIntent();
-        key = intent.getExtras().getString("UID");
-        integer = intent.getExtras().getInt("flag");
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Multiple_type_result.this, MainActivity.class);
-                startActivity(i);
-            }
-        });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                auth.signOut();
-            }
-        });
-        title=findViewById(R.id.title);
-        query=findViewById(R.id.query);
-        group=findViewById(R.id.options);
-        db=FirebaseFirestore.getInstance();
-        options=new HashMap<>();
-        response=new HashMap<>();
+        getIntentExtras(intent);
 
-        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
-        dialog=new Dialog(Multiple_type_result.this);
+
+       setGlobals(view);
+       setActionBarFunctionality();
+       setAuthStateListener();
         showDialog();
-        auth = FirebaseAuth.getInstance();
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Multiple_type_result.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
+        retriveData(db);
 
-            }
-        };
+
+
+
+    }
+
+    private void retriveData(FirebaseFirestore db) {
+
         db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                              @Override
                                                                              public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -161,7 +138,25 @@ public class Multiple_type_result extends AppCompatActivity {
                                                                          }
         );
 
+
     }
+
+    private void setAuthStateListener() {
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Multiple_type_result.this, LoginSignupActivity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
+
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -185,8 +180,6 @@ public class Multiple_type_result extends AppCompatActivity {
     }
     private void setOptions()
     {
-
-        int i=0;
         for(Map.Entry<String,Object> entry: response.entrySet())
         {
             String key=entry.getValue().toString();
@@ -217,7 +210,7 @@ public class Multiple_type_result extends AppCompatActivity {
                     if(entry.getValue()==1)
                     {
                         b.setChecked(true);
-                        if(b.isChecked()==false)
+                        if(!b.isChecked())
                             b.setChecked(true);
                     }
 
@@ -227,5 +220,42 @@ public class Multiple_type_result extends AppCompatActivity {
             });
         }
         dialog.dismiss();
+    }
+    private void setGlobals(View view)
+    {
+        title=findViewById(R.id.title);
+        query=findViewById(R.id.query);
+        group=findViewById(R.id.options);
+        db=FirebaseFirestore.getInstance();
+        options=new HashMap<>();
+        response=new HashMap<>();
+
+        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
+        dialog=new Dialog(Multiple_type_result.this);
+        auth = FirebaseAuth.getInstance();
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+    }
+    private void setActionBarFunctionality()
+    {
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Multiple_type_result.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                auth.signOut();
+            }
+        });
+    }
+    private void getIntentExtras(Intent intent)
+    {
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
+
     }
 }
