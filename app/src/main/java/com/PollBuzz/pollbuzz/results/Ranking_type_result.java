@@ -134,7 +134,7 @@ public class Ranking_type_result extends AppCompatActivity {
                                         }
                                     });
                                 }
-                                if(integer == 0){
+                                if(integer == 1){
                                     fb.getPollsCollection().document(key).collection("Response")
                                             .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
