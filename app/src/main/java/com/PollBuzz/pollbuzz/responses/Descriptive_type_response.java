@@ -1,10 +1,5 @@
 package com.PollBuzz.pollbuzz.responses;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -16,6 +11,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
@@ -118,9 +118,7 @@ public class Descriptive_type_response extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                  response.put("option",answer.getEditText().getText().toString());
-
                 System.out.println(response);
-
                 ref.document(auth.getCurrentUser().getUid()).set(response);
                 db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
                 Intent i=new Intent(Descriptive_type_response.this,MainActivity.class);

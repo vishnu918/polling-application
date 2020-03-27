@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.CollectionReference;
@@ -46,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import Utils.ImagePickerActivity;
 import Utils.firebase;
@@ -146,14 +148,34 @@ public class ProfileFeed extends Fragment {
         pPic = view.findViewById(R.id.profilePic);
         profileRV = view.findViewById(R.id.profileRV);
         mArrayList = new ArrayList<>();
+        fb = new firebase();
         mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
         profileRV.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        profileRV.setLayoutManager(linearLayoutManager);
-        userCreatedCol = fb.getUserDocument().collection("Created");
-        loadProfilePic(Utils.helper.getpPicPref(getContext()));
         Uname.setText(Utils.helper.getusernamePref(getContext()));
+        profileRV.setLayoutManager(linearLayoutManager);
+        loadProfilePic(Utils.helper.getpPicPref(getContext()));
+        fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                for (QueryDocumentSnapshot dS : task.getResult()) {
+                    if (dS.get("pollId") != null)
+                        fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
+                            if (task1.isSuccessful() && task1.getResult() != null) {
+                                DocumentSnapshot dS1 = task1.getResult();
+                                if (dS1.exists()) {
+                                    PollDetails polldetails = dS1.toObject(PollDetails.class);
+                                    polldetails.setUID(dS1.getId());
+                                    mArrayList.add(polldetails);
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                            } else {
+                                Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                }
+            }
+        });
     }
 
     private void showImagePickerOptions() {

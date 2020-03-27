@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.PollBuzz.pollbuzz">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.PollBuzz.pollbuzz">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+<<<<<<< HEAD
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -36,6 +37,19 @@
 
         </activity>
 
+=======
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:requestLegacyExternalStorage="true"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme"
+            tools:targetApi="q">
+        <activity android:name=".results.ResultActivity"></activity>
+        <activity android:name=".responses.Image_type_responses" />
+        <activity android:name=".responses.Ranking_type_response" />
+>>>>>>> TempBranch
         <activity android:name=".results.Descriptive_type_result" />
         <activity android:name=".results.Multiple_type_result" />
         <activity android:name=".results.Single_type_result" />
@@ -43,9 +57,16 @@
         <activity android:name=".navFragments.HomeFeed" />
         <activity android:name=".responses.Multiple_type_response" />
         <activity android:name=".responses.Descriptive_type_response" />
+<<<<<<< HEAD
         <activity android:name=".LoginSignup.ProfileSetUp" />
         <activity android:name="Utils.AuthCheck">
 
+=======
+        <activity android:name=".LogIn_SignUp.ProfileSetUp" />
+        <activity android:name="Utils.AuthCheck">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+>>>>>>> TempBranch
 
         </activity>
         <activity android:name="Utils.ImagePickerActivity" />
@@ -57,6 +78,7 @@
         <activity android:name=".PollList" />
         <activity android:name=".polls.Single_type_poll" />
         <activity
+<<<<<<< HEAD
             android:name=".MainActivity"
             android:theme="@style/NoActionBar" />
         <activity android:name=".LoginSignup.LoginSignupActivity" />
@@ -65,19 +87,28 @@
             android:screenOrientation="fullSensor"
             android:theme="@style/NoActionBar" />
 
+=======
+                android:name=".MainActivity"
+                android:theme="@style/NoActionBar" />
+        <activity android:name=".LogIn_SignUp.Login_Signup_Activity" />
+        <activity
+                android:name="com.yalantis.ucrop.UCropActivity"
+                android:screenOrientation="fullSensor"
+                android:theme="@style/NoActionBar" /> <!-- cache directory file provider paths -->
+>>>>>>> TempBranch
         <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.provider"
+                android:exported="false"
+                android:grantUriPermissions="true">
             <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths" />
         </provider>
 
         <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
+                android:name="preloaded_fonts"
+                android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

@@ -87,7 +87,7 @@ public class Single_type_response extends AppCompatActivity {
         db=FirebaseFirestore.getInstance();
        options=new HashMap<>();
        response=new HashMap<>();
-       key= "XPkv84bvWMRXX4mEM97j";
+       key= "K0GQeS6FHPRuhgiT4D4v";
        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
        dialog=new Dialog(Single_type_response.this);
         showDialog();
