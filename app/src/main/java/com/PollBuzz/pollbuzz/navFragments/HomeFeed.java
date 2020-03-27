@@ -86,8 +86,8 @@ public class HomeFeed extends Fragment {
         recyclerView.setAdapter(adapter);
         controller =
                 AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
-        YoYo.with(Techniques.RollIn).duration(1100).playOn(view.findViewById(R.id.text));
-        YoYo.with(Techniques.RollIn).duration(1100).playOn(fab);
+        YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(view.findViewById(R.id.text));
+        YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
         fb = new firebase();
     }
 }
