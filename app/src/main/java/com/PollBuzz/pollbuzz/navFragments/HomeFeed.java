@@ -12,6 +12,7 @@ import com.PollBuzz.pollbuzz.adapters.HomePageAdapter;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,7 @@ public class HomeFeed extends Fragment {
 
     private void addToRecyclerView(QueryDocumentSnapshot dS) {
         PollDetails polldetails = dS.toObject(PollDetails.class);
+        polldetails.setUID(dS.getId());
         arrayList.add(polldetails);
         recyclerView.setLayoutAnimation(controller);
         adapter.notifyDataSetChanged();

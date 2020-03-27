@@ -172,7 +172,7 @@ public class ProfileSetUp extends AppCompatActivity {
         fb = new firebase();
         if (fb.getUser().getDisplayName() != null)
             name.getEditText().setText(fb.getUser().getDisplayName());
-        loadProfilePic(fb.getUser().getPhotoUrl().toString());
+        loadProfilePic(fb.getUser().getPhotoUrl());
     }
 
     private void showImagePickerOptions() {
@@ -189,7 +189,7 @@ public class ProfileSetUp extends AppCompatActivity {
 
             @Override
             public void defaultPic() {
-                loadProfilePic(fb.getUser().getPhotoUrl().toString());
+                loadProfilePic(fb.getUser().getPhotoUrl());
             }
         });
     }
@@ -233,7 +233,7 @@ public class ProfileSetUp extends AppCompatActivity {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
                     // loading profile image from local cache
 
-                    loadProfilePic(uri.toString());
+                    loadProfilePic(uri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -241,10 +241,10 @@ public class ProfileSetUp extends AppCompatActivity {
         }
     }
 
-    private void loadProfilePic(String url) {
-        if (url != null) {
+    private void loadProfilePic(Uri uri) {
+        if (uri != null) {
             Glide.with(this)
-                    .load(url)
+                    .load(uri)
                     .transform(new CircleCrop())
                     .into(pPic);
         } else {

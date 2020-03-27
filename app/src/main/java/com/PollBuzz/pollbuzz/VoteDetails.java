@@ -1,7 +1,7 @@
 package com.PollBuzz.pollbuzz;
 
 public class VoteDetails {
-    String UserId,option,username;
+    private String UserId,option,username;
 
     public VoteDetails(String userId, String option, String username) {
         UserId = userId;

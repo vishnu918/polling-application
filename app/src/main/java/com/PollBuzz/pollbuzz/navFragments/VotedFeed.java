@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
@@ -14,6 +15,7 @@ import com.PollBuzz.pollbuzz.adapters.VotedFeedAdapter;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,22 +62,21 @@ public class VotedFeed extends Fragment {
     private void getVotedPolls(@NonNull Task<QuerySnapshot> task) {
         if (task.isSuccessful() && task.getResult() != null) {
             for (QueryDocumentSnapshot dS : task.getResult()) {
-                if (dS.get("pollId") != null)
-                    fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful() && task1.getResult() != null) {
-                            DocumentSnapshot dS1 = task1.getResult();
-                            if (dS1.exists())
-                                addToRecyclerView(dS1);
-                        } else {
-                            Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                if (dS.exists()) {
+                    fb.getPollsCollection().document(dS.getId())
+                            .get().addOnCompleteListener(task1 -> {
+                                if(task1.isSuccessful() && task1.getResult()!=null){
+                                    addToRecyclerView(task1.getResult());
+                                }
+                            });
+                }
             }
         }
     }
 
     private void addToRecyclerView(DocumentSnapshot dS1) {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
+        polldetails.setUID(dS1.getId());
         mArrayList.add(polldetails);
         mAdapter.notifyDataSetChanged();
     }
@@ -86,9 +87,9 @@ public class VotedFeed extends Fragment {
         votedRV.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         votedRV.setLayoutManager(layoutManager);
+        mArrayList = new ArrayList<>();
         mAdapter = new VotedFeedAdapter(getContext(), mArrayList);
         votedRV.setAdapter(mAdapter);
-        mArrayList = new ArrayList<>();
         fb = new firebase();
         userVotedRef = fb.getUserDocument().collection("Voted");
     }

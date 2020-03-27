@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -87,7 +89,8 @@ public class Single_type_response extends AppCompatActivity {
         db=FirebaseFirestore.getInstance();
        options=new HashMap<>();
        response=new HashMap<>();
-       key= "K0GQeS6FHPRuhgiT4D4v";
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
        dialog=new Dialog(Single_type_response.this);
         showDialog();
@@ -129,7 +132,6 @@ public class Single_type_response extends AppCompatActivity {
                            layoutParams.setMargins(5,20,5,20);
                            button.setLayoutParams(layoutParams);
                            button.setTypeface(typeface);
-                           /*button.setId(c+1);*/
                            button.setText(entry.getKey());
                            button.setTextSize(20.0f);
                            group.addView(button);
@@ -162,9 +164,25 @@ public class Single_type_response extends AppCompatActivity {
 
                 ref.document(auth.getCurrentUser().getUid()).set(response);
 
-               db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
-                Intent i=new Intent(Single_type_response.this,MainActivity.class);
-                startActivity(i);
+                Map<String,String> mapi = new HashMap<>();
+                mapi.put("pollId",auth.getCurrentUser().getUid().toString());
+                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+                       .addOnSuccessListener(new OnSuccessListener<Void>() {
+                           @Override
+                           public void onSuccess(Void aVoid) {
+                               Toast.makeText(Single_type_response.this, "Added", Toast.LENGTH_SHORT).show();
+                               Intent i=new Intent(Single_type_response.this,MainActivity.class);
+                               i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                               startActivity(i);
+                           }
+                       })
+                       .addOnFailureListener(new OnFailureListener() {
+                           @Override
+                           public void onFailure(@NonNull Exception e) {
+                               Toast.makeText(Single_type_response.this, "Failed", Toast.LENGTH_SHORT).show();
+                           }
+                       });
+
 
 
             }

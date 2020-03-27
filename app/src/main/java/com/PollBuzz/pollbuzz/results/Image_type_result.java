@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.api.Distribution;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +50,7 @@ public class Image_type_result extends AppCompatActivity {
     ImageButton logout;
     Map<String,Object> response;
     Map<String,Integer> options;
+    Integer integer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,9 @@ public class Image_type_result extends AppCompatActivity {
         View view =getSupportActionBar().getCustomView();
         logout = findViewById(R.id.logout);
         group=findViewById(R.id.options);
-        key = "AIskDlQrRfDKQSRhJEZB";
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
         response = new HashMap<>();
         options = new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
@@ -96,29 +101,54 @@ public class Image_type_result extends AppCompatActivity {
                                     i++;
                                 }
 
-                                fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).get()
-                                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                Toast.makeText(Image_type_result.this, "Added", Toast.LENGTH_SHORT).show();
-                                                if (documentSnapshot.exists()) {
-                                                    response = documentSnapshot.getData();
-                                                    if (response.containsValue("Option 2")) {
-                                                        b2.setChecked(true);
-                                                    } else
-                                                        b1.setChecked(true);
+                                if(integer == 0) {
+                                    fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).get()
+                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                    Toast.makeText(Image_type_result.this, "Added", Toast.LENGTH_SHORT).show();
+                                                    if (documentSnapshot.exists()) {
+                                                        response = documentSnapshot.getData();
+                                                        if (response.containsValue("Option 2")) {
+                                                            b2.setChecked(true);
+                                                        } else
+                                                            b1.setChecked(true);
+
+                                                    }
+
 
                                                 }
-
-
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(Image_type_result.this, "Failed", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                                if(integer == 1){
+                                    fb.getPollsCollection().document(key).collection("Response")
+                                            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if(task.isSuccessful())
+                                            {
+                                                QuerySnapshot querySnapshot = task.getResult();
+                                                if(querySnapshot != null)
+                                                {
+                                                    for(DocumentSnapshot documentSnapshot : querySnapshot)
+                                                    {
+                                                        response = documentSnapshot.getData();
+                                                        if (response.containsValue("Option 2")) {
+                                                            b2.setChecked(true);
+                                                        } else
+                                                            b1.setChecked(true);
+                                                    }
+                                                }
                                             }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(Image_type_result.this, "Failed", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
+                                        }
+                                    });
+                                }
 
                             }
                         }

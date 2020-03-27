@@ -40,6 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class Ranking_type_response extends AppCompatActivity {
@@ -74,7 +75,8 @@ public class Ranking_type_response extends AppCompatActivity {
         sequence=findViewById(R.id.sequence);
         options=new HashMap<>();
         response=new HashMap<>();
-        key= "7hKC06wS6Tc1gzM1VQsP";
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Ranking_type_response.this);
         showDialog();
@@ -184,9 +186,12 @@ public class Ranking_type_response extends AppCompatActivity {
         ref.document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                Map<String,String> mapi = new HashMap<>();
+                mapi.put("pollId",auth.getCurrentUser().getUid());
                 Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
-                firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
+                firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
                 Intent i=new Intent(Ranking_type_response.this,MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }
         })

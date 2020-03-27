@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ public class Single_type_result extends AppCompatActivity {
     FirebaseAuth.AuthStateListener listener;
     Map<String, Object> response;
     ArrayList<String> answers;
+    Integer integer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,10 @@ public class Single_type_result extends AppCompatActivity {
         View view = getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
+
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,8 +85,6 @@ public class Single_type_result extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         options = new HashMap<>();
         response = new HashMap<>();
-        key = "XPkv84bvWMRXX4mEM97j";
-        uid = "3fpFZ9pGKASP570h8BVBFn5UBDH2";
 
         typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
         dialog = new Dialog(Single_type_result.this);
@@ -97,43 +101,68 @@ public class Single_type_result extends AppCompatActivity {
 
             }
         };
-        db.collection("Polls")
-                .document(key)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                           @Override
-                                           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                               if (task.isSuccessful()) {
-                                                   DocumentSnapshot data = task.getResult();
-                                                   if (data.exists()) {
-                                                       group.removeAllViews();
-                                                       dialog.dismiss();
-                                                       PollDetails polldetails = data.toObject(PollDetails.class);
-                                                       title.setText(polldetails.getTitle());
-                                                       title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                                                       query.setText(polldetails.getQuestion());
-                                                       options = polldetails.getMap();
-                                                       db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                           @Override
-                                                           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                               if (task.isSuccessful()) {
-                                                                   DocumentSnapshot data = task.getResult();
-                                                                   if (data.exists()) {
-                                                                       response = data.getData();
-                                                                       setOptions();
+
+            db.collection("Polls")
+                    .document(key)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                               @Override
+                                               public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                   if (task.isSuccessful()) {
+                                                       DocumentSnapshot data = task.getResult();
+                                                       if (data.exists()) {
+                                                           group.removeAllViews();
+                                                           dialog.dismiss();
+                                                           PollDetails polldetails = data.toObject(PollDetails.class);
+                                                           title.setText(polldetails.getTitle());
+                                                           title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                                                           query.setText(polldetails.getQuestion());
+                                                           options = polldetails.getMap();
+                                                           if (integer == 0) {
+                                                               db.collection("Polls").document(key).collection("Response").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                   @Override
+                                                                   public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                       if (task.isSuccessful()) {
+                                                                           DocumentSnapshot data = task.getResult();
+                                                                           if (data.exists()) {
+                                                                               response = data.getData();
+                                                                               setOptions();
+                                                                           }
+                                                                       }
+
                                                                    }
-                                                               }
+                                                               });
+
 
                                                            }
-                                                       });
-
-
+                                                       }
+                                                       if (integer==1)
+                                                       {
+                                                           db.collection("Polls").document(key).collection("Response")
+                                                                   .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                               @Override
+                                                               public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                       if(task.isSuccessful())
+                                                                       {
+                                                                           QuerySnapshot querySnapshot = task.getResult();
+                                                                           if(querySnapshot != null)
+                                                                           {
+                                                                               for(DocumentSnapshot documentSnapshot : querySnapshot)
+                                                                               {
+                                                                                   response = documentSnapshot.getData();
+                                                                                   setOptions();
+                                                                               }
+                                                                           }
+                                                                       }
+                                                               }
+                                                           });
+                                                       }
                                                    }
-                                               }
 
+                                               }
                                            }
-                                       }
-                );
+                    );
+
     }
 
     private void showDialog() {

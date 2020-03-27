@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,6 +51,7 @@ public class Ranking_type_result extends AppCompatActivity {
     Dialog dialog;
     Map<String, Object> response;
     TreeMap<String, Object> options;
+    Integer integer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,9 @@ public class Ranking_type_result extends AppCompatActivity {
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
         options=new TreeMap<>();
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,8 +99,6 @@ public class Ranking_type_result extends AppCompatActivity {
         group = findViewById(R.id.options_ranking_result);
 
         fb = new firebase();
-        key = "7hKC06wS6Tc1gzM1VQsP";
-        uid= "3fpFZ9pGKASP570h8BVBFn5UBDH2";
 
         typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
         dialog = new Dialog(Ranking_type_result.this);
@@ -113,22 +116,44 @@ public class Ranking_type_result extends AppCompatActivity {
                                 title_ranking_result.setText(polldetails.getTitle());
                                 title_ranking_result.setPaintFlags(title_ranking_result.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                 query_ranking_result.setText(polldetails.getQuestion());
-                                fb.getPollsCollection().document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = task.getResult();
-                                            if (documentSnapshot != null) {
-                                                response = documentSnapshot.getData();
+                                if(integer == 0) {
+                                    fb.getPollsCollection().document(key).collection("Response").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot documentSnapshot = task.getResult();
+                                                if (documentSnapshot != null) {
+                                                    response = documentSnapshot.getData();
 
-                                                setAccordingToPriority();
+                                                    setAccordingToPriority();
 
 
+                                                }
+                                            }
+
+                                        }
+                                    });
+                                }
+                                if(integer == 0){
+                                    fb.getPollsCollection().document(key).collection("Response")
+                                            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if(task.isSuccessful())
+                                            {
+                                                QuerySnapshot querySnapshot = task.getResult();
+                                                if(querySnapshot != null)
+                                                {
+                                                    for(DocumentSnapshot documentSnapshot : querySnapshot)
+                                                    {
+                                                        response = documentSnapshot.getData();
+                                                        setAccordingToPriority();
+                                                    }
+                                                }
                                             }
                                         }
-
-                                    }
-                                });
+                                    });
+                                }
 
 
                             }

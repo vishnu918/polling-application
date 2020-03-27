@@ -74,7 +74,8 @@ public class Image_type_responses extends AppCompatActivity {
         group=findViewById(R.id.options);
         options=new HashMap<>();
         response=new HashMap<>();
-        key= "AIskDlQrRfDKQSRhJEZB";
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Image_type_responses.this);
         showDialog();
@@ -177,9 +178,12 @@ public class Image_type_responses extends AppCompatActivity {
                     collectionReference.document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            Map<String,String> mapi = new HashMap<>();
+                            mapi.put("pollId",auth.getCurrentUser().getUid());
                             Toast.makeText(Image_type_responses.this, "Added", Toast.LENGTH_SHORT).show();
-                            firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
+                            firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
                             Intent i=new Intent(Image_type_responses.this, MainActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i);
                         }
                     })

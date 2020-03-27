@@ -2,6 +2,7 @@ package com.PollBuzz.pollbuzz.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,7 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
         holder.cardV.setOnClickListener(view -> {
             Intent intent = new Intent(mContext, ResultActivity.class);
             intent.putExtra("UID", mPollDetails.get(position).getUID());
-            intent.putExtra("type", mPollDetails.get(position).getPoll_type());
+            intent.putExtra("type",mPollDetails.get(position).getPoll_type());
             mContext.startActivity(intent);
         });
     }

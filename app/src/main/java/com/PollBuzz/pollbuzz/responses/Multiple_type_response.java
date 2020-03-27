@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -62,7 +64,8 @@ public class Multiple_type_response extends AppCompatActivity {
         View view =getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
-        key="AKG63rW1U4GlYySL0OPB";
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
         c=0;
         home.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,11 +166,24 @@ public class Multiple_type_response extends AppCompatActivity {
                 Toast.makeText(Multiple_type_response.this, "Your answers are submitted", Toast.LENGTH_SHORT).show();
 
                 ref.document(auth.getCurrentUser().getUid()).set(response);
-                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
-                Intent i=new Intent(Multiple_type_response.this,MainActivity.class);
-                startActivity(i);
-
-
+                Map<String,String> mapi = new HashMap<>();
+                mapi.put("pollId",auth.getCurrentUser().getUid());
+                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(Multiple_type_response.this, "Added", Toast.LENGTH_SHORT).show();
+                                Intent i=new Intent(Multiple_type_response.this,MainActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(i);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(Multiple_type_response.this, "Failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 

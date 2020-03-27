@@ -1,27 +1,5 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.StorageReference;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -42,21 +20,41 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import Utils.ImagePickerActivity;
-import Utils.firebase;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import Utils.ImagePickerActivity;
+import Utils.firebase;
 
 public class ProfileFeed extends Fragment {
     private MaterialTextView Uname;
@@ -66,7 +64,6 @@ public class ProfileFeed extends Fragment {
     private RecyclerView profileRV;
     private ProfileFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
-    private CollectionReference userCreatedCol;
     private firebase fb;
 
     public ProfileFeed() {
@@ -82,7 +79,7 @@ public class ProfileFeed extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setGlobals(view);
-        userCreatedCol.get().addOnCompleteListener(task -> {
+        fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
             getOwnedPolls(task);
         });
         edit.setOnClickListener(view1 -> {
@@ -119,8 +116,10 @@ public class ProfileFeed extends Fragment {
                     fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
                         if (task1.isSuccessful() && task1.getResult() != null) {
                             DocumentSnapshot dS1 = task1.getResult();
-                            if (dS1.exists())
+                            if (dS1.exists()) {
+                                Log.d("ProfileFeed",dS1.getId());
                                 addToRecyclerView(dS1);
+                            }
                         } else {
                             Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -131,6 +130,7 @@ public class ProfileFeed extends Fragment {
 
     private void addToRecyclerView(DocumentSnapshot dS1) {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
+        polldetails.setUID(dS1.getId());
         mArrayList.add(polldetails);
         mAdapter.notifyDataSetChanged();
     }
@@ -156,26 +156,6 @@ public class ProfileFeed extends Fragment {
         Uname.setText(Utils.helper.getusernamePref(getContext()));
         profileRV.setLayoutManager(linearLayoutManager);
         loadProfilePic(Utils.helper.getpPicPref(getContext()));
-        fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                for (QueryDocumentSnapshot dS : task.getResult()) {
-                    if (dS.get("pollId") != null)
-                        fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
-                            if (task1.isSuccessful() && task1.getResult() != null) {
-                                DocumentSnapshot dS1 = task1.getResult();
-                                if (dS1.exists()) {
-                                    PollDetails polldetails = dS1.toObject(PollDetails.class);
-                                    polldetails.setUID(dS1.getId());
-                                    mArrayList.add(polldetails);
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                            } else {
-                                Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                }
-            }
-        });
     }
 
     private void showImagePickerOptions() {
