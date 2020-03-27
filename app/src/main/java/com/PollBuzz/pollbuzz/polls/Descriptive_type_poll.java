@@ -7,11 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.PollList;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,7 +28,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import Utils.helper;
 
@@ -72,7 +71,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
                 }
                 else {
                     if(auth.getCurrentUser() != null){
-                        Polldetails polldetails = new Polldetails();
+                        PollDetails polldetails = new PollDetails();
                         polldetails.setTitle(title_descriptive.getText().toString().trim());
                         polldetails.setQuestion(question_descriptive.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
@@ -88,6 +87,9 @@ public class Descriptive_type_poll extends AppCompatActivity {
                                         m.put("pollId",doc.getId());
                                         docCreated.document().set(m);
                                         Toast.makeText(Descriptive_type_poll.this, "Added successfully", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(Descriptive_type_poll.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

@@ -17,11 +17,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.PollList;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -125,7 +125,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                 }
                 else {
                     if (auth.getCurrentUser() != null) {
-                        Polldetails polldetails = new Polldetails();
+                        PollDetails polldetails = new PollDetails();
                         polldetails.setTitle(title_multi.getText().toString().trim());
                         polldetails.setQuestion(question_multi.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
@@ -147,6 +147,9 @@ public class Multiple_type_poll extends AppCompatActivity {
                                         m.put("pollId",doc.getId());
                                         docCreated.document().set(m);
                                         Toast.makeText(Multiple_type_poll.this, "Added to Database", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(Multiple_type_poll.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

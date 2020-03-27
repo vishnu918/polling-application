@@ -2,9 +2,11 @@ package com.PollBuzz.pollbuzz;
 
 import java.util.Map;
 
-public class Polldetails {
+public class PollDetails {
 
-    private String title, question, created_date, expiry_date,poll_type, author;
+    private String title, question, created_date, expiry_date, poll_type, author;
+    private String UID;
+    private Map<String, Integer> map;
 
     public String getAuthor() {
         return author;
@@ -14,7 +16,14 @@ public class Polldetails {
         this.author = author;
     }
 
-    private Map<String,Integer> map;
+
+    public void setUID(String UID) {
+        this.UID = UID;
+    }
+
+    public String getUID() {
+        return UID;
+    }
 
     public Map<String, Integer> getMap() {
         return map;

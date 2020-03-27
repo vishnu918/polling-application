@@ -3,18 +3,14 @@ package com.PollBuzz.pollbuzz.navFragments;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import com.PollBuzz.pollbuzz.Poll_list;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollList;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
 import com.PollBuzz.pollbuzz.adapters.VotedFeedAdapter;
 
 import android.content.Intent;
@@ -27,6 +23,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import Utils.firebase;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -34,76 +31,66 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class VotedFeed extends Fragment {
-    RecyclerView votedRV;
-    VotedFeedAdapter mAdapter;
-    ArrayList<Polldetails> mArrayList;
+    private RecyclerView votedRV;
+    private VotedFeedAdapter mAdapter;
+    private ArrayList<PollDetails> mArrayList;
     private LinearLayoutManager layoutManager;
-    FloatingActionButton fab;
-    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    private CollectionReference userColRef, pollsColRef;
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
+    private FloatingActionButton fab;
+    private CollectionReference userVotedRef;
+    private firebase fb;
+
     public VotedFeed() {
-        // Required empty public constructor
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_voted_feed, container, false);
-        return view;
+        return inflater.inflate(R.layout.activity_voted_feed, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mArrayList = new ArrayList<>();
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        userColRef = firebaseFirestore.collection("Users").document(mUser.getUid()).collection("Voted");
-        pollsColRef = firebaseFirestore.collection("Polls");
-        fab=view.findViewById(R.id.fab);
+        setGlobals(view);
+        fab.setOnClickListener(view1 -> {
+            Intent i = new Intent(getContext(), PollList.class);
+            startActivity(i);
+        });
+        userVotedRef.get().addOnCompleteListener(task -> getVotedPolls(task));
+    }
+
+    private void getVotedPolls(@NonNull Task<QuerySnapshot> task) {
+        if (task.isSuccessful() && task.getResult() != null) {
+            for (QueryDocumentSnapshot dS : task.getResult()) {
+                if (dS.exists()) {
+                    fb.getPollsCollection().document(dS.getId())
+                            .get().addOnCompleteListener(task1 -> {
+                                if(task1.isSuccessful() && task1.getResult()!=null){
+                                    addToRecyclerView(task1.getResult());
+                                }
+                            });
+                }
+            }
+        }
+    }
+
+    private void addToRecyclerView(DocumentSnapshot dS1) {
+        PollDetails polldetails = dS1.toObject(PollDetails.class);
+        polldetails.setUID(dS1.getId());
+        mArrayList.add(polldetails);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void setGlobals(@NonNull View view) {
+        fab = view.findViewById(R.id.fab);
         votedRV = view.findViewById(R.id.votedrecyclerview);
         votedRV.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new VotedFeedAdapter(getContext(),mArrayList);
-
         votedRV.setLayoutManager(layoutManager);
+        mArrayList = new ArrayList<>();
+        mAdapter = new VotedFeedAdapter(getContext(), mArrayList);
         votedRV.setAdapter(mAdapter);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i =new Intent(getContext(), Poll_list.class);
-                startActivity(i);
-            }
-        });
-        userColRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    for (QueryDocumentSnapshot dS : task.getResult()) {
-                        if (dS.get("pollId") != null)
-                            pollsColRef.document(dS.get("pollId").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful() && task.getResult() != null) {
-                                    Log.d("arraySize",task.getResult().getId());
-                                    DocumentSnapshot dS1 = task.getResult();
-                                    if (dS1.exists()) {
-                                        Log.d("arraySize","Exists");
-                                        Polldetails polldetails = dS1.toObject(Polldetails.class);
-                                        mArrayList.add(polldetails);
-                                        Log.d("arraySize",String.valueOf(mArrayList.size()));
-                                        mAdapter.notifyDataSetChanged();
-                                    }
-                                } else {
-                                    Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
+        fb = new firebase();
+        userVotedRef = fb.getUserDocument().collection("Voted");
     }
 }

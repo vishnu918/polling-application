@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,9 +31,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 
 import java.util.HashMap;
@@ -51,7 +53,7 @@ public class Single_type_response extends AppCompatActivity {
     FirebaseAuth.AuthStateListener listener;
     Button submit;
     int c;
-    Map<String,Integer> response;
+    Map<String,String> response;
     int b_id;
     String resp;
 
@@ -87,7 +89,8 @@ public class Single_type_response extends AppCompatActivity {
         db=FirebaseFirestore.getInstance();
        options=new HashMap<>();
        response=new HashMap<>();
-       key= "XPkv84bvWMRXX4mEM97j";
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
        dialog=new Dialog(Single_type_response.this);
         showDialog();
@@ -98,7 +101,7 @@ public class Single_type_response extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Single_type_response.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Single_type_response.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -116,7 +119,7 @@ public class Single_type_response extends AppCompatActivity {
                    if(data.exists())
                    {   group.removeAllViews();
                    dialog.dismiss();
-                       Polldetails polldetails=data.toObject(Polldetails.class);
+                       PollDetails polldetails=data.toObject(PollDetails.class);
                        title.setText(polldetails.getTitle());
                        title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                        query.setText(polldetails.getQuestion());
@@ -129,7 +132,6 @@ public class Single_type_response extends AppCompatActivity {
                            layoutParams.setMargins(5,20,5,20);
                            button.setLayoutParams(layoutParams);
                            button.setTypeface(typeface);
-                           /*button.setId(c+1);*/
                            button.setText(entry.getKey());
                            button.setTextSize(20.0f);
                            group.addView(button);
@@ -158,14 +160,29 @@ public class Single_type_response extends AppCompatActivity {
             public void onClick(View v) {
                 RadioButton button=findViewById(b_id);
                 Toast.makeText(getApplicationContext(),resp+" Opted",Toast.LENGTH_LONG).show();
-                options.clear();
-                options.put(resp,0);
+                response.put("option",resp);
 
-                ref.document(auth.getCurrentUser().getUid()).set(options);
+                ref.document(auth.getCurrentUser().getUid()).set(response);
 
-               db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(options);
-                Intent i=new Intent(Single_type_response.this,MainActivity.class);
-                startActivity(i);
+                Map<String,String> mapi = new HashMap<>();
+                mapi.put("pollId",auth.getCurrentUser().getUid().toString());
+                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+                       .addOnSuccessListener(new OnSuccessListener<Void>() {
+                           @Override
+                           public void onSuccess(Void aVoid) {
+                               Toast.makeText(Single_type_response.this, "Added", Toast.LENGTH_SHORT).show();
+                               Intent i=new Intent(Single_type_response.this,MainActivity.class);
+                               i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                               startActivity(i);
+                           }
+                       })
+                       .addOnFailureListener(new OnFailureListener() {
+                           @Override
+                           public void onFailure(@NonNull Exception e) {
+                               Toast.makeText(Single_type_response.this, "Failed", Toast.LENGTH_SHORT).show();
+                           }
+                       });
+
 
 
             }

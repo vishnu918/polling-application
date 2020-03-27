@@ -1,28 +1,31 @@
 package com.PollBuzz.pollbuzz.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.results.ResultActivity;
+
+import java.util.ArrayList;
 
 public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.ProfileViewHolder> {
 
-    private ArrayList<Polldetails> mPolldetails;
+    private ArrayList<PollDetails> mPollDetails;
     Context mContext;
 
-    public ProfileFeedAdapter(Context mContext, ArrayList<Polldetails> mPolldetails) {
+    public ProfileFeedAdapter(Context mContext, ArrayList<PollDetails> mPollDetails) {
         this.mContext = mContext;
-        this.mPolldetails = mPolldetails;
+        this.mPollDetails = mPollDetails;
     }
 
     @NonNull
@@ -35,28 +38,37 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ProfileViewHolder holder, int position) {
-        if(mPolldetails.get(position).getTitle()!=null)
-            holder.card_title.setText(mPolldetails.get(position).getTitle().trim());
-        if(mPolldetails.get(position).getPoll_type()!=null)
-            holder.card_type.setText(mPolldetails.get(position).getPoll_type());
-        if(mPolldetails.get(position).getQuestion()!=null)
-            holder.card_query.setText(mPolldetails.get(position).getQuestion().trim());
+        if (mPollDetails.get(position).getTitle() != null)
+            holder.card_title.setText(mPollDetails.get(position).getTitle().trim());
+        if (mPollDetails.get(position).getPoll_type() != null)
+            holder.card_type.setText(mPollDetails.get(position).getPoll_type());
+        if (mPollDetails.get(position).getQuestion() != null)
+            holder.card_query.setText(mPollDetails.get(position).getQuestion().trim());
         holder.card_author.setText("hello");
-        if(mPolldetails.get(position).getCreated_date()!=null)
-            holder.card_date.setText(mPolldetails.get(position).getCreated_date().trim());
+        if (mPollDetails.get(position).getCreated_date() != null)
+            holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
+
+        holder.cardV.setOnClickListener(view -> {
+            Intent intent = new Intent(mContext, ResultActivity.class);
+            intent.putExtra("UID", mPollDetails.get(position).getUID());
+            intent.putExtra("type",mPollDetails.get(position).getPoll_type());
+            mContext.startActivity(intent);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return mPolldetails.size();
+        return mPollDetails.size();
     }
 
     public static class ProfileViewHolder extends RecyclerView.ViewHolder {
 
+        private CardView cardV;
         public TextView card_title, card_type, card_query, card_author, card_date;
 
         public ProfileViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardV = itemView.findViewById(R.id.cardV);
             card_title = itemView.findViewById(R.id.card_title);
             card_type = itemView.findViewById(R.id.card_type);
             card_query = itemView.findViewById(R.id.card_query);

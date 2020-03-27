@@ -1,10 +1,5 @@
 package com.PollBuzz.pollbuzz.responses;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -16,12 +11,20 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,7 +39,7 @@ import java.util.Map;
 public class Descriptive_type_response extends AppCompatActivity {
     Button submit;
     TextView title,query;
-    Map<String,Integer> response;
+    Map<String,String> response;
     Typeface typeface;
     Dialog dialog;
     FirebaseAuth auth;
@@ -56,10 +59,11 @@ public class Descriptive_type_response extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
         View view =getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
-        key="80E2L7Whekw7AAtFu6yA";
         response=new HashMap<>();
         home.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +93,7 @@ public class Descriptive_type_response extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Descriptive_type_response.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Descriptive_type_response.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -105,7 +109,7 @@ public class Descriptive_type_response extends AppCompatActivity {
                     if(data.exists())
                     {
                         dialog.dismiss();
-                        Polldetails polldetails=data.toObject(Polldetails.class);
+                        PollDetails polldetails=data.toObject(PollDetails.class);
                         title.setText(polldetails.getTitle());
                         title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                         query.setText(polldetails.getQuestion());
@@ -117,16 +121,27 @@ public class Descriptive_type_response extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 response.put(answer.getEditText().getText().toString(),0);
-
+                 response.put("option",answer.getEditText().getText().toString());
                 System.out.println(response);
-
                 ref.document(auth.getCurrentUser().getUid()).set(response);
-                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(response);
-                Intent i=new Intent(Descriptive_type_response.this,MainActivity.class);
-                startActivity(i);
-
-
+                Map<String,String> mapi = new HashMap<>();
+                mapi.put("pollId",auth.getCurrentUser().getUid());
+                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(Descriptive_type_response.this, "ADded", Toast.LENGTH_SHORT).show();
+                                Intent i=new Intent(Descriptive_type_response.this,MainActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(i);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(Descriptive_type_response.this, "Failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 

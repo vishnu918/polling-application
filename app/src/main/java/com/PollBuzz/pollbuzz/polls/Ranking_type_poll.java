@@ -22,7 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.PollList;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,7 +36,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -129,7 +130,7 @@ public class Ranking_type_poll extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Ranking_type_poll.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Ranking_type_poll.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -152,7 +153,7 @@ public class Ranking_type_poll extends AppCompatActivity {
                 {
                     if(auth.getCurrentUser() != null)
                     {
-                        Polldetails polldetails = new Polldetails();
+                        PollDetails polldetails = new PollDetails();
                         polldetails.setTitle(title_ranking.getText().toString().trim());
                         polldetails.setQuestion(question_ranking.getText().toString().trim());
                         polldetails.setCreated_date(formatteddate);
@@ -175,6 +176,10 @@ public class Ranking_type_poll extends AppCompatActivity {
                                         m.put("pollId",doc.getId());
                                         docCreated.document().set(m);
                                         Toast.makeText(Ranking_type_poll.this, "Added Successfully", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(Ranking_type_poll.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

@@ -1,10 +1,5 @@
 package com.PollBuzz.pollbuzz.results;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -13,17 +8,20 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.responses.Single_type_response;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,16 +40,18 @@ public class Single_type_result extends AppCompatActivity {
     RadioGroup group;
     FirebaseFirestore db;
     CollectionReference ref;
-    Map<String,Integer> options;
+    Map<String, Integer> options;
     String key;
     String uid;
     Typeface typeface;
     Dialog dialog;
     FirebaseAuth auth;
-    ImageButton home,logout;
+    ImageButton home, logout;
     FirebaseAuth.AuthStateListener listener;
     Map<String, Object> response;
     ArrayList<String> answers;
+    Integer integer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,9 +59,13 @@ public class Single_type_result extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
-        View view =getSupportActionBar().getCustomView();
+        View view = getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
+
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,77 +79,93 @@ public class Single_type_result extends AppCompatActivity {
                 auth.signOut();
             }
         });
-        title=findViewById(R.id.title);
-        query=findViewById(R.id.query);
-        group=findViewById(R.id.options);
-        db=FirebaseFirestore.getInstance();
-        options=new HashMap<>();
-        response=new HashMap<>();
-        key= "XPkv84bvWMRXX4mEM97j";
-        uid="3fpFZ9pGKASP570h8BVBFn5UBDH2";
+        title = findViewById(R.id.title);
+        query = findViewById(R.id.query);
+        group = findViewById(R.id.options);
+        db = FirebaseFirestore.getInstance();
+        options = new HashMap<>();
+        response = new HashMap<>();
 
-        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
-        dialog=new Dialog(Single_type_result.this);
+        typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
+        dialog = new Dialog(Single_type_result.this);
         showDialog();
         auth = FirebaseAuth.getInstance();
-        listener=new FirebaseAuth.AuthStateListener() {
+        listener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Single_type_result.this, Login_Signup_Activity.class);
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    Intent i = new Intent(Single_type_result.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
             }
         };
-        db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                             @Override
-                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+            db.collection("Polls")
+                    .document(key)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                               @Override
+                                               public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                   if (task.isSuccessful()) {
+                                                       DocumentSnapshot data = task.getResult();
+                                                       if (data.exists()) {
+                                                           group.removeAllViews();
+                                                           dialog.dismiss();
+                                                           PollDetails polldetails = data.toObject(PollDetails.class);
+                                                           title.setText(polldetails.getTitle());
+                                                           title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                                                           query.setText(polldetails.getQuestion());
+                                                           options = polldetails.getMap();
+                                                           if (integer == 0) {
+                                                               db.collection("Polls").document(key).collection("Response").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                   @Override
+                                                                   public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                       if (task.isSuccessful()) {
+                                                                           DocumentSnapshot data = task.getResult();
+                                                                           if (data.exists()) {
+                                                                               response = data.getData();
+                                                                               setOptions();
+                                                                           }
+                                                                       }
+
+                                                                   }
+                                                               });
 
 
+                                                           }
+                                                       }
+                                                       if (integer==1)
+                                                       {
+                                                           db.collection("Polls").document(key).collection("Response")
+                                                                   .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                               @Override
+                                                               public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                       if(task.isSuccessful())
+                                                                       {
+                                                                           QuerySnapshot querySnapshot = task.getResult();
+                                                                           if(querySnapshot != null)
+                                                                           {
+                                                                               for(DocumentSnapshot documentSnapshot : querySnapshot)
+                                                                               {
+                                                                                   response = documentSnapshot.getData();
+                                                                                   setOptions();
+                                                                               }
+                                                                           }
+                                                                       }
+                                                               }
+                                                           });
+                                                       }
+                                                   }
 
-                                                                                 if (task.isSuccessful()) {
-
-                                                                                     DocumentSnapshot data = task.getResult();
-                                                                                     if(data.exists())
-                                                                                     {   group.removeAllViews();
-                                                                                         dialog.dismiss();
-                                                                                         Polldetails polldetails=data.toObject(Polldetails.class);
-                                                                                         title.setText(polldetails.getTitle());
-                                                                                         title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-                                                                                         query.setText(polldetails.getQuestion());
-                                                                                         options=polldetails.getMap();
-                                                                                         db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                                             @Override
-                                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                                                 if(task.isSuccessful())
-                                                                                                 {
-                                                                                                     DocumentSnapshot data = task.getResult();
-                                                                                                     if(data.exists())
-                                                                                                     {
-                                                                                                         response=data.getData();
-                                                                                                         setOptions();
-                                                                                                     }
-                                                                                                 }
-
-                                                                                             }
-                                                                                         });
-
-
-
-                                                                                     }
-                                                                                 }
-
-                                                                             }
-                                                                         }
-                                                                         );
-
+                                               }
+                                           }
+                    );
 
     }
-    private void showDialog()
-    {
+
+    private void showDialog() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.loading_dialog);
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
@@ -158,35 +179,33 @@ public class Single_type_result extends AppCompatActivity {
         dialog.show();
         window.setAttributes(lp);
     }
+
     @Override
     protected void onStart() {
         super.onStart();
         auth.addAuthStateListener(listener);
 
     }
-    private void setOptions()
-    {
 
-        for(Map.Entry<String,Object> entry: response.entrySet())
-        {
-            String key=entry.getKey();
-            if(options.containsKey(key))
-            {
-                options.remove(key);
-                options.put(key,1);
-            }
+    private void setOptions() {
+        String value = "";
+
+        for (Map.Entry<String, Object> entry : response.entrySet()) {
+            value = entry.getValue().toString();
         }
-        for(Map.Entry<String,Integer> entry : options.entrySet())
-        {
-            RadioButton button=new RadioButton(getApplicationContext());
-            RadioGroup.LayoutParams layoutParams=new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,RadioGroup.LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(5,20,5,20);
+
+        for (Map.Entry<String, Integer> entry : options.entrySet()) {
+            RadioButton button = new RadioButton(getApplicationContext());
+            RadioGroup.LayoutParams layoutParams = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(5, 20, 5, 20);
             button.setLayoutParams(layoutParams);
             button.setTypeface(typeface);
             button.setText(entry.getKey());
             button.setTextSize(20.0f);
             group.addView(button);
-            if(entry.getValue()==1)
+            if (button.getText().toString().equals(value))
+                button.setChecked(true);
+         /*   if(entry.getValue()==1)
                 button.setChecked(true);
             else
                 button.setEnabled(false);
@@ -204,7 +223,7 @@ public class Single_type_result extends AppCompatActivity {
                         else
                             b.setChecked(false);
                 }
-            });
+            });*/
         }
         dialog.dismiss();
     }

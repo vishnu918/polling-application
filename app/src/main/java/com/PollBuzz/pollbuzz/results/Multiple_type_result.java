@@ -13,16 +13,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.PollBuzz.pollbuzz.LogIn_SignUp.Login_Signup_Activity;
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.Polldetails;
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +47,7 @@ public class Multiple_type_result extends AppCompatActivity {
     ImageButton home,logout;
     FirebaseAuth.AuthStateListener listener;
     Map<String,Object> response;
+    Integer integer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +59,9 @@ public class Multiple_type_result extends AppCompatActivity {
         View view =getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
+        Intent intent = getIntent();
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,8 +81,6 @@ public class Multiple_type_result extends AppCompatActivity {
         db=FirebaseFirestore.getInstance();
         options=new HashMap<>();
         response=new HashMap<>();
-        key= "IydixH3XGmrNDnHwxTC7";
-        uid="3fpFZ9pGKASP570h8BVBFn5UBDH2";
 
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Multiple_type_result.this);
@@ -91,7 +92,7 @@ public class Multiple_type_result extends AppCompatActivity {
                 FirebaseUser user=firebaseAuth.getCurrentUser();
                 if(user==null)
                 {
-                    Intent i=new Intent(Multiple_type_result.this, Login_Signup_Activity.class);
+                    Intent i=new Intent(Multiple_type_result.this, LoginSignupActivity.class);
                     startActivity(i);
                 }
 
@@ -109,26 +110,47 @@ public class Multiple_type_result extends AppCompatActivity {
                                                                                      if(data.exists())
                                                                                      {   group.removeAllViews();
                                                                                          dialog.dismiss();
-                                                                                         Polldetails polldetails=data.toObject(Polldetails.class);
+                                                                                         PollDetails polldetails=data.toObject(PollDetails.class);
                                                                                          title.setText(polldetails.getTitle());
                                                                                          title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                                                                                          query.setText(polldetails.getQuestion());
                                                                                          options=polldetails.getMap();
-                                                                                         db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                                             @Override
-                                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                                                 if(task.isSuccessful())
-                                                                                                 {
-                                                                                                     DocumentSnapshot data = task.getResult();
-                                                                                                     if(data.exists())
+                                                                                         if(integer == 0) {
+                                                                                             db.collection("Polls").document(key).collection("Response").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                                 @Override
+                                                                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                                                     if (task.isSuccessful()) {
+                                                                                                         DocumentSnapshot data = task.getResult();
+                                                                                                         if (data.exists()) {
+                                                                                                             response = data.getData();
+                                                                                                             setOptions();
+                                                                                                         }
+                                                                                                     }
+
+                                                                                                 }
+                                                                                             });
+                                                                                         }
+                                                                                         if( integer == 1){
+
+                                                                                             db.collection("Polls").document(key).collection("Response")
+                                                                                                     .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                                                 @Override
+                                                                                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                                                     if(task.isSuccessful())
                                                                                                      {
-                                                                                                         response=data.getData();
-                                                                                                         setOptions();
+                                                                                                         QuerySnapshot querySnapshot = task.getResult();
+                                                                                                         if(querySnapshot != null)
+                                                                                                         {
+                                                                                                             for(DocumentSnapshot documentSnapshot : querySnapshot)
+                                                                                                             {
+                                                                                                                 response = documentSnapshot.getData();
+                                                                                                                 setOptions();
+                                                                                                             }
+                                                                                                         }
                                                                                                      }
                                                                                                  }
-
-                                                                                             }
-                                                                                         });
+                                                                                             });
+                                                                                         }
 
 
 
@@ -164,13 +186,14 @@ public class Multiple_type_result extends AppCompatActivity {
     private void setOptions()
     {
 
+        int i=0;
         for(Map.Entry<String,Object> entry: response.entrySet())
         {
-            String key=entry.getKey();
+            String key=entry.getValue().toString();
             if(options.containsKey(key))
             {
                 options.remove(key);
-                options.put(key,1);
+                options.put(entry.getValue().toString(),1);
             }
         }
         for(Map.Entry<String,Integer> entry : options.entrySet())
