@@ -3,13 +3,20 @@ package com.PollBuzz.pollbuzz.results;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.VoteDetails;
 import com.PollBuzz.pollbuzz.adapters.VoterPageAdapter;
@@ -34,15 +41,25 @@ public class ResultActivity extends AppCompatActivity {
     List<VoteDetails> mVoteDetailsList;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
-    String type;
+    ImageButton home,logout;
+    TextView page_title;
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private CollectionReference pollsColRef, userColRef;
     firebase fb;
+    FirebaseAuth.AuthStateListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
+        View view = getSupportActionBar().getCustomView();
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+        page_title=view.findViewById(R.id.page_title);
+        page_title.setText("Results");
         Intent parent = getIntent();
         String UID = parent.getStringExtra("UID");
         String type = parent.getStringExtra("type");
@@ -67,6 +84,30 @@ public class ResultActivity extends AppCompatActivity {
 //                }
 //            });
 //        }
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ResultActivity.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAuth.signOut();
+            }
+        });
+        listener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    Intent i = new Intent(ResultActivity.this, LoginSignupActivity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
         userColRef = firebaseFirestore.collection("Users");
         voteRV = findViewById(R.id.voterListRV);
         mVoteDetailsList = new ArrayList<>();
@@ -104,5 +145,11 @@ public class ResultActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(listener);
+
     }
 }
