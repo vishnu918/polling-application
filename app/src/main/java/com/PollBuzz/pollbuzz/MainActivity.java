@@ -4,22 +4,20 @@ import com.PollBuzz.pollbuzz.navFragments.HomeFeed;
 import com.PollBuzz.pollbuzz.navFragments.ProfileFeed;
 import com.PollBuzz.pollbuzz.navFragments.VotedFeed;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import me.ibrahimsn.lib.OnItemSelectedListener;
 import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends AppCompatActivity {
-    SmoothBottomBar bottomBar;
+    public static SmoothBottomBar bottomBar;
     FrameLayout container;
-    Fragment active;
+    public static Fragment active;
     Boolean flag2 = false, flag3 = false;
-    Fragment fragment1, fragment2, fragment3;
+    public static Fragment fragment1, fragment2, fragment3;
     FragmentManager fm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         fragment2 = new VotedFeed();
         fragment3 = new ProfileFeed();
         fm = getSupportFragmentManager();
-        fm.beginTransaction().add(R.id.container, fragment1, "1").commit();
+        fm.beginTransaction().addToBackStack("1").add(R.id.container, fragment1, "1").commit();
         active = fragment1;
     }
 
@@ -44,22 +42,23 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.setOnItemSelectedListener(i -> {
             switch (i) {
                 case 0:
-                    replaceFragment(fragment1);
+                    if (fm.findFragmentByTag("1") == null) {
+                        createFragment(fragment1, "1");
+                    } else
+                        replaceFragment(fragment1);
                     active = fragment1;
                     break;
                 case 1:
-                    if (!flag2) {
+                    if (fm.findFragmentByTag("2") == null) {
                         createFragment(fragment2, "2");
-                        flag2 = true;
                     } else {
                         replaceFragment(fragment2);
                     }
                     active = fragment2;
                     break;
                 case 2:
-                    if (!flag3) {
+                    if (fm.findFragmentByTag("3") == null) {
                         createFragment(fragment3, "3");
-                        flag3 = true;
                     } else {
                         replaceFragment(fragment3);
                     }
@@ -70,10 +69,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void replaceFragment(Fragment fragment) {
-        fm.beginTransaction().hide(active).show(fragment).commit();
+        if (fragment.getTag().equals("3"))
+            fm.beginTransaction().hide(active).show(fragment).commit();
+        else
+            fm.beginTransaction().addToBackStack(fragment.getTag()).hide(active).show(fragment).commit();
     }
 
     private void createFragment(Fragment fragment, String id) {
-        fm.beginTransaction().add(R.id.container, fragment, id).hide(active).commit();
+        if (id.equals("3"))
+            fm.beginTransaction().add(R.id.container, fragment, id).hide(active).commit();
+        else
+            fm.beginTransaction().addToBackStack(id).add(R.id.container, fragment, id).hide(active).commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }
