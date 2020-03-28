@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -25,27 +24,24 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.firebase;
+
 public class Descriptive_type_result extends AppCompatActivity {
-    Button submit;
     TextView title, query, answer;
     Map<String, Object> response;
     Typeface typeface;
     Dialog dialog;
-    FirebaseAuth auth;
     ImageButton home, logout;
     FirebaseAuth.AuthStateListener listener;
-    FirebaseFirestore db;
-    CollectionReference ref;
     String key, uid;
     Integer integer;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    firebase fb = new firebase();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,44 +51,18 @@ public class Descriptive_type_result extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
-        home = view.findViewById(R.id.home);
-        logout = view.findViewById(R.id.logout);
-        auth = FirebaseAuth.getInstance();
+
+        setGlobals(view);
         Intent intent = getIntent();
-        key = intent.getExtras().getString("UID");
-        integer = intent.getExtras().getInt("flag");
-
-        if(integer == 1)
-        {
-            uid = intent.getExtras().getString("UIDUser");
-        }
-        if(integer == 0)
-        {
-            uid = auth.getCurrentUser().getUid();
-        }
-
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Descriptive_type_result.this, MainActivity.class);
-                startActivity(i);
-            }
-        });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                auth.signOut();
-            }
-        });
-        title = findViewById(R.id.title);
-        query = findViewById(R.id.query);
-        answer = findViewById(R.id.answer);
-        db = FirebaseFirestore.getInstance();
-        response = new HashMap<>();
-
-        typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
-        dialog = new Dialog(Descriptive_type_result.this);
+        getIntentExtras(intent);
+        setActionBarFunctionality();
+        setAuthStateListener();
         showDialog();
+        retriveData(fb);
+
+    }
+
+    private void setAuthStateListener() {
 
         listener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -105,60 +75,90 @@ public class Descriptive_type_result extends AppCompatActivity {
 
             }
         };
-        db.collection("Polls").document(key)
+    }
+
+    private void retriveData(firebase fb) {
+
+        fb.getPollsCollection().document(key)
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                             @Override
-                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                 @Override
+                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
 
-                                                                                 if (task.isSuccessful()) {
+                                                     if (task.isSuccessful()) {
 
-                                                                                     DocumentSnapshot data = task.getResult();
-                                                                                     if (data.exists()) {
-                                                                                         dialog.dismiss();
-                                                                                         PollDetails polldetails = data.toObject(PollDetails.class);
-                                                                                         title.setText(polldetails.getTitle());
-                                                                                         title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                                                                                         query.setText(polldetails.getQuestion());
-                                                                                             db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                                                 @Override
-                                                                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                                                     if (task.isSuccessful()) {
-                                                                                                         DocumentSnapshot data = task.getResult();
-                                                                                                         if (data.exists()) {
-                                                                                                             response = data.getData();
-                                                                                                             setAnswer();
-                                                                                                         }
-                                                                                                     }
-
-                                                                                                 }
-                                                                                             });
-
-                                                                                     /*    if (integer == 1) {
-                                                                                             db.collection("Polls").document(key).collection("Response")
-                                                                                                     .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                                                 @Override
-                                                                                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                                                     if (task.isSuccessful()) {
-                                                                                                         QuerySnapshot querySnapshot = task.getResult();
-                                                                                                         if (querySnapshot != null) {
-                                                                                                             for (DocumentSnapshot documentSnapshot : querySnapshot) {
-                                                                                                                 response = documentSnapshot.getData();
-                                                                                                                 setAnswer();
-                                                                                                             }
-                                                                                                         }
-                                                                                                     }
-                                                                                                 }
-                                                                                             });
-                                                                                         }*/
-
-                                                                                     }
-                                                                                 }
-
-                                                                             }
+                                                         DocumentSnapshot data = task.getResult();
+                                                         if (data.exists()) {
+                                                             dialog.dismiss();
+                                                             PollDetails polldetails = data.toObject(PollDetails.class);
+                                                             title.setText(polldetails.getTitle());
+                                                             title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                                                             query.setText(polldetails.getQuestion());
+                                                             fb.getPollsCollection().document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                 @Override
+                                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                     if (task.isSuccessful()) {
+                                                                         DocumentSnapshot data = task.getResult();
+                                                                         if (data.exists()) {
+                                                                             response = data.getData();
+                                                                             setAnswer();
                                                                          }
-        );
+                                                                     }
 
+                                                                 }
+                                                             });
+
+                                                         }
+                                                     }
+
+                                                 }
+                                             }
+        );
+    }
+
+    private void setActionBarFunctionality() {
+
+
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Descriptive_type_result.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fb.signOut();
+            }
+        });
+    }
+
+    private void getIntentExtras(Intent intent) {
+
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
+
+        if(integer == 1)
+        {
+            uid = intent.getExtras().getString("UIDUser");
+        }
+        if(integer == 0) {
+            uid = fb.getUserId();
+        }
+
+    }
+
+    private void setGlobals(View view) {
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+        title = findViewById(R.id.title);
+        query = findViewById(R.id.query);
+        answer = findViewById(R.id.answer);
+        response = new HashMap<>();
+
+        typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
+        dialog = new Dialog(Descriptive_type_result.this);
     }
 
     @Override
