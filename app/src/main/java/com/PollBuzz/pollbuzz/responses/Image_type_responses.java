@@ -56,11 +56,8 @@ public class Image_type_responses extends AppCompatActivity {
     String key;
     Typeface typeface;
     Dialog dialog;
-    ImageButton logout;
+    ImageButton logout,home;
     FirebaseAuth.AuthStateListener listener;
-    int c;
-    int b_id;
-    String resp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,46 +67,13 @@ public class Image_type_responses extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
-        logout = findViewById(R.id.logout);
-        group=findViewById(R.id.options);
-        options=new HashMap<>();
-        response=new HashMap<>();
+        setGlobals(view);
         Intent intent = getIntent();
-        key = intent.getExtras().getString("UID");
-        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
-        dialog=new Dialog(Image_type_responses.this);
+        getIntentExtras(intent);
+        setActionBarFunctionality();
         showDialog();
-        auth = FirebaseAuth.getInstance();
+        setAuthStateListener();
 
-        title = findViewById(R.id.title);
-        query = findViewById(R.id.query);
-        submit = findViewById(R.id.submit);
-
-        image1 = findViewById(R.id.image1);
-        image2 = findViewById(R.id.image2);
-
-        b1 = findViewById(R.id.option1);
-        b2 = findViewById(R.id.option2);
-
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                auth.signOut();
-            }
-        });
-
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Image_type_responses.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
         b1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -128,8 +92,56 @@ public class Image_type_responses extends AppCompatActivity {
                 }
             }
         });
+        retrieveData();
 
 
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                submitResponse();
+
+            }
+        });
+
+    }
+
+    private void submitResponse() {
+        if(b1.isChecked())
+        {
+            response.put("option",b1.getText().toString().trim());
+        }
+        if(b2.isChecked())
+        {
+            response.put("option",b2.getText().toString().trim());
+        }
+        if(auth.getCurrentUser() != null)
+        {
+            collectionReference = firebaseFirestore.collection("Polls").document(key).collection("Response");
+            collectionReference.document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Map<String,String> mapi = new HashMap<>();
+                    mapi.put("pollId",auth.getCurrentUser().getUid());
+                    Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
+                    firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
+                    Intent i=new Intent(Image_type_responses.this, MainActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                }
+            })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(Image_type_responses.this, "Unable to submit .Please try again ", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+        }
+
+    }
+
+    private void retrieveData() {
         firebaseFirestore.collection("Polls").document(key).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -161,44 +173,66 @@ public class Image_type_responses extends AppCompatActivity {
                         }
                     }
                 });
-        submit.setOnClickListener(new View.OnClickListener() {
+
+    }
+
+    private void setAuthStateListener() {
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Image_type_responses.this, LoginSignupActivity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
+
+    }
+
+    private void setActionBarFunctionality() {
+        logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(b1.isChecked())
-                {
-                    response.put("option",b1.getText().toString().trim());
-                }
-                if(b2.isChecked())
-                {
-                    response.put("option",b2.getText().toString().trim());
-                }
-                if(auth.getCurrentUser() != null)
-                {
-                    collectionReference = firebaseFirestore.collection("Polls").document(key).collection("Response");
-                    collectionReference.document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Map<String,String> mapi = new HashMap<>();
-                            mapi.put("pollId",auth.getCurrentUser().getUid());
-                            Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                            firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
-                            Intent i=new Intent(Image_type_responses.this, MainActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
-                        }
-                    })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(Image_type_responses.this, "Unable to submit .Please try again ", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-                }
+                auth.signOut();
+            }
+        });
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Image_type_responses.this, MainActivity.class);
+                startActivity(i);
             }
         });
 
     }
+
+    private void getIntentExtras(Intent intent) {
+        key = intent.getExtras().getString("UID");
+
+    }
+
+    private void setGlobals(View view) {
+        logout =view.findViewById(R.id.logout);
+        home=view.findViewById(R.id.home);
+        group=findViewById(R.id.options);
+        options=new HashMap<>();
+        response=new HashMap<>();
+        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
+        dialog=new Dialog(Image_type_responses.this);
+        auth = FirebaseAuth.getInstance();
+        title = findViewById(R.id.title);
+        query = findViewById(R.id.query);
+        submit = findViewById(R.id.submit);
+        image1 = findViewById(R.id.image1);
+        image2 = findViewById(R.id.image2);
+        b1 = findViewById(R.id.option1);
+        b2 = findViewById(R.id.option2);
+
+    }
+
 
     private void loadProfilePic(ImageView view, String url) {
         view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
