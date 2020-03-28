@@ -100,6 +100,7 @@ public class Single_type_poll extends AppCompatActivity {
             polldetails.setTitle(title.getText().toString());
             polldetails.setQuestion(question.getText().toString());
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+            polldetails.setAuthorUID(fb.getUserId());
             Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < group.getChildCount(); i++) {
                 RadioButton v = (RadioButton) group.getChildAt(i);

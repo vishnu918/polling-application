@@ -95,47 +95,52 @@ public class Ranking_type_poll extends AppCompatActivity {
                 question_ranking.setError("Please enter the question");
                 question_ranking.requestFocus();
             } else {
-                if (fb.getUser() != null) {
-                    PollDetails polldetails = new PollDetails();
-                    polldetails.setTitle(title_ranking.getText().toString().trim());
-                    polldetails.setQuestion(question_ranking.getText().toString().trim());
-                    polldetails.setCreated_date(formatteddate);
-                    polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
-                    Map<String, Integer> map = new HashMap<>();
-                    for (int i = 0; i < group.getChildCount(); i++) {
-                        RadioButton v = (RadioButton) group.getChildAt(i);
-                        map.put(v.getText().toString().trim(), 0);
-                    }
-                    polldetails.setMap(map);
-                    polldetails.setPoll_type("PRIORITY POLL");
-                    CollectionReference docCreated = fb.getUserDocument().collection("Created");
-                    DocumentReference doc = fb.getPollsCollection().document();
-                    doc.set(polldetails)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Map<String, String> m = new HashMap<>();
-                                    m.put("pollId", doc.getId());
-                                    docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Toast.makeText(Ranking_type_poll.this, "Your data added Successfully", Toast.LENGTH_SHORT).show();
-                                                Intent intent = new Intent(Ranking_type_poll.this, MainActivity.class);
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                startActivity(intent);
-                                            } else {
-                                                Toast.makeText(Ranking_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                                }
-                            })
-                            .addOnFailureListener(e -> Toast.makeText(Ranking_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
-                }
+                addToDatabase(formatteddate);
             }
 
         });
+    }
+
+    private void addToDatabase(String formatteddate) {
+        if (fb.getUser() != null) {
+            PollDetails polldetails = new PollDetails();
+            polldetails.setTitle(title_ranking.getText().toString().trim());
+            polldetails.setQuestion(question_ranking.getText().toString().trim());
+            polldetails.setCreated_date(formatteddate);
+            polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+            polldetails.setAuthorUID(fb.getUserId());
+            Map<String, Integer> map = new HashMap<>();
+            for (int i = 0; i < group.getChildCount(); i++) {
+                RadioButton v = (RadioButton) group.getChildAt(i);
+                map.put(v.getText().toString().trim(), 0);
+            }
+            polldetails.setMap(map);
+            polldetails.setPoll_type("PRIORITY POLL");
+            CollectionReference docCreated = fb.getUserDocument().collection("Created");
+            DocumentReference doc = fb.getPollsCollection().document();
+            doc.set(polldetails)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Map<String, String> m = new HashMap<>();
+                            m.put("pollId", doc.getId());
+                            docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(Ranking_type_poll.this, "Your data added Successfully", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(Ranking_type_poll.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                    } else {
+                                        Toast.makeText(Ranking_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(Ranking_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
+        }
     }
 
     private void setGlobals() {

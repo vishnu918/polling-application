@@ -1,7 +1,10 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.PollList;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import Utils.firebase;
+import Utils.helper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -78,11 +82,22 @@ public class HomeFeed extends Fragment {
     private void addToRecyclerView(QueryDocumentSnapshot dS) {
         PollDetails polldetails = dS.toObject(PollDetails.class);
         polldetails.setUID(dS.getId());
-        if (polldetails.getAuthor() != Utils.helper.getusernamePref(getContext())) {
-            arrayList.add(polldetails);
-            recyclerView.setLayoutAnimation(controller);
-            adapter.notifyDataSetChanged();
-            recyclerView.scheduleLayoutAnimation();
+        if(!polldetails.getAuthorUID().equals(fb.getUserId())) {
+            fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful() && task.getResult()!=null){
+                        for (QueryDocumentSnapshot dS1 : task.getResult()) {
+                            if(!dS1.getId().equals(fb.getUserId())){
+                                arrayList.add(polldetails);
+                                recyclerView.setLayoutAnimation(controller);
+                                adapter.notifyDataSetChanged();
+                                recyclerView.scheduleLayoutAnimation();
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 
