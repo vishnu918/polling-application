@@ -90,4 +90,6 @@ public class HomeFeed extends Fragment {
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
         fb = new firebase();
     }
+
+
 }

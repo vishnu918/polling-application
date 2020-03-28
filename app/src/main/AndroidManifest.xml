@@ -31,7 +31,7 @@
         <activity android:name=".responses.Ranking_type_response" >
 
         </activity>
-        <activity android:name=".results.ResultActivity"></activity>
+        <activity android:name=".results.ResultActivity" />
         <activity android:name=".results.Descriptive_type_result" />
         <activity android:name=".results.Multiple_type_result" />
         <activity android:name=".results.Single_type_result" />

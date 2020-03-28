@@ -107,13 +107,13 @@ public class LoginFragment extends Fragment {
 
     private void isProfileSet(DocumentSnapshot dS) {
         Intent i = new Intent(getActivity(), MainActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         if (dS != null && dS.exists()) {
             setSharedPreference(dS);
         } else {
             removeSharedPreference();
             i = new Intent(getActivity(), ProfileSetUp.class);
         }
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }
 
@@ -123,7 +123,10 @@ public class LoginFragment extends Fragment {
 
     private void setSharedPreference(DocumentSnapshot dS) {
         Utils.helper.setProfileSetUpPref(getContext(), true);
-        Utils.helper.setpPicPref(getContext(), String.valueOf(dS.get("pic")));
+        if (dS.get("pic") != null)
+            Utils.helper.setpPicPref(getContext(), String.valueOf(dS.get("pic")));
+        else
+            Utils.helper.setpPicPref(getContext(), null);
         Utils.helper.setusernamePref(getContext(), String.valueOf(dS.get("username")));
     }
 

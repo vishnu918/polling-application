@@ -25,13 +25,14 @@ public class AuthCheck extends AppCompatActivity {
 
     private Intent getIntent(firebase fb) {
         Intent i = new Intent(AuthCheck.this, LoginSignupActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         if (!isUserLoggedIn(fb)) {
             helper.removeProfileSetUpPref(getApplicationContext());
-            return i;
         }
-        i = isProfileSetUp() ? new Intent(AuthCheck.this, MainActivity.class) :
-                new Intent(AuthCheck.this, ProfileSetUp.class);
+        else {
+            i = isProfileSetUp() ? new Intent(AuthCheck.this, MainActivity.class) :
+                    new Intent(AuthCheck.this, ProfileSetUp.class);
+        }
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return i;
     }
 

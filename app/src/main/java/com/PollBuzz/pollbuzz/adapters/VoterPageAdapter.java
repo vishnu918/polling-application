@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,8 @@ import com.PollBuzz.pollbuzz.results.Image_type_result;
 import com.PollBuzz.pollbuzz.results.Multiple_type_result;
 import com.PollBuzz.pollbuzz.results.Ranking_type_result;
 import com.PollBuzz.pollbuzz.results.Single_type_result;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 
 import java.util.List;
 
@@ -43,7 +46,14 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
     public void onBindViewHolder(@NonNull VoterViewHolder holder, int position) {
         if(mVotedetails.get(position).getUsername()!=null)
             holder.voterUsername.setText(mVotedetails.get(position).getUsername().trim());
-
+        if(mVotedetails.get(position).getProgfileUrl()==null){
+            holder.voterPhoto.setImageResource(R.drawable.ic_person_black_24dp);
+        }else{
+            Glide.with(mContext)
+                    .load(mVotedetails.get(position).getProgfileUrl())
+                    .transform(new CircleCrop())
+                    .into(holder.voterPhoto);
+        }
         holder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,11 +120,13 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
 
         public TextView voterUsername;
         public CardView card_view;
+        public ImageView voterPhoto;
 
         public VoterViewHolder(@NonNull View itemView) {
             super(itemView);
             card_view = itemView.findViewById(R.id.card_view);
             voterUsername = itemView.findViewById(R.id.voterUsername);
+            voterPhoto=itemView.findViewById(R.id.voterPhoto);
         }
     }
 }
