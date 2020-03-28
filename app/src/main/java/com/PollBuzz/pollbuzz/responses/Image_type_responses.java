@@ -133,7 +133,7 @@ public class Image_type_responses extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(Image_type_responses.this, "Unable to submit .Please try again ", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Image_type_responses.this, "Unable to submit.\nPlease try again ", Toast.LENGTH_SHORT).show();
                         }
                     });
 
