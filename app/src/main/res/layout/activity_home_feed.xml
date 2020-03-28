@@ -26,7 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
-        android:layout_marginHorizontal="5dp"
         android:layout_below="@+id/text"
         android:layoutAnimation="@anim/animation_down_to_up"
         app:shimmer_demo_shimmer_color="@color/white"

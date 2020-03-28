@@ -1,7 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
-import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -11,10 +11,12 @@ import com.google.firebase.storage.StorageReference;
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.PollList;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -68,6 +70,7 @@ public class ProfileFeed extends Fragment {
     private ProfileFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
     private firebase fb;
+    private FloatingActionButton fab;
     private LayoutAnimationController controller;
 
     public ProfileFeed() {
@@ -85,6 +88,10 @@ public class ProfileFeed extends Fragment {
         setGlobals(view);
         fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
             getOwnedPolls(task);
+        });
+        fab.setOnClickListener(view1 -> {
+            Intent i = new Intent(getContext(), PollList.class);
+            startActivity(i);
         });
         edit.setOnClickListener(view1 -> {
             try {
@@ -179,6 +186,7 @@ public class ProfileFeed extends Fragment {
         mArrayList = new ArrayList<>();
         fb = new firebase();
         mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
+        fab = view.findViewById(R.id.fab);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
