@@ -1,17 +1,15 @@
 package com.PollBuzz.pollbuzz.polls;
 
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollList;
-import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
+import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 
@@ -36,11 +34,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.firebase;
+import Utils.helper;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
-import Utils.helper;
 
 public class Single_type_poll extends AppCompatActivity {
     Button add;
@@ -51,125 +49,106 @@ public class Single_type_poll extends AppCompatActivity {
     TextInputEditText title,question;
     MaterialButton button;
     Date date = Calendar.getInstance().getTime();
-    FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseFirestore fb = FirebaseFirestore.getInstance();
-
+    firebase fb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_type_poll);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.action_bar);
-        View view =getSupportActionBar().getCustomView();
-        group=findViewById(R.id.options);
-        add=findViewById(R.id.add);
-        c=group.getChildCount();
-        title = findViewById(R.id.title1);
-        button = findViewById(R.id.post);
-        question = findViewById(R.id.question);
-
-
+        setGlobals();
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         final String formattedDate = df.format(date);
+        setListeners(formattedDate);
 
-        if(group.getChildCount()==0)
-            group.setVisibility(View.INVISIBLE);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RadioButton button=new RadioButton(getApplicationContext());
-                button.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,RadioGroup.LayoutParams.WRAP_CONTENT));
-                String t="Option"+(c+1);
-                //
-                showDialog(Single_type_poll.this, button,0);
+    }
 
-                button.setTag(t.toLowerCase());
-
-                //group.removeAllViews();
-                group.removeView(findViewById(R.id.option1));
-                group.removeView(findViewById(R.id.option2));
-
-                //button.setText(name);
-                group.addView(button);
-                group.setVisibility(View.VISIBLE);
-                registerForContextMenu(button);
-
-
+    private void setListeners(String formattedDate) {
+        add.setOnClickListener(v -> {
+            RadioButton button = new RadioButton(getApplicationContext());
+            button.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT));
+            String t = "Option" + (c + 1);
+            showDialog(Single_type_poll.this, button, 0);
+            button.setTag(t.toLowerCase());
+            group.removeView(findViewById(R.id.option1));
+            group.removeView(findViewById(R.id.option2));
+            group.addView(button);
+            group.setVisibility(View.VISIBLE);
+            registerForContextMenu(button);
+        });
+        group.setOnCheckedChangeListener((RadioGroup.OnCheckedChangeListener) (group, checkedId) -> {
+            RadioButton button = (RadioButton) findViewById(checkedId);
+            button.setChecked(false);
+            button.showContextMenu();
+        });
+        button.setOnClickListener(view -> {
+            if (title.getText().toString().isEmpty()) {
+                title.setError("Please enter the title");
+                title.requestFocus();
+            } else if (question.getText().toString().isEmpty()) {
+                question.setError("Please enter the question");
+                question.requestFocus();
+            } else if (group.getChildCount() == 0) {
+                Toast.makeText(Single_type_poll.this, "U shld have atleast two options", Toast.LENGTH_SHORT).show();
+            } else {
+                addToDatabase(formattedDate);
             }
         });
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                RadioButton button=(RadioButton)findViewById(checkedId);
-                button.setChecked(false);
-                button.showContextMenu();
+    }
 
-
-
+    private void addToDatabase(String formattedDate) {
+        if (fb.getUser() != null) {
+            PollDetails polldetails = new PollDetails();
+            polldetails.setTitle(title.getText().toString());
+            polldetails.setQuestion(question.getText().toString());
+            polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+            Map<String, Integer> map = new HashMap<>();
+            for (int i = 0; i < group.getChildCount(); i++) {
+                RadioButton v = (RadioButton) group.getChildAt(i);
+                map.put(v.getText().toString(), 0);
             }
-        });
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(title.getText().toString().isEmpty())
-                {
-                    title.setError("Please enter the title");
-                    title.requestFocus();
-                }
-                else if(question.getText().toString().isEmpty())
-                {
-                    question.setError("Please enter the question");
-                    question.requestFocus();
-                }
-                else if(group.getChildCount()==0) {
-                    Toast.makeText(Single_type_poll.this, "U shld have atleast two options", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    if(auth.getCurrentUser()!=null) {
-                        PollDetails polldetails = new PollDetails();
-                        polldetails.setTitle(title.getText().toString());
-                        polldetails.setQuestion(question.getText().toString());
-                        polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
-                        Map<String,Integer> map = new HashMap<>();
-                        for(int i=0; i<group.getChildCount();i++)
-                        {
-                            RadioButton v = (RadioButton)group.getChildAt(i);
-                            map.put(v.getText().toString(),0);
-                        }
-                        polldetails.setMap(map);
-                        polldetails.setPoll_type("SINGLE ANSWER POLL");
-                        polldetails.setCreated_date(formattedDate);
-                        CollectionReference docCreated = fb.collection("Users").document(auth.getCurrentUser().getUid()).collection("Created");
-                        DocumentReference doc = fb.collection("Polls").document();
-                        doc.set(polldetails)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Map<String,String> m=new HashMap<>();
-                                        m.put("pollId",doc.getId());
-                                        docCreated.document().set(m);
+            polldetails.setMap(map);
+            polldetails.setPoll_type("SINGLE ANSWER POLL");
+            polldetails.setCreated_date(formattedDate);
+            CollectionReference docCreated = fb.getUserDocument().collection("Created");
+            DocumentReference doc = fb.getPollsCollection().document();
+            doc.set(polldetails)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Map<String, String> m = new HashMap<>();
+                            m.put("pollId", doc.getId());
+                            docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
                                         Toast.makeText(Single_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(Single_type_poll.this, MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(Single_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
-                }
-            }
+                                    } else
+                                        Toast.makeText(Single_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(Single_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
+        }
+    }
 
-        });
-
+    private void setGlobals() {
+        setContentView(R.layout.activity_single_type_poll);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
+        View view = getSupportActionBar().getCustomView();
+        fb = new firebase();
+        group = findViewById(R.id.options);
+        add = findViewById(R.id.add);
+        c = group.getChildCount();
+        title = findViewById(R.id.title1);
+        button = findViewById(R.id.post);
+        question = findViewById(R.id.question);
+        if(group.getChildCount()==0)
+            group.setVisibility(View.INVISIBLE);
     }
 
 
