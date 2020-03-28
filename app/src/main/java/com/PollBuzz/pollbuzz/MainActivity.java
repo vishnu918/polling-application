@@ -5,7 +5,6 @@ import com.PollBuzz.pollbuzz.navFragments.ProfileFeed;
 import com.PollBuzz.pollbuzz.navFragments.VotedFeed;
 
 import android.os.Bundle;
-import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -14,11 +13,9 @@ import me.ibrahimsn.lib.SmoothBottomBar;
 
 public class MainActivity extends AppCompatActivity {
     public static SmoothBottomBar bottomBar;
-    FrameLayout container;
     public static Fragment active;
-    Boolean flag2 = false, flag3 = false;
     public static Fragment fragment1, fragment2, fragment3;
-    FragmentManager fm;
+    private FragmentManager fm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setGlobals() {
         bottomBar = findViewById(R.id.bottom);
-        container = findViewById(R.id.container);
         fragment1 = new HomeFeed();
         fragment2 = new VotedFeed();
         fragment3 = new ProfileFeed();
@@ -69,10 +65,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void replaceFragment(Fragment fragment) {
-        if (fragment.getTag().equals("3"))
-            fm.beginTransaction().hide(active).show(fragment).commit();
-        else
-            fm.beginTransaction().addToBackStack(fragment.getTag()).hide(active).show(fragment).commit();
+        if (fragment.getTag() != null) {
+            if (fragment.getTag().equals("3"))
+                fm.beginTransaction().hide(active).show(fragment).commit();
+            else
+                fm.beginTransaction().addToBackStack(fragment.getTag()).hide(active).show(fragment).commit();
+        }
     }
 
     private void createFragment(Fragment fragment, String id) {

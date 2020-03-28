@@ -41,6 +41,15 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.HomeVi
 
     @Override
     public void onBindViewHolder(@NonNull HomeViewHolder holder, int position) {
+        setData(holder, position);
+        clickListener(holder, position);
+    }
+
+    private void clickListener(@NonNull HomeViewHolder holder, int position) {
+        holder.cardView.setOnClickListener(view -> startIntent(mPollDetails.get(position).getUID(), mPollDetails.get(position).getPoll_type()));
+    }
+
+    private void setData(@NonNull HomeViewHolder holder, int position) {
         if (mPollDetails.get(position).getTitle() != null)
             holder.card_title.setText(mPollDetails.get(position).getTitle().trim());
         if (mPollDetails.get(position).getPoll_type() != null)
@@ -51,46 +60,32 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.HomeVi
             holder.card_author.setText((mPollDetails.get(position).getAuthor().trim()));
         if (mPollDetails.get(position).getCreated_date() != null)
             holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
-
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                 startintent(mPollDetails.get(position).getUID(),mPollDetails.get(position).getPoll_type());
-            }
-        });
     }
 
-    private void startintent(String uid , String polltype) {
+    private void startIntent(String uid, String pollType) {
         Intent intent;
-        switch(polltype)
+        switch (pollType)
         {
             case "SINGLE ANSWER POLL":
                 intent = new Intent(mContext, Single_type_response.class);
-                intent.putExtra("UID",uid);
-                mContext.startActivity(intent);
                 break;
             case "MULTI ANSWER POLL":
                 intent = new Intent(mContext, Multiple_type_response.class);
-                intent.putExtra("UID",uid);
-                mContext.startActivity(intent);
                 break;
             case "DESCRIPTIVE POLL":
                 intent = new Intent(mContext, Descriptive_type_response.class);
-                intent.putExtra("UID",uid);
-                mContext.startActivity(intent);
                 break;
             case "PRIORITY POLL":
                 intent = new Intent(mContext, Ranking_type_response.class);
-                intent.putExtra("UID",uid);
-                mContext.startActivity(intent);
                 break;
             case "IMAGE POLL":
                 intent = new Intent(mContext, Image_type_responses.class);
-                intent.putExtra("UID",uid);
-                mContext.startActivity(intent);
                 break;
-
+            default:
+                throw new IllegalStateException("Unexpected value: " + pollType);
         }
+        intent.putExtra("UID", uid);
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -98,13 +93,17 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.HomeVi
         return mPollDetails.size();
     }
 
-    public static class HomeViewHolder extends RecyclerView.ViewHolder {
+    static class HomeViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView card_title, card_type, card_query, card_author, card_date;
-        public CardView cardView;
+        private TextView card_title, card_type, card_query, card_author, card_date;
+        private CardView cardView;
 
-        public HomeViewHolder(@NonNull View itemView) {
+        private HomeViewHolder(@NonNull View itemView) {
             super(itemView);
+            setGlobals(itemView);
+        }
+
+        private void setGlobals(@NonNull View itemView) {
             card_title = itemView.findViewById(R.id.card_title);
             card_type = itemView.findViewById(R.id.card_type);
             card_query = itemView.findViewById(R.id.card_query);

@@ -1,28 +1,23 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
-import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import com.PollBuzz.pollbuzz.PollList;
 import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.PollList;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.adapters.VotedFeedAdapter;
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -31,7 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class VotedFeed extends Fragment {
     private ShimmerRecyclerView votedRV;
@@ -56,33 +50,40 @@ public class VotedFeed extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setGlobals(view);
+        setListeners();
+        getData();
+    }
+
+    private void setListeners() {
         fab.setOnClickListener(view1 -> {
             Intent i = new Intent(getContext(), PollList.class);
             startActivity(i);
         });
-        userVotedRef.get().addOnCompleteListener(task -> getVotedPolls(task));
     }
 
-    private void getVotedPolls(@NonNull Task<QuerySnapshot> task) {
-        if (task.isSuccessful() && task.getResult() != null) {
-            votedRV.setAdapter(mAdapter);
-            votedRV.hideShimmerAdapter();
-            for (QueryDocumentSnapshot dS : task.getResult()) {
-                if (dS.exists()) {
-                    fb.getPollsCollection().document(dS.getId())
-                            .get().addOnCompleteListener(task1 -> {
-                                if(task1.isSuccessful() && task1.getResult()!=null){
-                                    addToRecyclerView(task1.getResult());
-                                }
-                            });
+    private void getData() {
+        userVotedRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                votedRV.hideShimmerAdapter();
+                for (QueryDocumentSnapshot dS : task.getResult()) {
+                    if (dS.exists()) {
+                        fb.getPollsCollection().document(dS.getId())
+                                .get().addOnCompleteListener(task1 -> {
+                            if (task1.isSuccessful() && task1.getResult() != null) {
+                                addToRecyclerView(task1.getResult());
+                            }
+                        });
+                    }
                 }
             }
-        }
+        });
     }
 
     private void addToRecyclerView(DocumentSnapshot dS1) {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
-        polldetails.setUID(dS1.getId());
+        if (polldetails != null) {
+            polldetails.setUID(dS1.getId());
+        }
         mArrayList.add(polldetails);
         votedRV.setLayoutAnimation(controller);
         mAdapter.notifyDataSetChanged();
@@ -97,10 +98,10 @@ public class VotedFeed extends Fragment {
         votedRV.setLayoutManager(layoutManager);
         mArrayList = new ArrayList<>();
         mAdapter = new VotedFeedAdapter(getContext(), mArrayList);
+        votedRV.setAdapter(mAdapter);
         votedRV.showShimmerAdapter();
         fb = new firebase();
         userVotedRef = fb.getUserDocument().collection("Voted");
-        controller =
-                AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
+        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
     }
 }

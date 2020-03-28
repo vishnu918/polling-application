@@ -18,9 +18,9 @@ import androidx.fragment.app.Fragment;
 
 public class SignupFragment extends Fragment {
 
-    TextInputLayout emailL, passwordL, password2L;
-    Button signup;
-    firebase fb;
+    private TextInputLayout emailL, passwordL, password2L;
+    private Button signup;
+    private firebase fb;
 
     public SignupFragment() {
     }
@@ -76,7 +76,7 @@ public class SignupFragment extends Fragment {
         }
     }
 
-    void setGlobals(View view) {
+    private void setGlobals(View view) {
         emailL = (TextInputLayout) view.findViewById(R.id.email);
         passwordL = (TextInputLayout) view.findViewById(R.id.password);
         password2L = (TextInputLayout) view.findViewById(R.id.password2);

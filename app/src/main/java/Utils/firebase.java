@@ -22,8 +22,7 @@ public class firebase {
     }
 
     public FirebaseFirestore getDatabase() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        return db;
+        return FirebaseFirestore.getInstance();
     }
 
     public CollectionReference getUsersCollection() {

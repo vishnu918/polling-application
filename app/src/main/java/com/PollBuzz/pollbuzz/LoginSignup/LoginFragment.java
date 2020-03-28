@@ -32,11 +32,11 @@ import androidx.fragment.app.Fragment;
 
 public class LoginFragment extends Fragment {
 
-    TextInputLayout email,password;
-    Button login;
-    SignInButton gsignin;
-    GoogleSignInClient googleSignInClient;
-    firebase fb;
+    private TextInputLayout email, password;
+    private Button login;
+    private SignInButton gsignin;
+    private GoogleSignInClient googleSignInClient;
+    private firebase fb;
 
     public LoginFragment() {
     }
@@ -50,6 +50,10 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         setGlobals(view);
+        setListeners();
+    }
+
+    private void setListeners() {
         login.setOnClickListener(v -> {
             login();
         });
@@ -176,7 +180,4 @@ public class LoginFragment extends Fragment {
                     }
                 });
     }
-
-
-
 }

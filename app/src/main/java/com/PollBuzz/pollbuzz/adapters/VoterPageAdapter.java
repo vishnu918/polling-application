@@ -1,17 +1,5 @@
 package com.PollBuzz.pollbuzz.adapters;
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.VoteDetails;
 import com.PollBuzz.pollbuzz.results.Descriptive_type_result;
@@ -22,12 +10,24 @@ import com.PollBuzz.pollbuzz.results.Single_type_result;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 
+import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.VoterViewHolder> {
 
     private List<VoteDetails> mVotedetails;
-    Context mContext;
+    private Context mContext;
 
     public VoterPageAdapter(Context mContext, List<VoteDetails> mVoteDetails) {
         this.mContext = mContext;
@@ -44,6 +44,15 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
 
     @Override
     public void onBindViewHolder(@NonNull VoterViewHolder holder, int position) {
+        setData(holder, position);
+        clickListener(holder, position);
+    }
+
+    private void clickListener(@NonNull VoterViewHolder holder, int position) {
+        holder.card_view.setOnClickListener(view -> startActivity(mVotedetails.get(position).getUserId().trim(), mVotedetails.get(position).getOption().trim(), mVotedetails.get(position).getPollId().trim()));
+    }
+
+    private void setData(@NonNull VoterViewHolder holder, int position) {
         if(mVotedetails.get(position).getUsername()!=null)
             holder.voterUsername.setText(mVotedetails.get(position).getUsername().trim());
         if(mVotedetails.get(position).getProgfileUrl()==null){
@@ -54,12 +63,6 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
                     .transform(new CircleCrop())
                     .into(holder.voterPhoto);
         }
-        holder.card_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(mVotedetails.get(position).getUserId().trim(),mVotedetails.get(position).getOption().trim(),mVotedetails.get(position).getPollId().trim());
-            }
-        });
     }
 
     private void startActivity(String useruid,String option,String uid) {
@@ -68,47 +71,27 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
         {
             case "SINGLE ANSWER POLL":
                 intent = new Intent(mContext, Single_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("UIDUser",useruid);
-                intent.putExtra("flag",1);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
                 break;
             case "MULTI ANSWER POLL":
                 intent = new Intent(mContext, Multiple_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("UIDUser",useruid);
-                intent.putExtra("flag",1);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
                 break;
             case "DESCRIPTIVE POLL":
                 intent = new Intent(mContext, Descriptive_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("UIDUser",useruid);
-                intent.putExtra("flag",1);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
                 break;
             case "PRIORITY POLL":
                 intent = new Intent(mContext, Ranking_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("UIDUser",useruid);
-                intent.putExtra("flag",1);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
                 break;
             case "IMAGE POLL":
                 intent = new Intent(mContext, Image_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("UIDUser",useruid);
-                intent.putExtra("flag",1);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
                 break;
-
+            default:
+                throw new IllegalStateException("Unexpected value: " + option);
         }
-
+        intent.putExtra("UID", uid);
+        intent.putExtra("UIDUser", useruid);
+        intent.putExtra("flag", 1);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -116,14 +99,18 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
         return mVotedetails.size();
     }
 
-    public static class VoterViewHolder extends RecyclerView.ViewHolder {
+    static class VoterViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView voterUsername;
-        public CardView card_view;
-        public ImageView voterPhoto;
+        private TextView voterUsername;
+        private CardView card_view;
+        private ImageView voterPhoto;
 
-        public VoterViewHolder(@NonNull View itemView) {
+        VoterViewHolder(@NonNull View itemView) {
             super(itemView);
+            setGlobals(itemView);
+        }
+
+        private void setGlobals(@NonNull View itemView) {
             card_view = itemView.findViewById(R.id.card_view);
             voterUsername = itemView.findViewById(R.id.voterUsername);
             voterPhoto=itemView.findViewById(R.id.voterPhoto);
