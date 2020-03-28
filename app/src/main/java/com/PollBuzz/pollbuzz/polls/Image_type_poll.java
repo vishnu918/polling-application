@@ -27,8 +27,11 @@ import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.bumptech.glide.Glide;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.CollectionReference;
@@ -75,6 +78,86 @@ public class Image_type_poll extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setGlobals();
+        registerForContextMenu(b1);
+        registerForContextMenu(b1);
+        setListeners();
+    }
+
+    private void setListeners() {
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Image_type_poll.this, MainActivity.class);
+            startActivity(i);
+        });
+        logout.setOnClickListener(v -> fb.signOut());
+        b1.setOnClickListener(v -> {
+            v.showContextMenu();
+            b1.setChecked(false);
+            try {
+                requestCode = 100;
+                Dexter.withActivity(Image_type_poll.this)
+                        .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if (report.areAllPermissionsGranted()) {
+                                    showImagePickerOptions();
+                                }
+
+                                if (report.isAnyPermissionPermanentlyDenied()) {
+                                    showSettingsDialog();
+                                }
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        b2.setOnClickListener(v -> {
+            v.showContextMenu();
+            b2.setChecked(false);
+            try {
+                requestCode = 200;
+                Dexter.withActivity(Image_type_poll.this)
+                        .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if (report.areAllPermissionsGranted()) {
+                                    showImagePickerOptions();
+                                }
+                                if (report.isAnyPermissionPermanentlyDenied()) {
+                                    showSettingsDialog();
+                                }
+                            }
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        post_image.setOnClickListener(view -> {
+            if (title_image.getText().toString().isEmpty()) {
+                title_image.setError("Please enter the title");
+                title_image.requestFocus();
+            } else if (question_image.getText().toString().isEmpty()) {
+                question_image.setError("Please enter the question");
+                question_image.requestFocus();
+            } else {
+               addToStorage();
+            }
+        });
+    }
+
+    private void setGlobals() {
         setContentView(R.layout.activity_image_type_poll);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -96,100 +179,8 @@ public class Image_type_poll extends AppCompatActivity {
         title_image = findViewById(R.id.title_imagetype);
         question_image = findViewById(R.id.question_imagetype);
         c = group.getChildCount();
-        registerForContextMenu(b1);
-        registerForContextMenu(b1);
-
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Image_type_poll.this, MainActivity.class);
-                startActivity(i);
-            }
-        });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fb.signOut();
-            }
-        });
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.showContextMenu();
-                b1.setChecked(false);
-                try {
-                    requestCode = 100;
-                    Dexter.withActivity(Image_type_poll.this)
-                            .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            .withListener(new MultiplePermissionsListener() {
-                                @Override
-                                public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                    if (report.areAllPermissionsGranted()) {
-                                        showImagePickerOptions();
-                                    }
-
-                                    if (report.isAnyPermissionPermanentlyDenied()) {
-                                        showSettingsDialog();
-                                    }
-                                }
-
-                                @Override
-                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                                    token.continuePermissionRequest();
-                                }
-                            }).check();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                ;
-            }
-        });
-        b2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.showContextMenu();
-                b2.setChecked(false);
-                try {
-                    requestCode = 200;
-                    Dexter.withActivity(Image_type_poll.this)
-                            .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            .withListener(new MultiplePermissionsListener() {
-                                @Override
-                                public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                    if (report.areAllPermissionsGranted()) {
-                                        showImagePickerOptions();
-                                    }
-
-                                    if (report.isAnyPermissionPermanentlyDenied()) {
-                                        showSettingsDialog();
-                                    }
-                                }
-
-                                @Override
-                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                                    token.continuePermissionRequest();
-                                }
-                            }).check();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        post_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (title_image.getText().toString().isEmpty()) {
-                    title_image.setError("Please enter the title");
-                    title_image.requestFocus();
-                } else if (question_image.getText().toString().isEmpty()) {
-                    question_image.setError("Please enter the question");
-                    question_image.requestFocus();
-                } else {
-                   addToStorage();
-                }
-            }
-        });
     }
+
     private void showImagePickerOptions() {
         ImagePickerActivity.showImagePickerOptions(this, new ImagePickerActivity.PickerOptionListener() {
             @Override
@@ -300,21 +291,31 @@ public class Image_type_poll extends AppCompatActivity {
                                                         .addOnCompleteListener(task -> {
                                                             if (task.isSuccessful()) {
                                                                 deleteCache();
-                                                                Toast.makeText(this, "Your data added successfully", Toast.LENGTH_SHORT).show();
-                                                                Intent i = new Intent(Image_type_poll.this, MainActivity.class);
-                                                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                                startActivity(i);
+                                                                Map<String,String> m=new HashMap<>();
+                                                                m.put("pollId",task.getResult().getId());
+                                                                fb.getUserDocument().collection("Created").document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if(task.isSuccessful()){
+                                                                            Toast.makeText(Image_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
+                                                                            Intent i = new Intent(Image_type_poll.this, MainActivity.class);
+                                                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                            startActivity(i);
+                                                                        }
+                                                                        else{
+                                                                            Toast.makeText(Image_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    }
+                                                                });
+
                                                             } else {
                                                                 Toast.makeText(Image_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                                                 Log.d("Exception", task.getException().toString());
                                                             }
                                                         });
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception exception) {
-                                                    exception.printStackTrace();
-                                                    Log.d("Exception", exception.toString());
-                                                }
+                                            }).addOnFailureListener(exception -> {
+                                                exception.printStackTrace();
+                                                Log.d("Exception", exception.toString());
                                             });
                                         })
                                         .addOnFailureListener(new OnFailureListener() {

@@ -2,11 +2,6 @@ package com.PollBuzz.pollbuzz.adapters;
 
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.responses.Descriptive_type_response;
-import com.PollBuzz.pollbuzz.responses.Image_type_responses;
-import com.PollBuzz.pollbuzz.responses.Multiple_type_response;
-import com.PollBuzz.pollbuzz.responses.Ranking_type_response;
-import com.PollBuzz.pollbuzz.responses.Single_type_response;
 import com.PollBuzz.pollbuzz.results.Descriptive_type_result;
 import com.PollBuzz.pollbuzz.results.Image_type_result;
 import com.PollBuzz.pollbuzz.results.Multiple_type_result;
@@ -29,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class VotedFeedAdapter extends RecyclerView.Adapter<VotedFeedAdapter.VotedViewHolder> {
 
     private ArrayList<PollDetails> mPollDetails;
-    Context mContext;
+    private Context mContext;
 
     public VotedFeedAdapter(Context mContext, ArrayList<PollDetails> mPollDetails) {
         this.mContext = mContext;
@@ -46,55 +41,52 @@ public class VotedFeedAdapter extends RecyclerView.Adapter<VotedFeedAdapter.Vote
 
     @Override
     public void onBindViewHolder(@NonNull VotedViewHolder holder, int position) {
-        if(mPollDetails.get(position).getTitle()!=null)
-            holder.card_title.setText(mPollDetails.get(position).getTitle().trim());
-        if(mPollDetails.get(position).getPoll_type()!=null)
-            holder.card_type.setText(mPollDetails.get(position).getPoll_type());
-        if(mPollDetails.get(position).getQuestion()!=null)
-            holder.card_query.setText(mPollDetails.get(position).getQuestion().trim());
-        if(mPollDetails.get(position).getAuthor()!=null)
-        holder.card_author.setText(mPollDetails.get(position).getAuthor().trim());
-        if(mPollDetails.get(position).getCreated_date()!=null)
-            holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
-        holder.cardView.setOnClickListener(view -> startactivity(mPollDetails.get(position).getUID().trim(),mPollDetails.get(position).getPoll_type().trim()));
+        setData(holder, position);
+        clickListener(holder, position);
     }
 
-    private void startactivity(String uid,String polltype) {
+    private void clickListener(@NonNull VotedViewHolder holder, int position) {
+        holder.cardView.setOnClickListener(view -> startIntent(mPollDetails.get(position).getUID().trim(), mPollDetails.get(position).getPoll_type().trim()));
+    }
+
+    private void setData(@NonNull VotedViewHolder holder, int position) {
+        if (mPollDetails.get(position).getTitle() != null)
+            holder.card_title.setText(mPollDetails.get(position).getTitle().trim());
+        if (mPollDetails.get(position).getPoll_type() != null)
+            holder.card_type.setText(mPollDetails.get(position).getPoll_type());
+        if (mPollDetails.get(position).getQuestion() != null)
+            holder.card_query.setText(mPollDetails.get(position).getQuestion().trim());
+        if (mPollDetails.get(position).getAuthor() != null)
+            holder.card_author.setText(mPollDetails.get(position).getAuthor().trim());
+        if (mPollDetails.get(position).getCreated_date() != null)
+            holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
+    }
+
+    private void startIntent(String uid, String pollType) {
         Intent intent;
-        switch(polltype)
+        switch (pollType)
         {
             case "SINGLE ANSWER POLL":
                 intent = new Intent(mContext, Single_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("flag",0);
-                mContext.startActivity(intent);
                 break;
             case "MULTI ANSWER POLL":
                 intent = new Intent(mContext, Multiple_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("flag",0);
-                mContext.startActivity(intent);
                 break;
             case "DESCRIPTIVE POLL":
                 intent = new Intent(mContext, Descriptive_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("flag",0);
-                mContext.startActivity(intent);
                 break;
             case "PRIORITY POLL":
                 intent = new Intent(mContext, Ranking_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("flag",0);
-                mContext.startActivity(intent);
                 break;
             case "IMAGE POLL":
                 intent = new Intent(mContext, Image_type_result.class);
-                intent.putExtra("UID",uid);
-                intent.putExtra("flag",0);
-                mContext.startActivity(intent);
                 break;
-
+            default:
+                throw new IllegalStateException("Unexpected value: " + pollType);
         }
+        intent.putExtra("UID", uid);
+        intent.putExtra("flag", 0);
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -102,13 +94,17 @@ public class VotedFeedAdapter extends RecyclerView.Adapter<VotedFeedAdapter.Vote
         return mPollDetails.size();
     }
 
-    public static class VotedViewHolder extends RecyclerView.ViewHolder {
+    static class VotedViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView card_title, card_type, card_query, card_author, card_date;
-        CardView cardView;
+        private TextView card_title, card_type, card_query, card_author, card_date;
+        private CardView cardView;
 
-        public VotedViewHolder(@NonNull View itemView) {
+        VotedViewHolder(@NonNull View itemView) {
             super(itemView);
+            setGlobals(itemView);
+        }
+
+        private void setGlobals(@NonNull View itemView) {
             card_title = itemView.findViewById(R.id.card_title);
             card_type = itemView.findViewById(R.id.card_type);
             card_query = itemView.findViewById(R.id.card_query);

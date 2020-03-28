@@ -1,11 +1,9 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.StorageReference;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -86,9 +84,11 @@ public class ProfileFeed extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setGlobals(view);
-        fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
-            getOwnedPolls(task);
-        });
+        setListeners();
+        getData();
+    }
+
+    private void setListeners() {
         fab.setOnClickListener(view1 -> {
             Intent i = new Intent(getContext(), PollList.class);
             startActivity(i);
@@ -103,12 +103,10 @@ public class ProfileFeed extends Fragment {
                                 if (report.areAllPermissionsGranted()) {
                                     showImagePickerOptions();
                                 }
-
                                 if (report.isAnyPermissionPermanentlyDenied()) {
                                     showSettingsDialog();
                                 }
                             }
-
                             @Override
                             public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                                 token.continuePermissionRequest();
@@ -120,25 +118,25 @@ public class ProfileFeed extends Fragment {
         });
     }
 
-    private void getOwnedPolls(Task<QuerySnapshot> task) {
-        if (task.isSuccessful() && task.getResult() != null) {
+    private void getData() {
+        fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
             profileRV.hideShimmerAdapter();
-            profileRV.setAdapter(mAdapter);
-            for (QueryDocumentSnapshot dS : task.getResult()) {
-                if (dS.get("pollId") != null)
-                    fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful() && task1.getResult() != null) {
-                            DocumentSnapshot dS1 = task1.getResult();
-                            if (dS1.exists()) {
-                                Log.d("ProfileFeed",dS1.getId());
-                                addToRecyclerView(dS1);
+            if (task.isSuccessful() && task.getResult() != null) {
+                for (QueryDocumentSnapshot dS : task.getResult()) {
+                    if (dS.get("pollId") != null)
+                        fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
+                            if (task1.isSuccessful() && task1.getResult() != null) {
+                                DocumentSnapshot dS1 = task1.getResult();
+                                if (dS1.exists()) {
+                                    addToRecyclerView(dS1);
+                                }
+                            } else {
+                                Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                        });
+                }
             }
-        }
+        });
     }
 
     private void addToRecyclerView(DocumentSnapshot dS1) {
@@ -157,44 +155,45 @@ public class ProfileFeed extends Fragment {
         if (((MainActivity) getActivity()).getSupportActionBar() != null) {
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (getFragmentManager() != null) {
-                        int index = getFragmentManager().getBackStackEntryCount() - 1;
-                        FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
-                        String tag = backEntry.getName();
-                        getFragmentManager().beginTransaction().hide(ProfileFeed.this)
-                                .show(getFragmentManager().findFragmentByTag(tag))
-                                .commit();
-                        if (tag.equals("1")) {
-                            MainActivity.bottomBar.setActiveItem(0);
-                            MainActivity.active = MainActivity.fragment1;
-                        } else if (tag.equals("2")) {
-                            MainActivity.bottomBar.setActiveItem(1);
-                            MainActivity.active = MainActivity.fragment2;
-                        }
-                    }
-                }
-            });
+            onBackArrowPressed(toolbar);
         }
+        fb = new firebase();
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);
         pPic = view.findViewById(R.id.profilePic);
         profileRV =(ShimmerRecyclerView) view.findViewById(R.id.profileRV);
-        profileRV.showShimmerAdapter();
-        mArrayList = new ArrayList<>();
-        fb = new firebase();
-        mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
-        fab = view.findViewById(R.id.fab);
-
+        profileRV.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        Uname.setText(Utils.helper.getusernamePref(getContext()));
         profileRV.setLayoutManager(linearLayoutManager);
+        mArrayList = new ArrayList<>();
+        mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
+        profileRV.setAdapter(mAdapter);
+        profileRV.showShimmerAdapter();
+        fab = view.findViewById(R.id.fab);
+        Uname.setText(Utils.helper.getusernamePref(getContext()));
         loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
-        controller =
-                AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
+        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
+    }
+
+    private void onBackArrowPressed(Toolbar toolbar) {
+        toolbar.setNavigationOnClickListener(view1 -> {
+            if (getFragmentManager() != null) {
+                int index = getFragmentManager().getBackStackEntryCount() - 1;
+                FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
+                String tag = backEntry.getName();
+                getFragmentManager().beginTransaction().hide(ProfileFeed.this)
+                        .show(getFragmentManager().findFragmentByTag(tag))
+                        .commit();
+                if (tag.equals("1")) {
+                    MainActivity.bottomBar.setActiveItem(0);
+                    MainActivity.active = MainActivity.fragment1;
+                } else if (tag.equals("2")) {
+                    MainActivity.bottomBar.setActiveItem(1);
+                    MainActivity.active = MainActivity.fragment2;
+                }
+            }
+        });
     }
 
     private void showImagePickerOptions() {

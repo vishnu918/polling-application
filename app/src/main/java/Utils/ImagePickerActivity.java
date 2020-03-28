@@ -41,7 +41,6 @@ public class ImagePickerActivity extends AppCompatActivity {
     public static final String INTENT_BITMAP_MAX_WIDTH = "max_width";
     public static final String INTENT_BITMAP_MAX_HEIGHT = "max_height";
 
-
     public static final int REQUEST_IMAGE_CAPTURE = 0;
     public static final int REQUEST_GALLERY_IMAGE = 1;
 

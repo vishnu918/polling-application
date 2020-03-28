@@ -1,5 +1,22 @@
 package com.PollBuzz.pollbuzz.LoginSignup;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,26 +34,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.R;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +44,9 @@ import java.util.Map;
 
 import Utils.ImagePickerActivity;
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class ProfileSetUp extends AppCompatActivity {
     TextInputLayout name, Uname, date;
@@ -65,6 +65,10 @@ public class ProfileSetUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_set_up);
         setGlobals();
+        setListeners();
+    }
+
+    private void setListeners() {
         date.getEditText().setOnClickListener(view -> {
             final Calendar cldr = Calendar.getInstance();
             final int dayT = cldr.get(Calendar.DAY_OF_MONTH);

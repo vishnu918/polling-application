@@ -11,8 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 public class LoginSignupActivity extends AppCompatActivity {
-    Button login, signup;
-    Fragment login_frag, signup_frag;
+    private Button login, signup;
+    private Fragment login_frag, signup_frag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +20,10 @@ public class LoginSignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login_signup);
         setGlobals();
         setLoginFragment();
+        setListeners();
+    }
+
+    private void setListeners() {
         login.setOnClickListener(v -> setLoginFragment());
         signup.setOnClickListener(v -> setSignupFragment());
     }
