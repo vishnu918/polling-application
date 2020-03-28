@@ -14,10 +14,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,16 +34,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+
+import Utils.firebase;
 
 public class Ranking_type_response extends AppCompatActivity {
 
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     FirebaseAuth auth;
     MaterialButton submit;
     MaterialTextView title_ranking , query_ranking;
@@ -59,6 +56,7 @@ public class Ranking_type_response extends AppCompatActivity {
     ImageButton logout,home;
     FirebaseAuth.AuthStateListener listener;
     int c;
+    firebase fb = new firebase();
     ArrayList<String> resp=new ArrayList<>();
 
     @Override
@@ -73,12 +71,10 @@ public class Ranking_type_response extends AppCompatActivity {
         key = intent.getExtras().getString("UID");
 
         setGlobals(view);
-
-
         showDialog();
         setActionBarFunctionality();
         setAuthStateListener();
-        retrieveData();
+        retrieveData(fb);
 
 
 
@@ -95,14 +91,14 @@ public class Ranking_type_response extends AppCompatActivity {
                 }
                 else
                 {
-                    setResponse();
+                    setResponse(fb);
                 }
             }
         });
     }
 
-    private void retrieveData() {
-        firebaseFirestore.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    private void retrieveData(firebase fb) {
+        fb.getPollsCollection().document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful())
@@ -202,26 +198,25 @@ public class Ranking_type_response extends AppCompatActivity {
 
     }
 
-    private void setResponse() {
+    private void setResponse(firebase fb) {
         for(int i=0;i<c;i++)
         {
             response.put("option"+i,resp.get(i));
 
         }
-        submitResponse();
+        submitResponse(fb);
         return;
     }
 
-    private void submitResponse() {
+    private void submitResponse(firebase fb) {
 
-        ref = firebaseFirestore.collection("Polls").document(key).collection("Response");
-        ref.document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
+     fb.getPollsCollection().document(key).collection("Response").document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Map<String,String> mapi = new HashMap<>();
                 mapi.put("pollId",auth.getCurrentUser().getUid());
                 Toast.makeText(getApplicationContext(),"Successfully submitted your response",Toast.LENGTH_LONG).show();
-                firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
+                fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
                 Intent i=new Intent(Ranking_type_response.this,MainActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
