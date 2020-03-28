@@ -44,7 +44,7 @@ public class Image_type_result extends AppCompatActivity {
     firebase fb = new firebase();
     RadioButton b1,b2;
     ImageView image1,image2;
-    String key;
+    String key,uid;
     Typeface typeface;
     Dialog dialog;
     ImageButton logout;
@@ -65,6 +65,16 @@ public class Image_type_result extends AppCompatActivity {
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
         integer = intent.getExtras().getInt("flag");
+
+        if(integer == 1)
+        {
+            uid = intent.getExtras().getString("UIDUser");
+        }
+        if(integer == 0)
+        {
+            uid = fb.getUserId();
+        }
+
         response = new HashMap<>();
         options = new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
@@ -101,8 +111,7 @@ public class Image_type_result extends AppCompatActivity {
                                     i++;
                                 }
 
-                                if(integer == 0) {
-                                    fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).get()
+                                    fb.getPollsCollection().document(key).collection("Response").document(uid).get()
                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                 @Override
                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -125,8 +134,7 @@ public class Image_type_result extends AppCompatActivity {
                                                     Toast.makeText(Image_type_result.this, "Failed", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
-                                }
-                                if(integer == 1){
+                          /*      if(integer == 1){
                                     fb.getPollsCollection().document(key).collection("Response")
                                             .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
@@ -148,7 +156,7 @@ public class Image_type_result extends AppCompatActivity {
                                             }
                                         }
                                     });
-                                }
+                                }*/
 
                             }
                         }

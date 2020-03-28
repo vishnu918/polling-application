@@ -158,8 +158,8 @@ public class Single_type_response extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RadioButton button=findViewById(b_id);
-                Toast.makeText(getApplicationContext(),resp+" Opted",Toast.LENGTH_LONG).show();
+               // RadioButton button=findViewById(b_id);
+                //Toast.makeText(getApplicationContext(),resp+" Opted",Toast.LENGTH_LONG).show();
                 response.put("option",resp);
 
                 ref.document(auth.getCurrentUser().getUid()).set(response);
@@ -170,7 +170,7 @@ public class Single_type_response extends AppCompatActivity {
                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                            @Override
                            public void onSuccess(Void aVoid) {
-                               Toast.makeText(Single_type_response.this, "Added", Toast.LENGTH_SHORT).show();
+                               Toast.makeText(Single_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
                                Intent i=new Intent(Single_type_response.this,MainActivity.class);
                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                startActivity(i);
@@ -179,7 +179,7 @@ public class Single_type_response extends AppCompatActivity {
                        .addOnFailureListener(new OnFailureListener() {
                            @Override
                            public void onFailure(@NonNull Exception e) {
-                               Toast.makeText(Single_type_response.this, "Failed", Toast.LENGTH_SHORT).show();
+                               Toast.makeText(Single_type_response.this, "Unable to submit.Please try again", Toast.LENGTH_SHORT).show();
                            }
                        });
 

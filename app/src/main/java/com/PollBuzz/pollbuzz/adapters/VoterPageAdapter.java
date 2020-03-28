@@ -47,18 +47,19 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
         holder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(mVotedetails.get(position).getUserId().trim(),mVotedetails.get(position).getOption().trim());
+                startActivity(mVotedetails.get(position).getUserId().trim(),mVotedetails.get(position).getOption().trim(),mVotedetails.get(position).getPollId().trim());
             }
         });
     }
 
-    private void startActivity(String uid,String option) {
+    private void startActivity(String useruid,String option,String uid) {
         Intent intent;
         switch(option)
         {
             case "SINGLE ANSWER POLL":
                 intent = new Intent(mContext, Single_type_result.class);
                 intent.putExtra("UID",uid);
+                intent.putExtra("UIDUser",useruid);
                 intent.putExtra("flag",1);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
@@ -66,6 +67,7 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
             case "MULTI ANSWER POLL":
                 intent = new Intent(mContext, Multiple_type_result.class);
                 intent.putExtra("UID",uid);
+                intent.putExtra("UIDUser",useruid);
                 intent.putExtra("flag",1);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
@@ -73,6 +75,7 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
             case "DESCRIPTIVE POLL":
                 intent = new Intent(mContext, Descriptive_type_result.class);
                 intent.putExtra("UID",uid);
+                intent.putExtra("UIDUser",useruid);
                 intent.putExtra("flag",1);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
@@ -80,6 +83,7 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
             case "PRIORITY POLL":
                 intent = new Intent(mContext, Ranking_type_result.class);
                 intent.putExtra("UID",uid);
+                intent.putExtra("UIDUser",useruid);
                 intent.putExtra("flag",1);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
@@ -87,6 +91,7 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
             case "IMAGE POLL":
                 intent = new Intent(mContext, Image_type_result.class);
                 intent.putExtra("UID",uid);
+                intent.putExtra("UIDUser",useruid);
                 intent.putExtra("flag",1);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);

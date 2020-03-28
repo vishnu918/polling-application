@@ -298,6 +298,7 @@ public class Image_type_poll extends AppCompatActivity {
                                                         .addOnCompleteListener(task -> {
                                                             if (task.isSuccessful()) {
                                                                 deleteCache();
+                                                                Toast.makeText(this, "Your data added successfully", Toast.LENGTH_SHORT).show();
                                                                 Intent i = new Intent(Image_type_poll.this, MainActivity.class);
                                                                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                                                 startActivity(i);

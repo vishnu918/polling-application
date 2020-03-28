@@ -130,7 +130,7 @@ public class Descriptive_type_response extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(Descriptive_type_response.this, "ADded", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Descriptive_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
                                 Intent i=new Intent(Descriptive_type_response.this,MainActivity.class);
                                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(i);
@@ -139,7 +139,7 @@ public class Descriptive_type_response extends AppCompatActivity {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(Descriptive_type_response.this, "Failed", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Descriptive_type_response.this, "Unable to submit.Please tey again ", Toast.LENGTH_SHORT).show();
                             }
                         });
             }

@@ -60,6 +60,16 @@ public class Descriptive_type_result extends AppCompatActivity {
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
         integer = intent.getExtras().getInt("flag");
+
+        if(integer == 1)
+        {
+            uid = intent.getExtras().getString("UIDUser");
+        }
+        if(integer == 0)
+        {
+            uid = auth.getCurrentUser().getUid();
+        }
+
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,8 +119,7 @@ public class Descriptive_type_result extends AppCompatActivity {
                                                                                          title.setText(polldetails.getTitle());
                                                                                          title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                                                                          query.setText(polldetails.getQuestion());
-                                                                                         if (integer == 0) {
-                                                                                             db.collection("Polls").document(key).collection("Response").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                                             db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                                                  @Override
                                                                                                  public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                                                                      if (task.isSuccessful()) {
@@ -124,8 +133,7 @@ public class Descriptive_type_result extends AppCompatActivity {
                                                                                                  }
                                                                                              });
 
-                                                                                         }
-                                                                                         if (integer == 1) {
+                                                                                     /*    if (integer == 1) {
                                                                                              db.collection("Polls").document(key).collection("Response")
                                                                                                      .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                                                                  @Override
@@ -141,7 +149,7 @@ public class Descriptive_type_result extends AppCompatActivity {
                                                                                                      }
                                                                                                  }
                                                                                              });
-                                                                                         }
+                                                                                         }*/
 
                                                                                      }
                                                                                  }

@@ -66,24 +66,6 @@ public class ResultActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         fb=new firebase();
-
-//        if (UID != null) {
-//            pollsColRef = firebaseFirestore.collection("Polls")
-//                    .document(UID)
-//                    .collection("Response");
-//            firebaseFirestore.collection("Polls").document(UID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                @Override
-//                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                    if(task.isSuccessful() && task.getResult()!=null)
-//                    {
-//                        DocumentSnapshot documentSnapshot = task.getResult();
-//                        PollDetails pollDetails = documentSnapshot.toObject(PollDetails.class);
-//                        type = pollDetails.getPoll_type();
-//
-//                    }
-//                }
-//            });
-//        }
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,7 +112,7 @@ public class ResultActivity extends AppCompatActivity {
                                                 DocumentSnapshot documentSnapshot = task1.getResult();
                                                 Object author = documentSnapshot.get("username");
                                                 Log.d("type", author.toString());
-                                                VoteDetails voteDetails = new VoteDetails(UID, type, author.toString());
+                                                VoteDetails voteDetails = new VoteDetails(UID, type, author.toString(),dS.getId());
                                                 Log.d("TypeOf", voteDetails.getOption());
                                                 mVoteDetailsList.add(voteDetails);
                                                 mPageAdapter.notifyDataSetChanged();

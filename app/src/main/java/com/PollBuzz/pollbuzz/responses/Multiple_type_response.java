@@ -163,7 +163,7 @@ public class Multiple_type_response extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(Multiple_type_response.this, "Your answers are submitted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Multiple_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
 
                 ref.document(auth.getCurrentUser().getUid()).set(response);
                 Map<String,String> mapi = new HashMap<>();
@@ -181,7 +181,7 @@ public class Multiple_type_response extends AppCompatActivity {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(Multiple_type_response.this, "Failed", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Multiple_type_response.this, "Unable to submit.Please try again", Toast.LENGTH_SHORT).show();
                             }
                         });
             }

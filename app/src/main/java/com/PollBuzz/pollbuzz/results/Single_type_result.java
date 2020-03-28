@@ -66,6 +66,15 @@ public class Single_type_result extends AppCompatActivity {
         key = intent.getExtras().getString("UID");
         integer = intent.getExtras().getInt("flag");
 
+        if(integer == 1)
+        {
+            uid = intent.getExtras().getString("UIDUser");
+        }
+        if(integer == 0)
+        {
+            uid = auth.getCurrentUser().getUid();
+        }
+
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,14 +121,13 @@ public class Single_type_result extends AppCompatActivity {
                                                        DocumentSnapshot data = task.getResult();
                                                        if (data.exists()) {
                                                            group.removeAllViews();
-                                                           dialog.dismiss();
+                                                          dialog.dismiss();
                                                            PollDetails polldetails = data.toObject(PollDetails.class);
                                                            title.setText(polldetails.getTitle());
                                                            title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                                            query.setText(polldetails.getQuestion());
                                                            options = polldetails.getMap();
-                                                           if (integer == 0) {
-                                                               db.collection("Polls").document(key).collection("Response").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                               db.collection("Polls").document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                    @Override
                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                                        if (task.isSuccessful()) {
@@ -134,28 +142,6 @@ public class Single_type_result extends AppCompatActivity {
                                                                });
 
 
-                                                           }
-                                                       }
-                                                       if (integer==1)
-                                                       {
-                                                           db.collection("Polls").document(key).collection("Response")
-                                                                   .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                               @Override
-                                                               public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                       if(task.isSuccessful())
-                                                                       {
-                                                                           QuerySnapshot querySnapshot = task.getResult();
-                                                                           if(querySnapshot != null)
-                                                                           {
-                                                                               for(DocumentSnapshot documentSnapshot : querySnapshot)
-                                                                               {
-                                                                                   response = documentSnapshot.getData();
-                                                                                   setOptions();
-                                                                               }
-                                                                           }
-                                                                       }
-                                                               }
-                                                           });
                                                        }
                                                    }
 

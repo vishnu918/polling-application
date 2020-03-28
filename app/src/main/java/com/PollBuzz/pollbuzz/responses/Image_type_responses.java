@@ -180,7 +180,7 @@ public class Image_type_responses extends AppCompatActivity {
                         public void onSuccess(Void aVoid) {
                             Map<String,String> mapi = new HashMap<>();
                             mapi.put("pollId",auth.getCurrentUser().getUid());
-                            Toast.makeText(Image_type_responses.this, "Added", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
                             firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
                             Intent i=new Intent(Image_type_responses.this, MainActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -190,7 +190,7 @@ public class Image_type_responses extends AppCompatActivity {
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(Image_type_responses.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(Image_type_responses.this, "Unable to submit .Please try again ", Toast.LENGTH_SHORT).show();
                                 }
                             });
 

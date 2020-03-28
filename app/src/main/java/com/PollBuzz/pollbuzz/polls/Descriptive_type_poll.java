@@ -86,7 +86,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
                                         Map<String,String> m=new HashMap<>();
                                         m.put("pollId",doc.getId());
                                         docCreated.document().set(m);
-                                        Toast.makeText(Descriptive_type_poll.this, "Added successfully", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Descriptive_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(Descriptive_type_poll.this, MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
@@ -95,7 +95,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(Descriptive_type_poll.this, "Unable to add try again", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Descriptive_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }

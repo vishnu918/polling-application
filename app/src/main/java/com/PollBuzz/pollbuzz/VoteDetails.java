@@ -1,12 +1,21 @@
 package com.PollBuzz.pollbuzz;
 
 public class VoteDetails {
-    private String UserId,option,username;
+    private String UserId,option,username,PollId;
 
-    public VoteDetails(String userId, String option, String username) {
-        UserId = userId;
+    public VoteDetails(String PollId, String option, String username,String UserId) {
+        this.PollId = PollId;
+        this.UserId = UserId;
         this.option = option;
         this.username = username;
+    }
+
+    public String getPollId() {
+        return PollId;
+    }
+
+    public void setPollId(String pollId) {
+        PollId = pollId;
     }
 
     public void setUserId(String userId) {

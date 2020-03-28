@@ -188,7 +188,7 @@ public class Ranking_type_response extends AppCompatActivity {
             public void onSuccess(Void aVoid) {
                 Map<String,String> mapi = new HashMap<>();
                 mapi.put("pollId",auth.getCurrentUser().getUid());
-                Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Successfully submitted your response",Toast.LENGTH_LONG).show();
                 firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
                 Intent i=new Intent(Ranking_type_response.this,MainActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -198,7 +198,7 @@ public class Ranking_type_response extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Ranking_type_response.this, "Failde", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Ranking_type_response.this, "Unable to submit your.Please try again", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

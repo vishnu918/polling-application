@@ -146,7 +146,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                                         Map<String,String> m=new HashMap<>();
                                         m.put("pollId",doc.getId());
                                         docCreated.document().set(m);
-                                        Toast.makeText(Multiple_type_poll.this, "Added to Database", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Multiple_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(Multiple_type_poll.this, MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
@@ -155,7 +155,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(Multiple_type_poll.this, "Unable to add try again later", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Multiple_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }
