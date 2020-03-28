@@ -1,9 +1,17 @@
 package com.PollBuzz.pollbuzz.responses;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+import com.bumptech.glide.Glide;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -21,24 +29,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 public class Image_type_responses extends AppCompatActivity {
 
@@ -46,16 +44,14 @@ public class Image_type_responses extends AppCompatActivity {
     ImageView image1 ,image2;
     RadioGroup group;
     RadioButton b1,b2;
-    FirebaseAuth auth;
     MaterialButton submit;
     Map<String,Integer> options;
     Map<String,String> response;
     String key;
     Typeface typeface;
     Dialog dialog;
-    firebase fb = new firebase();
+    firebase fb;
     ImageButton logout,home;
-    FirebaseAuth.AuthStateListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +66,6 @@ public class Image_type_responses extends AppCompatActivity {
         setGlobals(view);
         setActionBarFunctionality();
         showDialog();
-        setAuthStateListener();
 
         b1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -113,16 +108,16 @@ public class Image_type_responses extends AppCompatActivity {
         {
             response.put("option",b2.getText().toString().trim());
         }
-        if(auth.getCurrentUser() != null)
+        if (fb.getUser() != null)
         {
             fb.getPollsCollection().document(key).collection("Response")
-            .document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    .document(fb.getUserId()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Map<String,String> mapi = new HashMap<>();
-                    mapi.put("pollId",auth.getCurrentUser().getUid());
+                    mapi.put("pollId", fb.getUserId());
                     Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                    fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
+                    fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi);
                     Intent i=new Intent(Image_type_responses.this, MainActivity.class);
                     i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
@@ -174,38 +169,20 @@ public class Image_type_responses extends AppCompatActivity {
 
     }
 
-    private void setAuthStateListener() {
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Image_type_responses.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
-
-    }
-
     private void setActionBarFunctionality() {
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                auth.signOut();
-            }
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Image_type_responses.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Image_type_responses.this, MainActivity.class);
-                startActivity(i);
-            }
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Image_type_responses.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-
     }
+
 
     private void getIntentExtras(Intent intent) {
         key = intent.getExtras().getString("UID");
@@ -220,7 +197,6 @@ public class Image_type_responses extends AppCompatActivity {
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Image_type_responses.this);
-        auth = FirebaseAuth.getInstance();
         title = findViewById(R.id.title);
         query = findViewById(R.id.query);
         submit = findViewById(R.id.submit);
@@ -228,7 +204,7 @@ public class Image_type_responses extends AppCompatActivity {
         image2 = findViewById(R.id.image2);
         b1 = findViewById(R.id.option1);
         b2 = findViewById(R.id.option2);
-
+        fb = new firebase();
     }
 
 
@@ -257,11 +233,5 @@ public class Image_type_responses extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth.addAuthStateListener(listener);
-
     }
 }

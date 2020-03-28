@@ -9,9 +9,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.responses.Single_type_response;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -24,6 +26,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -50,17 +53,32 @@ public class Single_type_poll extends AppCompatActivity {
     MaterialButton button;
     Date date = Calendar.getInstance().getTime();
     firebase fb;
+    ImageButton home,logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setGlobals();
+        setActionBarFunctionality();
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         final String formattedDate = df.format(date);
         setListeners(formattedDate);
 
     }
 
+    private void setActionBarFunctionality() {
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Single_type_poll.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        });
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Single_type_poll.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        });
+    }
     private void setListeners(String formattedDate) {
         add.setOnClickListener(v -> {
             RadioButton button = new RadioButton(getApplicationContext());
@@ -142,6 +160,8 @@ public class Single_type_poll extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
         fb = new firebase();
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
         c = group.getChildCount();

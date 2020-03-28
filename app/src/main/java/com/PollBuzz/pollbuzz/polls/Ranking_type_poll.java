@@ -9,6 +9,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
@@ -59,16 +60,26 @@ public class Ranking_type_poll extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setGlobals();
+        setActionBarFunctionality();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         final String formatteddate = dateFormat.format(date);
         setListeners(formatteddate);
     }
 
-    private void setListeners(String formatteddate) {
+    private void setActionBarFunctionality() {
         home.setOnClickListener(v -> {
             Intent i = new Intent(Ranking_type_poll.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
         });
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Ranking_type_poll.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        });
+    }
+    private void setListeners(String formatteddate) {
         add.setOnClickListener(v -> {
             final RadioButton button = new RadioButton(getApplicationContext());
             button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));

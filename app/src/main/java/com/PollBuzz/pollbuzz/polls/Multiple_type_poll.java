@@ -6,9 +6,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.responses.Multiple_type_response;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -46,14 +49,30 @@ public class Multiple_type_poll extends AppCompatActivity {
     RadioButton b;
     Date date = Calendar.getInstance().getTime();
     firebase fb;
+    ImageButton home, logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setGlobals();
+        setActionBarFunctionality();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         final String formatteddate = dateFormat.format(date);
         setListeners(formatteddate);
+    }
+
+    private void setActionBarFunctionality() {
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Multiple_type_poll.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        });
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Multiple_type_poll.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        });
     }
 
     private void setListeners(String formatteddate) {
@@ -127,6 +146,8 @@ public class Multiple_type_poll extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
         fb = new firebase();
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
         c = group.getChildCount();

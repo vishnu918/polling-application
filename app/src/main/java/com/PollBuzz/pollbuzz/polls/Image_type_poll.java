@@ -9,6 +9,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
@@ -75,17 +76,13 @@ public class Image_type_poll extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setGlobals();
+        setActionBarFunctionality();
         registerForContextMenu(b1);
         registerForContextMenu(b1);
         setListeners();
     }
 
     private void setListeners() {
-        home.setOnClickListener(v -> {
-            Intent i = new Intent(Image_type_poll.this, MainActivity.class);
-            startActivity(i);
-        });
-        logout.setOnClickListener(v -> fb.signOut());
         b1.setOnClickListener(v -> {
             v.showContextMenu();
             b1.setChecked(false);
@@ -150,6 +147,20 @@ public class Image_type_poll extends AppCompatActivity {
             } else {
                addToStorage();
             }
+        });
+    }
+
+    private void setActionBarFunctionality() {
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Image_type_poll.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        });
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Image_type_poll.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
     }
 

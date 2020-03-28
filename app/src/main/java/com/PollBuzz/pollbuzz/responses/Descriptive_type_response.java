@@ -1,15 +1,9 @@
 package com.PollBuzz.pollbuzz.responses;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
@@ -32,39 +26,19 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.firebase;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
-
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import Utils.firebase;
 public class Descriptive_type_response extends AppCompatActivity {
     Button submit;
     TextView title,query;
     Map<String,String> response;
     Typeface typeface;
     Dialog dialog;
-    FirebaseAuth auth;
     ImageButton home,logout;
-    FirebaseAuth.AuthStateListener listener;
-    firebase fb = new firebase();
+    firebase fb;
     TextInputLayout answer;
     String key;
 
@@ -81,12 +55,7 @@ public class Descriptive_type_response extends AppCompatActivity {
         setGlobals( view);
         setActionBarFunctionality();
         showDialog();
-        setAuthStateListener();
         retrieveData();
-
-
-
-
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,25 +72,17 @@ public class Descriptive_type_response extends AppCompatActivity {
         response.put("option",answer.getEditText().getText().toString());
         System.out.println(response);
         fb.getPollsCollection().document(key).collection("Response")
-        .document(auth.getCurrentUser().getUid()).set(response);
+                .document(fb.getUserId()).set(response);
         Map<String,String> mapi = new HashMap<>();
-        mapi.put("pollId",auth.getCurrentUser().getUid());
-        fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(Descriptive_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                        Intent i=new Intent(Descriptive_type_response.this,MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(i);
-                    }
+        mapi.put("pollId", fb.getUserId());
+        fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(Descriptive_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
+                    Intent i = new Intent(Descriptive_type_response.this, MainActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Descriptive_type_response.this, "Unable to submit.\nPlease try again ", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnFailureListener(e -> Toast.makeText(Descriptive_type_response.this, "Unable to submit.\nPlease try again ", Toast.LENGTH_SHORT).show());
     }
 
     private void retrieveData() {
@@ -145,38 +106,19 @@ public class Descriptive_type_response extends AppCompatActivity {
 
     }
 
-    private void setAuthStateListener() {
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Descriptive_type_response.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
-
-    }
 
     private void setActionBarFunctionality() {
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Descriptive_type_response.this, MainActivity.class);
-                startActivity(i);
-            }
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Descriptive_type_response.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                auth.signOut();
-            }
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Descriptive_type_response.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-
-
     }
 
     private void getIntentExtras(Intent intent) {
@@ -192,18 +134,11 @@ public class Descriptive_type_response extends AppCompatActivity {
         lp.copyFrom(window.getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
     }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth.addAuthStateListener(listener);
 
-    }
     private void setGlobals(View view)
     {
         title=findViewById(R.id.title);
@@ -212,8 +147,8 @@ public class Descriptive_type_response extends AppCompatActivity {
         answer=findViewById(R.id.answer);
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Descriptive_type_response.this);
-        auth = FirebaseAuth.getInstance();
-        response=new HashMap<>();
+        fb = new firebase();
+        response = new HashMap<>();
         logout=view.findViewById(R.id.logout);
         home=view.findViewById(R.id.home);
     }

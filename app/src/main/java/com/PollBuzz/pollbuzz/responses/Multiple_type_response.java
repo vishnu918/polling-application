@@ -1,9 +1,13 @@
 package com.PollBuzz.pollbuzz.responses;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -20,23 +24,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 public class Multiple_type_response extends AppCompatActivity {
     TextView title, query;
@@ -45,11 +40,9 @@ public class Multiple_type_response extends AppCompatActivity {
     String key;
     Typeface typeface;
     Dialog dialog;
-    FirebaseAuth auth;
     ImageButton home,logout;
-    FirebaseAuth.AuthStateListener listener;
     Button submit;
-    firebase fb = new firebase();
+    firebase fb;
     int c;
     Map<String,String> response;
 
@@ -66,24 +59,9 @@ public class Multiple_type_response extends AppCompatActivity {
         setGlobals(view);
         setActionBarFunctionality();
         showDialog();
-        setAuthStateListener();
         retrieveData();
 
-
-
-
-
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submitResponse();
-
-            }
-        });
-
-
-
-
+        submit.setOnClickListener(v -> submitResponse());
     }
 
     private void getIntentExtras(Intent intent) {
@@ -92,12 +70,11 @@ public class Multiple_type_response extends AppCompatActivity {
     }
 
     private void submitResponse() {
-
         fb.getPollsCollection().document(key).collection("Response")
-        .document(auth.getCurrentUser().getUid()).set(response);
+                .document(fb.getUserId()).set(response);
         Map<String,String> mapi = new HashMap<>();
-        mapi.put("pollId",auth.getCurrentUser().getUid());
-        fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+        mapi.put("pollId", fb.getUserId());
+        fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -117,96 +94,66 @@ public class Multiple_type_response extends AppCompatActivity {
     }
 
     private void retrieveData() {
-       fb.getPollsCollection().document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                                             @Override
-                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+        fb.getPollsCollection().document(key).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
+                        DocumentSnapshot data = task.getResult();
+                        if (data.exists()) {
+
+                            dialog.dismiss();
+                            PollDetails polldetails = data.toObject(PollDetails.class);
+                            title.setText(polldetails.getTitle());
+                            title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                            query.setText(polldetails.getQuestion());
+                            options = polldetails.getMap();
+                            group.removeAllViews();
+                            response.clear();
+
+                            int i = 0;
+                            for (Map.Entry<String, Integer> entry : options.entrySet()) {
+                                CheckBox button = new CheckBox(getApplicationContext());
+                                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                layoutParams.setMargins(5, 20, 5, 20);
+                                button.setLayoutParams(layoutParams);
+                                button.setTypeface(typeface);
+
+                                button.setText(entry.getKey());
+                                button.setTextSize(20.0f);
+                                group.addView(button);
+                                int finalI = i;
+                                button.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        CheckBox b = (CheckBox) v;
+                                        if (b.isChecked())
+                                            response.put("option" + finalI, b.getText().toString());
+                                        else
+                                            response.values().remove(b.getText().toString());
 
 
+                                    }
+                                });
+                                i++;
+                            }
+                        }
+                    }
 
-                                                                                 if (task.isSuccessful()) {
-
-                                                                                     DocumentSnapshot data = task.getResult();
-                                                                                     if(data.exists())
-                                                                                     {
-
-                                                                                         dialog.dismiss();
-                                                                                         PollDetails polldetails=data.toObject(PollDetails.class);
-                                                                                         title.setText(polldetails.getTitle());
-                                                                                         title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-                                                                                         query.setText(polldetails.getQuestion());
-                                                                                         options=polldetails.getMap();
-                                                                                         group.removeAllViews();
-                                                                                         response.clear();
-
-                                                                                         int i=0;
-                                                                                         for(Map.Entry<String,Integer> entry : options.entrySet())
-                                                                                         {
-                                                                                             CheckBox button=new CheckBox(getApplicationContext());
-                                                                                             LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-                                                                                             layoutParams.setMargins(5,20,5,20);
-                                                                                             button.setLayoutParams(layoutParams);
-                                                                                             button.setTypeface(typeface);
-
-                                                                                             button.setText(entry.getKey());
-                                                                                             button.setTextSize(20.0f);
-                                                                                             group.addView(button);
-                                                                                             int finalI = i;
-                                                                                             button.setOnClickListener(new View.OnClickListener() {
-                                                                                                 @Override
-                                                                                                 public void onClick(View v) {
-                                                                                                     CheckBox b=(CheckBox) v;
-                                                                                                     if(b.isChecked())
-                                                                                                         response.put("option"+ finalI,b.getText().toString());
-                                                                                                     else
-                                                                                                         response.values().remove(b.getText().toString());
-
-
-                                                                                                 }
-                                                                                             });
-                                                                                             i++;
-                                                                                         }
-                                                                                     }
-                                                                                 }
-
-                                                                             }
-                                                                         }
-
-        );
-
-
-    }
-
-    private void setAuthStateListener() {
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Multiple_type_response.this, LoginSignupActivity.class);
-                    startActivity(i);
                 }
-
-            }
-        };
-
+        );
     }
 
     private void setActionBarFunctionality() {
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Multiple_type_response.this, MainActivity.class);
-                startActivity(i);
-            }
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Multiple_type_response.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                auth.signOut();
-            }
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Multiple_type_response.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-
     }
 
     private void setGlobals(View view) {
@@ -221,10 +168,7 @@ public class Multiple_type_response extends AppCompatActivity {
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Multiple_type_response.this);
-        auth = FirebaseAuth.getInstance();
-
-
-
+        fb = new firebase();
     }
 
     private void showDialog()
@@ -236,16 +180,8 @@ public class Multiple_type_response extends AppCompatActivity {
         lp.copyFrom(window.getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth.addAuthStateListener(listener);
-
     }
 }

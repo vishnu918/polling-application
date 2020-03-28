@@ -1,9 +1,18 @@
 package com.PollBuzz.pollbuzz.responses;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -20,30 +29,18 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 public class Ranking_type_response extends AppCompatActivity {
 
-    FirebaseAuth auth;
     MaterialButton submit;
     MaterialTextView title_ranking , query_ranking;
     LinearLayout group,sequence;
@@ -54,9 +51,8 @@ public class Ranking_type_response extends AppCompatActivity {
     Typeface typeface;
     Dialog dialog;
     ImageButton logout,home;
-    FirebaseAuth.AuthStateListener listener;
     int c;
-    firebase fb = new firebase();
+    firebase fb;
     ArrayList<String> resp=new ArrayList<>();
 
     @Override
@@ -69,18 +65,10 @@ public class Ranking_type_response extends AppCompatActivity {
         View view =getSupportActionBar().getCustomView();
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
-
         setGlobals(view);
         showDialog();
         setActionBarFunctionality();
-        setAuthStateListener();
-        retrieveData(fb);
-
-
-
-
-
-
+        retrieveData();
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +85,7 @@ public class Ranking_type_response extends AppCompatActivity {
         });
     }
 
-    private void retrieveData(firebase fb) {
+    private void retrieveData() {
         fb.getPollsCollection().document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -122,35 +110,18 @@ public class Ranking_type_response extends AppCompatActivity {
 
     }
 
-    private void setAuthStateListener() {
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Ranking_type_response.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
-
-    }
 
     private void setActionBarFunctionality() {
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                auth.signOut();
-            }
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(Ranking_type_response.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Ranking_type_response.this, MainActivity.class);
-                startActivity(i);
-            }
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(Ranking_type_response.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
     }
 
@@ -163,11 +134,10 @@ public class Ranking_type_response extends AppCompatActivity {
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Ranking_type_response.this);
-        auth = FirebaseAuth.getInstance();
         title_ranking = findViewById(R.id.title);
         query_ranking = findViewById(R.id.query);
         submit = findViewById(R.id.submit);
-
+        fb = new firebase();
     }
 
     private void setOptions() {
@@ -210,13 +180,13 @@ public class Ranking_type_response extends AppCompatActivity {
 
     private void submitResponse(firebase fb) {
 
-     fb.getPollsCollection().document(key).collection("Response").document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
+        fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Map<String,String> mapi = new HashMap<>();
-                mapi.put("pollId",auth.getCurrentUser().getUid());
+                mapi.put("pollId", fb.getUserId());
                 Toast.makeText(getApplicationContext(),"Successfully submitted your response",Toast.LENGTH_LONG).show();
-                fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
+                fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi);
                 Intent i=new Intent(Ranking_type_response.this,MainActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
@@ -265,11 +235,4 @@ public class Ranking_type_response extends AppCompatActivity {
         dialog.show();
         window.setAttributes(lp);
     }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth.addAuthStateListener(listener);
-
-    }
-
 }
