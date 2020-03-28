@@ -2,10 +2,7 @@ package Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
-
-
+import androidx.preference.PreferenceManager;
 
 public class helper {
     private static String profileSetUpPref = "profileSetUpSharedPreferences";
