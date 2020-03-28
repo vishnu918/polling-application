@@ -60,7 +60,8 @@ public class HomeFeed extends Fragment {
             if (task.isSuccessful() && task.getResult() != null) {
                 recyclerView.hideShimmerAdapter();
                 for (QueryDocumentSnapshot dS : task.getResult()) {
-                    addToRecyclerView(dS);
+                    if (!dS.getId().equals(fb.getUserId()))
+                        addToRecyclerView(dS);
                 }
             } else {
                 Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
