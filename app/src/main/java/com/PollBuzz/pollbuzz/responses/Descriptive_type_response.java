@@ -102,7 +102,7 @@ public class Descriptive_type_response extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Descriptive_type_response.this, "Unable to submit.Please tey again ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Descriptive_type_response.this, "Unable to submit.\nPlease try again ", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
