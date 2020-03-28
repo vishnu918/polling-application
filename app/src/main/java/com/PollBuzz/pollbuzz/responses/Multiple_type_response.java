@@ -63,7 +63,7 @@ public class Multiple_type_response extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
         Intent intent = getIntent();
-        key = intent.getExtras().getString("UID");
+        getIntentExtras(intent);
         setGlobals(view);
         setActionBarFunctionality();
         showDialog();
@@ -84,6 +84,11 @@ public class Multiple_type_response extends AppCompatActivity {
 
 
 
+
+    }
+
+    private void getIntentExtras(Intent intent) {
+        key = intent.getExtras().getString("UID");
 
     }
 
@@ -153,7 +158,7 @@ public class Multiple_type_response extends AppCompatActivity {
                                                                                                      if(b.isChecked())
                                                                                                          response.put("option"+ finalI,b.getText().toString());
                                                                                                      else
-                                                                                                         response.remove(b.getText().toString());
+                                                                                                         response.values().remove(b.getText().toString());
 
 
                                                                                                  }
@@ -219,6 +224,7 @@ public class Multiple_type_response extends AppCompatActivity {
         dialog=new Dialog(Multiple_type_response.this);
         auth = FirebaseAuth.getInstance();
         ref=db.collection("Polls").document(key).collection("Response");
+
 
     }
 
