@@ -13,6 +13,7 @@ import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,9 +82,7 @@ public class VotedFeed extends Fragment {
 
     private void addToRecyclerView(DocumentSnapshot dS1) {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
-        if (polldetails != null) {
-            polldetails.setUID(dS1.getId());
-        }
+        polldetails.setUID(dS1.getId());
         mArrayList.add(polldetails);
         votedRV.setLayoutAnimation(controller);
         mAdapter.notifyDataSetChanged();
