@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -61,7 +62,7 @@ public class ProfileFeed extends Fragment {
     private ImageView pPic;
     private ImageButton edit;
     private Uri uri;
-    private RecyclerView profileRV;
+    private ShimmerRecyclerView profileRV;
     private ProfileFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
     private firebase fb;
@@ -111,6 +112,8 @@ public class ProfileFeed extends Fragment {
 
     private void getOwnedPolls(Task<QuerySnapshot> task) {
         if (task.isSuccessful() && task.getResult() != null) {
+            profileRV.hideShimmerAdapter();
+            profileRV.setAdapter(mAdapter);
             for (QueryDocumentSnapshot dS : task.getResult()) {
                 if (dS.get("pollId") != null)
                     fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
@@ -151,11 +154,12 @@ public class ProfileFeed extends Fragment {
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);
         pPic = view.findViewById(R.id.profilePic);
-        profileRV = view.findViewById(R.id.profileRV);
+        profileRV =(ShimmerRecyclerView) view.findViewById(R.id.profileRV);
+        profileRV.showShimmerAdapter();
         mArrayList = new ArrayList<>();
         fb = new firebase();
         mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
-        profileRV.setAdapter(mAdapter);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         Uname.setText(Utils.helper.getusernamePref(getContext()));

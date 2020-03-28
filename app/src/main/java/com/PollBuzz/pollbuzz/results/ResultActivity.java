@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.results;
 
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -33,7 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ResultActivity extends AppCompatActivity {
 
-    RecyclerView voteRV;
+    ShimmerRecyclerView voteRV;
     VoterPageAdapter mPageAdapter;
     List<VoteDetails> mVoteDetailsList;
     FirebaseAuth mAuth;
@@ -89,14 +90,16 @@ public class ResultActivity extends AppCompatActivity {
         };
         userColRef = firebaseFirestore.collection("Users");
         voteRV = findViewById(R.id.voterListRV);
+        voteRV.showShimmerAdapter();
         mVoteDetailsList = new ArrayList<>();
         mPageAdapter = new VoterPageAdapter(getApplicationContext(), mVoteDetailsList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         voteRV.setLayoutManager(linearLayoutManager);
-        voteRV.setAdapter(mPageAdapter);
         if (UID != null) {
             fb.getPollsCollection().document(UID).collection("Response").get().addOnCompleteListener(task -> {
+                voteRV.setAdapter(mPageAdapter);
+                voteRV.hideShimmerAdapter();
                 if (task.isSuccessful()) {
                     QuerySnapshot querySnapshot = task.getResult();
                     if (querySnapshot != null) {

@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -31,7 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class HomeFeed extends Fragment {
     private ArrayList<PollDetails> arrayList;
-    private RecyclerView recyclerView;
+    private ShimmerRecyclerView recyclerView;
     private com.PollBuzz.pollbuzz.adapters.HomePageAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private FloatingActionButton fab;
@@ -57,6 +58,8 @@ public class HomeFeed extends Fragment {
         });
         fb.getPollsCollection().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
+                recyclerView.hideShimmerAdapter();
+                recyclerView.setAdapter(adapter);
                 for (QueryDocumentSnapshot dS : task.getResult()) {
                     addToRecyclerView(dS);
                 }
@@ -79,11 +82,12 @@ public class HomeFeed extends Fragment {
         arrayList = new ArrayList<>();
         fab = view.findViewById(R.id.fab);
         recyclerView = view.findViewById(R.id.recyclerview);
+        recyclerView.showShimmerAdapter();
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         adapter = new HomePageAdapter(getContext(), arrayList);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+
         controller =
                 AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(view.findViewById(R.id.text));

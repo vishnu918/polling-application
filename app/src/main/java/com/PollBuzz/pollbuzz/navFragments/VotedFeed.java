@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -31,7 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class VotedFeed extends Fragment {
-    private RecyclerView votedRV;
+    private ShimmerRecyclerView votedRV;
     private VotedFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
     private LinearLayoutManager layoutManager;
@@ -61,6 +62,8 @@ public class VotedFeed extends Fragment {
 
     private void getVotedPolls(@NonNull Task<QuerySnapshot> task) {
         if (task.isSuccessful() && task.getResult() != null) {
+            votedRV.setAdapter(mAdapter);
+            votedRV.hideShimmerAdapter();
             for (QueryDocumentSnapshot dS : task.getResult()) {
                 if (dS.exists()) {
                     fb.getPollsCollection().document(dS.getId())
@@ -89,7 +92,7 @@ public class VotedFeed extends Fragment {
         votedRV.setLayoutManager(layoutManager);
         mArrayList = new ArrayList<>();
         mAdapter = new VotedFeedAdapter(getContext(), mArrayList);
-        votedRV.setAdapter(mAdapter);
+        votedRV.showShimmerAdapter();
         fb = new firebase();
         userVotedRef = fb.getUserDocument().collection("Voted");
     }
