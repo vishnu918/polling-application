@@ -62,11 +62,133 @@ public class Multiple_type_response extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
-        home = view.findViewById(R.id.home);
-        logout = view.findViewById(R.id.logout);
+        setGlobals(view);
+
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
-        c=0;
+        setActionBarFunctionality();
+        showDialog();
+        setAuthStateListener();
+        retrieveData();
+
+
+
+
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submitResponse();
+
+            }
+        });
+
+
+
+
+    }
+
+    private void submitResponse() {
+
+        ref.document(auth.getCurrentUser().getUid()).set(response);
+        Map<String,String> mapi = new HashMap<>();
+        mapi.put("pollId",auth.getCurrentUser().getUid());
+        db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(Multiple_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
+                        Intent i=new Intent(Multiple_type_response.this,MainActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(Multiple_type_response.this, "Unable to submit. \nPlease try again", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void retrieveData() {
+        db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                             @Override
+                                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+
+
+                                                                                 if (task.isSuccessful()) {
+
+                                                                                     DocumentSnapshot data = task.getResult();
+                                                                                     if(data.exists())
+                                                                                     {
+
+                                                                                         dialog.dismiss();
+                                                                                         PollDetails polldetails=data.toObject(PollDetails.class);
+                                                                                         title.setText(polldetails.getTitle());
+                                                                                         title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+                                                                                         query.setText(polldetails.getQuestion());
+                                                                                         options=polldetails.getMap();
+                                                                                         group.removeAllViews();
+                                                                                         response.clear();
+
+                                                                                         int i=0;
+                                                                                         for(Map.Entry<String,Integer> entry : options.entrySet())
+                                                                                         {
+                                                                                             CheckBox button=new CheckBox(getApplicationContext());
+                                                                                             LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+                                                                                             layoutParams.setMargins(5,20,5,20);
+                                                                                             button.setLayoutParams(layoutParams);
+                                                                                             button.setTypeface(typeface);
+
+                                                                                             button.setText(entry.getKey());
+                                                                                             button.setTextSize(20.0f);
+                                                                                             group.addView(button);
+                                                                                             int finalI = i;
+                                                                                             button.setOnClickListener(new View.OnClickListener() {
+                                                                                                 @Override
+                                                                                                 public void onClick(View v) {
+                                                                                                     CheckBox b=(CheckBox) v;
+                                                                                                     if(b.isChecked())
+                                                                                                         response.put("option"+ finalI,b.getText().toString());
+                                                                                                     else
+                                                                                                         response.remove(b.getText().toString());
+
+
+                                                                                                 }
+                                                                                             });
+                                                                                             i++;
+                                                                                         }
+                                                                                     }
+                                                                                 }
+
+                                                                             }
+                                                                         }
+
+        );
+
+
+    }
+
+    private void setAuthStateListener() {
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Multiple_type_response.this, LoginSignupActivity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
+
+    }
+
+    private void setActionBarFunctionality() {
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,6 +202,13 @@ public class Multiple_type_response extends AppCompatActivity {
                 auth.signOut();
             }
         });
+
+    }
+
+    private void setGlobals(View view) {
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+        c=0;
         title=findViewById(R.id.title);
         submit=findViewById(R.id.submit);
         query=findViewById(R.id.query);
@@ -89,108 +218,11 @@ public class Multiple_type_response extends AppCompatActivity {
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Multiple_type_response.this);
-        showDialog();
         auth = FirebaseAuth.getInstance();
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Multiple_type_response.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
-        db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
-
-
-                if (task.isSuccessful()) {
-
-                    DocumentSnapshot data = task.getResult();
-                    if(data.exists())
-                    {
-
-                    dialog.dismiss();
-                    PollDetails polldetails=data.toObject(PollDetails.class);
-                    title.setText(polldetails.getTitle());
-                    title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-                    query.setText(polldetails.getQuestion());
-                    options=polldetails.getMap();
-                    group.removeAllViews();
-                        response.clear();
-
-                        int i=0;
-                    for(Map.Entry<String,Integer> entry : options.entrySet())
-                    {
-                        CheckBox button=new CheckBox(getApplicationContext());
-                        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(5,20,5,20);
-                        button.setLayoutParams(layoutParams);
-                        button.setTypeface(typeface);
-
-                        button.setText(entry.getKey());
-                        button.setTextSize(20.0f);
-                        group.addView(button);
-                        int finalI = i;
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                CheckBox b=(CheckBox) v;
-                                if(b.isChecked())
-                                    response.put("option"+ finalI,b.getText().toString());
-                                else
-                                    response.remove(b.getText().toString());
-
-
-                            }
-                        });
-                        i++;
-                    }
-                    }
-                }
-
-            }
-        }
-
-        );
-
         ref=db.collection("Polls").document(key).collection("Response");
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(Multiple_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-
-                ref.document(auth.getCurrentUser().getUid()).set(response);
-                Map<String,String> mapi = new HashMap<>();
-                mapi.put("pollId",auth.getCurrentUser().getUid());
-                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(Multiple_type_response.this, "Added", Toast.LENGTH_SHORT).show();
-                                Intent i=new Intent(Multiple_type_response.this,MainActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(i);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(Multiple_type_response.this, "Unable to submit.Please try again", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            }
-        });
-
-
-
 
     }
+
     private void showDialog()
     {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
