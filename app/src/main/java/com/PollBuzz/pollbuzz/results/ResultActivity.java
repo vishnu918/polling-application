@@ -3,9 +3,7 @@ package com.PollBuzz.pollbuzz.results;
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -40,12 +38,10 @@ public class ResultActivity extends AppCompatActivity {
     VoterPageAdapter mPageAdapter;
     List<VoteDetails> mVoteDetailsList;
     FirebaseAuth mAuth;
-    FirebaseUser mUser;
     ImageButton home,logout;
     TextView page_title;
-    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    private CollectionReference pollsColRef, userColRef;
-    firebase fb;
+    String UID,type;
+    firebase fb = new firebase();
     FirebaseAuth.AuthStateListener listener;
     private LayoutAnimationController controller;
 
@@ -57,31 +53,19 @@ public class ResultActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
-        home = view.findViewById(R.id.home);
-        logout = view.findViewById(R.id.logout);
-        page_title=view.findViewById(R.id.page_title);
-        page_title.setText("Results");
-        Intent parent = getIntent();
-        String UID = parent.getStringExtra("UID");
-        String type = parent.getStringExtra("type");
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        controller =
-                AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
-        fb=new firebase();
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ResultActivity.this, MainActivity.class);
-                startActivity(i);
-            }
-        });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAuth.signOut();
-            }
-        });
+
+        setGlobals(view);
+        Intent intent = getIntent();
+        getIntentExtras(intent);
+        setActionBarFunctionality();
+        setAuthStateListener();
+        retriveData(fb);
+
+
+    }
+
+    private void setAuthStateListener() {
+
         listener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -93,7 +77,9 @@ public class ResultActivity extends AppCompatActivity {
 
             }
         };
-        userColRef = firebaseFirestore.collection("Users");
+    }
+
+    private void retriveData(firebase fb) {
         voteRV = findViewById(R.id.voterListRV);
 
         voteRV.showShimmerAdapter();
@@ -110,7 +96,7 @@ public class ResultActivity extends AppCompatActivity {
                     QuerySnapshot querySnapshot = task.getResult();
                     if (querySnapshot != null) {
                         for (DocumentSnapshot dS : querySnapshot) {
-                            userColRef.document(dS.getId()).get()
+                            fb.getUsersCollection().document(dS.getId()).get()
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful() && task1.getResult() != null) {
                                             DocumentSnapshot documentSnapshot = task1.getResult();
@@ -138,6 +124,38 @@ public class ResultActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void getIntentExtras(Intent parent) {
+         UID = parent.getStringExtra("UID");
+         type = parent.getStringExtra("type");
+    }
+
+    private void setActionBarFunctionality() {
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ResultActivity.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fb.signOut();
+            }
+        });
+    }
+
+    private void setGlobals(View view) {
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+        page_title=view.findViewById(R.id.page_title);
+        mAuth = FirebaseAuth.getInstance();
+        page_title.setText("Results");
+        controller =
+                AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
