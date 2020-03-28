@@ -106,23 +106,41 @@
                 app:title="Your Polls" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
-            android:background="@color/white"
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">>
 
-        <com.cooltechworks.views.shimmer.ShimmerRecyclerView
-                android:id="@+id/profileRV"
+        <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-           app:shimmer_demo_shimmer_color="@color/white"
-            app:shimmer_demo_angle="20"
-            app:shimmer_demo_view_holder_item_background="@color/white"
-            app:shimmer_demo_layout_manager_type="linear_vertical"
-            app:shimmer_demo_layout="@layout/placeholder"
-            app:shimmer_demo_child_count="7"
-            />
-    </androidx.core.widget.NestedScrollView>
+                android:background="@color/white"
+                android:clipToPadding="false">
+
+            <com.cooltechworks.views.shimmer.ShimmerRecyclerView
+                    android:id="@+id/profileRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:shimmer_demo_angle="20"
+                    app:shimmer_demo_child_count="7"
+                    app:shimmer_demo_layout="@layout/placeholder"
+                    app:shimmer_demo_layout_manager_type="linear_vertical"
+                    app:shimmer_demo_shimmer_color="@color/white"
+                    app:shimmer_demo_view_holder_item_background="@color/white" />
+        </androidx.core.widget.NestedScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="15dp"
+                android:src="@drawable/ic_add_primary_dark_24dp"
+                app:backgroundTint="@color/white"
+                app:elevation="10dp" />
+    </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
