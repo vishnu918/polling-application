@@ -56,10 +56,9 @@ public class Ranking_type_response extends AppCompatActivity {
     String key;
     Typeface typeface;
     Dialog dialog;
-    ImageButton logout;
+    ImageButton logout,home;
     FirebaseAuth.AuthStateListener listener;
     int c;
-    int b_id;
     ArrayList<String> resp=new ArrayList<>();
 
     @Override
@@ -70,62 +69,21 @@ public class Ranking_type_response extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
-        logout = findViewById(R.id.logout);
-        group=findViewById(R.id.options);
-        sequence=findViewById(R.id.sequence);
-        options=new HashMap<>();
-        response=new HashMap<>();
+        setGlobals(view);
+
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
-        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
-        dialog=new Dialog(Ranking_type_response.this);
+
         showDialog();
-        auth = FirebaseAuth.getInstance();
-        title_ranking = findViewById(R.id.title);
-        query_ranking = findViewById(R.id.query);
-        submit = findViewById(R.id.submit);
+        setActionBarFunctionality();
+        setAuthStateListener();
+        retrieveData();
 
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                    auth.signOut();
-            }
-        });
 
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Ranking_type_response.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
 
-            }
-        };
 
-        firebaseFirestore.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful())
-                {
-                    DocumentSnapshot data = task.getResult();
-                    if(data.exists())
-                    {   group.removeAllViews();
-                        dialog.dismiss();
-                        PollDetails polldetails=data.toObject(PollDetails.class);
-                        title_ranking.setText(polldetails.getTitle());
-                        title_ranking.setPaintFlags(title_ranking.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
-                        query_ranking.setText(polldetails.getQuestion());
-                        options=polldetails.getMap();
-                       c=options.size();
-                       setOptions();
 
-                    }
-                }
-            }
-        });
+
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +98,79 @@ public class Ranking_type_response extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void retrieveData() {
+        firebaseFirestore.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful())
+                {
+                    DocumentSnapshot data = task.getResult();
+                    if(data.exists())
+                    {   group.removeAllViews();
+                        dialog.dismiss();
+                        PollDetails polldetails=data.toObject(PollDetails.class);
+                        title_ranking.setText(polldetails.getTitle());
+                        title_ranking.setPaintFlags(title_ranking.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+                        query_ranking.setText(polldetails.getQuestion());
+                        options=polldetails.getMap();
+                        c=options.size();
+                        setOptions();
+
+                    }
+                }
+            }
+        });
+
+    }
+
+    private void setAuthStateListener() {
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Ranking_type_response.this, LoginSignupActivity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
+
+    }
+
+    private void setActionBarFunctionality() {
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                auth.signOut();
+            }
+        });
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Ranking_type_response.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+    }
+
+    private void setGlobals(View view) {
+        logout = view.findViewById(R.id.logout);
+        home=view.findViewById(R.id.home);
+        group=findViewById(R.id.options);
+        sequence=findViewById(R.id.sequence);
+        options=new HashMap<>();
+        response=new HashMap<>();
+        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
+        dialog=new Dialog(Ranking_type_response.this);
+        auth = FirebaseAuth.getInstance();
+        title_ranking = findViewById(R.id.title);
+        query_ranking = findViewById(R.id.query);
+        submit = findViewById(R.id.submit);
+
     }
 
     private void setOptions() {
