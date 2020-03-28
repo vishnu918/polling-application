@@ -63,6 +63,7 @@ public class Single_type_result extends AppCompatActivity {
         View view = getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
+        auth = FirebaseAuth.getInstance();
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
         integer = intent.getExtras().getInt("flag");
@@ -73,7 +74,7 @@ public class Single_type_result extends AppCompatActivity {
         }
         if(integer == 0)
         {
-                uid = Utils.helper.getusernamePref(getApplicationContext());
+                uid = auth.getCurrentUser().getUid();
         }
 
         home.setOnClickListener(new View.OnClickListener() {
@@ -99,7 +100,7 @@ public class Single_type_result extends AppCompatActivity {
         typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
         dialog = new Dialog(Single_type_result.this);
         showDialog();
-        auth = FirebaseAuth.getInstance();
+
         listener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {

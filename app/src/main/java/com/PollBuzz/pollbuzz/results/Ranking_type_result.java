@@ -63,6 +63,7 @@ public class Ranking_type_result extends AppCompatActivity {
         View view = getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
+        auth = FirebaseAuth.getInstance();
         options=new TreeMap<>();
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
@@ -90,7 +91,7 @@ public class Ranking_type_result extends AppCompatActivity {
                 auth.signOut();
             }
         });
-        auth = FirebaseAuth.getInstance();
+
         listener=new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {

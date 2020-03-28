@@ -58,11 +58,12 @@ public class Multiple_type_result extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
 
+        setGlobals(view);
         Intent intent = getIntent();
         getIntentExtras(intent);
 
 
-       setGlobals(view);
+
        setActionBarFunctionality();
        setAuthStateListener();
        showDialog();
