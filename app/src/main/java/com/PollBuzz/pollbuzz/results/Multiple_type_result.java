@@ -106,7 +106,7 @@ public class Multiple_type_result extends AppCompatActivity {
                     }
                 }
         );
-
+   group.setEnabled(false);
 
     }
 

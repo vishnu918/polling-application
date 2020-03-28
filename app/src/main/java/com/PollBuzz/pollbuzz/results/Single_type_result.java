@@ -102,6 +102,7 @@ public class Single_type_result extends AppCompatActivity {
                         }
                     }
                 });
+        group.setEnabled(false);
     }
 
 
