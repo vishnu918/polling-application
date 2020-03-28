@@ -37,6 +37,24 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import Utils.firebase;
 public class Descriptive_type_response extends AppCompatActivity {
     Button submit;
     TextView title,query;
@@ -46,8 +64,7 @@ public class Descriptive_type_response extends AppCompatActivity {
     FirebaseAuth auth;
     ImageButton home,logout;
     FirebaseAuth.AuthStateListener listener;
-    FirebaseFirestore db;
-    CollectionReference ref;
+    firebase fb = new firebase();
     TextInputLayout answer;
     String key;
 
@@ -85,10 +102,11 @@ public class Descriptive_type_response extends AppCompatActivity {
     private void submitResponse() {
         response.put("option",answer.getEditText().getText().toString());
         System.out.println(response);
-        ref.document(auth.getCurrentUser().getUid()).set(response);
+        fb.getPollsCollection().document(key).collection("Response")
+        .document(auth.getCurrentUser().getUid()).set(response);
         Map<String,String> mapi = new HashMap<>();
         mapi.put("pollId",auth.getCurrentUser().getUid());
-        db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+        fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -107,7 +125,7 @@ public class Descriptive_type_response extends AppCompatActivity {
     }
 
     private void retrieveData() {
-        db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        fb.getPollsCollection().document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
@@ -192,11 +210,9 @@ public class Descriptive_type_response extends AppCompatActivity {
         submit=findViewById(R.id.submit);
         query=findViewById(R.id.query);
         answer=findViewById(R.id.answer);
-        db=FirebaseFirestore.getInstance();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Descriptive_type_response.this);
         auth = FirebaseAuth.getInstance();
-        ref=db.collection("Polls").document(key).collection("Response");
         response=new HashMap<>();
         logout=view.findViewById(R.id.logout);
         home=view.findViewById(R.id.home);

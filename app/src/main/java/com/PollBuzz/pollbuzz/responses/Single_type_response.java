@@ -26,9 +26,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -39,11 +37,11 @@ import com.PollBuzz.pollbuzz.R;
 import java.util.HashMap;
 import java.util.Map;
 
+import Utils.firebase;
+
 public class Single_type_response extends AppCompatActivity {
     TextView title, query;
     RadioGroup group;
-    FirebaseFirestore db;
-    CollectionReference ref;
     Map<String,Integer> options;
     String key;
     Typeface typeface;
@@ -54,6 +52,7 @@ public class Single_type_response extends AppCompatActivity {
     Button submit;
     Map<String,String> response;
     String resp;
+    firebase fb = new firebase();
 
 
     @Override
@@ -68,24 +67,16 @@ public class Single_type_response extends AppCompatActivity {
         getIntentExtras(intent);
         setGlobals(view);
         setActionBarFunctionality();
-
-
-        showDialog();
         setAuthStateListener();
-        retrieveData();
-
-
+        showDialog();
+        retrieveData(fb);
 
 
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitResponse();
-
-
-
-
+                submitResponse(fb);
             }
         });
 
@@ -95,14 +86,14 @@ public class Single_type_response extends AppCompatActivity {
 
     }
 
-    private void submitResponse() {
+    private void submitResponse(firebase fb) {
         response.put("option",resp);
 
-        ref.document(auth.getCurrentUser().getUid()).set(response);
+        fb.getPollsCollection().document(key).collection("Response").document(auth.getCurrentUser().getUid()).set(response);
 
         Map<String,String> mapi = new HashMap<>();
         mapi.put("pollId",auth.getCurrentUser().getUid().toString());
-        db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+        fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -121,8 +112,11 @@ public class Single_type_response extends AppCompatActivity {
 
     }
 
-    private void retrieveData() {
-        db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    private void retrieveData(firebase fb) {
+        fb.getPollsCollection()
+                .document(key)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                              @Override
                                                                              public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
@@ -156,8 +150,6 @@ public class Single_type_response extends AppCompatActivity {
                                                                                                      RadioButton b=(RadioButton)v;
                                                                                                      if(b.isChecked())
                                                                                                          resp=b.getText().toString();
-
-
                                                                                                  }
                                                                                              });
                                                                                          }
@@ -217,13 +209,11 @@ public class Single_type_response extends AppCompatActivity {
         submit=findViewById(R.id.submit);
         query=findViewById(R.id.query);
         group=findViewById(R.id.options);
-        db=FirebaseFirestore.getInstance();
         options=new HashMap<>();
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Single_type_response.this);
         auth = FirebaseAuth.getInstance();
-        ref=db.collection("Polls").document(key).collection("Response");
 
     }
 

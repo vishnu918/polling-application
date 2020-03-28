@@ -31,15 +31,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import Utils.firebase;
 
 public class Image_type_responses extends AppCompatActivity {
 
@@ -48,14 +47,13 @@ public class Image_type_responses extends AppCompatActivity {
     RadioGroup group;
     RadioButton b1,b2;
     FirebaseAuth auth;
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    CollectionReference collectionReference;
     MaterialButton submit;
     Map<String,Integer> options;
     Map<String,String> response;
     String key;
     Typeface typeface;
     Dialog dialog;
+    firebase fb = new firebase();
     ImageButton logout,home;
     FirebaseAuth.AuthStateListener listener;
 
@@ -117,14 +115,14 @@ public class Image_type_responses extends AppCompatActivity {
         }
         if(auth.getCurrentUser() != null)
         {
-            collectionReference = firebaseFirestore.collection("Polls").document(key).collection("Response");
-            collectionReference.document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
+            fb.getPollsCollection().document(key).collection("Response")
+            .document(auth.getCurrentUser().getUid()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Map<String,String> mapi = new HashMap<>();
                     mapi.put("pollId",auth.getCurrentUser().getUid());
                     Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                    firebaseFirestore.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
+                    fb.getUsersCollection().document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi);
                     Intent i=new Intent(Image_type_responses.this, MainActivity.class);
                     i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
@@ -142,7 +140,7 @@ public class Image_type_responses extends AppCompatActivity {
     }
 
     private void retrieveData() {
-        firebaseFirestore.collection("Polls").document(key).get()
+        fb.getPollsCollection().document(key).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
