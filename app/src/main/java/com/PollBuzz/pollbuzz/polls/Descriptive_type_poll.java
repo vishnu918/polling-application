@@ -68,6 +68,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
             polldetails.setCreated_date(formatteddate);
             polldetails.setPoll_type("DESCRIPTIVE POLL");
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+            polldetails.setAuthorUID(fb.getUserId());
             CollectionReference docCreated = fb.getUserDocument().collection("Created");
             DocumentReference doc = fb.getPollsCollection().document();
             doc.set(polldetails)

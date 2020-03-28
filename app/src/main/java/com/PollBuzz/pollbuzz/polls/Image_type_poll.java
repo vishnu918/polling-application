@@ -259,6 +259,7 @@ public class Image_type_poll extends AppCompatActivity {
         polldetails.setCreated_date(formatteddate);
         polldetails.setPoll_type("IMAGE POLL");
         polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+        polldetails.setAuthorUID(fb.getUserId());
         Map<String, Integer> map = new HashMap<>();
         String uri1String=uri1.toString().replace("\\","");
         StorageReference mRef = fb.getStorageReference().child("polls/"+fb.getUserId()+"/"+uri1String+"/option1");

@@ -97,6 +97,7 @@ public class Multiple_type_poll extends AppCompatActivity {
             polldetails.setCreated_date(formatteddate);
             polldetails.setPoll_type("MULTI ANSWER POLL");
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+            polldetails.setAuthorUID(fb.getUserId());
             Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < group.getChildCount(); i++) {
                 RadioButton v = (RadioButton) group.getChildAt(i);
