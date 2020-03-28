@@ -83,7 +83,7 @@ public class Single_type_poll extends AppCompatActivity {
                 button.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,RadioGroup.LayoutParams.WRAP_CONTENT));
                 String t="Option"+(c+1);
                 //
-                showDialog(Single_type_poll.this, button);
+                showDialog(Single_type_poll.this, button,0);
 
                 button.setTag(t.toLowerCase());
 
@@ -173,7 +173,7 @@ public class Single_type_poll extends AppCompatActivity {
     }
 
 
-    public void showDialog(Activity activity, final RadioButton button){
+    public void showDialog(Activity activity, final RadioButton button,int flag){
         final Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.set_name_dialog);
@@ -183,6 +183,10 @@ public class Single_type_poll extends AppCompatActivity {
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
+        final TextInputLayout text =  dialog.findViewById(R.id.name);
+        if(flag == 1 && b.getText() != null){
+            text.getEditText().setText(b.getText().toString().trim());
+        }
 
         dialog.setCancelable(false);
         dialog.show();
@@ -190,7 +194,7 @@ public class Single_type_poll extends AppCompatActivity {
 
 
 
-        final TextInputLayout text =  dialog.findViewById(R.id.name);
+
 
 
         Button dialogButton = (Button) dialog.findViewById(R.id.done);
@@ -227,7 +231,7 @@ public class Single_type_poll extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item){
         if(item.getItemId()==R.id.edit){
             //Toast.makeText(getApplicationContext(),"calling code",Toast.LENGTH_LONG).show();
-            showDialog(Single_type_poll.this,b);
+            showDialog(Single_type_poll.this,b,1);
         }
         else if(item.getItemId()==R.id.delete){
             group.removeView(b);

@@ -81,7 +81,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                 button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
                 String t="Option"+(c+1);
                 //
-                showDialog(Multiple_type_poll.this, button);
+                showDialog(Multiple_type_poll.this, button,0);
 
                 button.setTag(t.toLowerCase());
 
@@ -165,7 +165,7 @@ public class Multiple_type_poll extends AppCompatActivity {
 
 
     }
-    public void showDialog(Activity activity, final RadioButton button){
+    public void showDialog(Activity activity, final RadioButton button,int flag){
         final Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.set_name_dialog);
@@ -175,14 +175,15 @@ public class Multiple_type_poll extends AppCompatActivity {
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
+        final TextInputLayout text =  dialog.findViewById(R.id.name);
+        if(flag == 1 && b.getText() != null){
+            text.getEditText().setText(b.getText().toString().trim());
+        }
 
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
 
-
-
-        final TextInputLayout text =  dialog.findViewById(R.id.name);
 
 
         Button dialogButton = (Button) dialog.findViewById(R.id.done);
@@ -220,7 +221,7 @@ public class Multiple_type_poll extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item){
         if(item.getItemId()==R.id.edit){
             //Toast.makeText(getApplicationContext(),"calling code",Toast.LENGTH_LONG).show();
-            showDialog(Multiple_type_poll.this,b);
+            showDialog(Multiple_type_poll.this,b,1);
         }
         else if(item.getItemId()==R.id.delete){
             group.removeView(b);
