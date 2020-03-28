@@ -37,6 +37,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -66,6 +68,7 @@ public class ProfileFeed extends Fragment {
     private ProfileFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
     private firebase fb;
+    private LayoutAnimationController controller;
 
     public ProfileFeed() {
     }
@@ -135,7 +138,9 @@ public class ProfileFeed extends Fragment {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
         polldetails.setUID(dS1.getId());
         mArrayList.add(polldetails);
+        profileRV.setLayoutAnimation(controller);
         mAdapter.notifyDataSetChanged();
+        profileRV.scheduleLayoutAnimation();
     }
 
     private void setGlobals(@NonNull View view) {
@@ -165,6 +170,8 @@ public class ProfileFeed extends Fragment {
         Uname.setText(Utils.helper.getusernamePref(getContext()));
         profileRV.setLayoutManager(linearLayoutManager);
         loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
+        controller =
+                AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
     }
 
     private void showImagePickerOptions() {

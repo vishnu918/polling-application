@@ -18,6 +18,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +47,7 @@ public class ResultActivity extends AppCompatActivity {
     private CollectionReference pollsColRef, userColRef;
     firebase fb;
     FirebaseAuth.AuthStateListener listener;
+    private LayoutAnimationController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,8 @@ public class ResultActivity extends AppCompatActivity {
         String type = parent.getStringExtra("type");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        controller =
+                AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
         fb=new firebase();
         home.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +95,7 @@ public class ResultActivity extends AppCompatActivity {
         };
         userColRef = firebaseFirestore.collection("Users");
         voteRV = findViewById(R.id.voterListRV);
+
         voteRV.showShimmerAdapter();
         mVoteDetailsList = new ArrayList<>();
         mPageAdapter = new VoterPageAdapter(getApplicationContext(), mVoteDetailsList);
@@ -118,7 +124,9 @@ public class ResultActivity extends AppCompatActivity {
                                                 voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null);
                                             Log.d("TypeOf", voteDetails.getOption());
                                             mVoteDetailsList.add(voteDetails);
+                                            voteRV.setLayoutAnimation(controller);
                                             mPageAdapter.notifyDataSetChanged();
+                                            voteRV.scheduleLayoutAnimation();
                                             Log.d("count", Integer.toString(mPageAdapter.getItemCount()));
                                         }
                                     });

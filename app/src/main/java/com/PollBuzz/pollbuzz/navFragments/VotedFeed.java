@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class VotedFeed extends Fragment {
     private FloatingActionButton fab;
     private CollectionReference userVotedRef;
     private firebase fb;
+    private LayoutAnimationController controller;
 
     public VotedFeed() {
     }
@@ -81,7 +84,9 @@ public class VotedFeed extends Fragment {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
         polldetails.setUID(dS1.getId());
         mArrayList.add(polldetails);
+        votedRV.setLayoutAnimation(controller);
         mAdapter.notifyDataSetChanged();
+        votedRV.scheduleLayoutAnimation();
     }
 
     private void setGlobals(@NonNull View view) {
@@ -95,5 +100,7 @@ public class VotedFeed extends Fragment {
         votedRV.showShimmerAdapter();
         fb = new firebase();
         userVotedRef = fb.getUserDocument().collection("Voted");
+        controller =
+                AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
     }
 }
