@@ -67,9 +67,9 @@ public class Image_type_responses extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
-        setGlobals(view);
         Intent intent = getIntent();
         getIntentExtras(intent);
+        setGlobals(view);
         setActionBarFunctionality();
         showDialog();
         setAuthStateListener();

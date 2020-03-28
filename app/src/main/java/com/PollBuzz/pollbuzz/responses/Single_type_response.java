@@ -64,10 +64,12 @@ public class Single_type_response extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
-        setGlobals(view);
-        setActionBarFunctionality();
         Intent intent = getIntent();
         getIntentExtras(intent);
+        setGlobals(view);
+        setActionBarFunctionality();
+
+
         showDialog();
         setAuthStateListener();
         retrieveData();

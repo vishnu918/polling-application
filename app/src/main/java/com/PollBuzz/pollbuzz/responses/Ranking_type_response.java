@@ -69,10 +69,11 @@ public class Ranking_type_response extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view =getSupportActionBar().getCustomView();
-        setGlobals(view);
-
         Intent intent = getIntent();
         key = intent.getExtras().getString("UID");
+
+        setGlobals(view);
+
 
         showDialog();
         setActionBarFunctionality();
