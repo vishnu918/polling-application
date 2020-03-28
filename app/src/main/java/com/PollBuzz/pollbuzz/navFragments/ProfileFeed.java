@@ -1,5 +1,25 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,33 +40,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.adapters.ProfileFeedAdapter;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.StorageReference;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +48,13 @@ import java.util.List;
 
 import Utils.ImagePickerActivity;
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ProfileFeed extends Fragment {
     private MaterialTextView Uname;
@@ -142,6 +142,11 @@ public class ProfileFeed extends Fragment {
         if (((MainActivity) getActivity()).getSupportActionBar() != null) {
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            });
         }
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);
@@ -155,7 +160,7 @@ public class ProfileFeed extends Fragment {
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         Uname.setText(Utils.helper.getusernamePref(getContext()));
         profileRV.setLayoutManager(linearLayoutManager);
-        loadProfilePic(Utils.helper.getpPicPref(getContext()));
+        loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
     }
 
     private void showImagePickerOptions() {
@@ -178,7 +183,10 @@ public class ProfileFeed extends Fragment {
     }
 
     private void defaultIntent() {
-        loadProfilePic(fb.getUser().getPhotoUrl().toString());
+        if (fb.getUser().getPhotoUrl() != null)
+            loadProfilePic(fb.getUser().getPhotoUrl().toString(), true);
+        else
+            loadProfilePic(null, true);
         fb.getStorageReference().child("images/" + fb.getUserId()).delete();
     }
 
@@ -232,31 +240,45 @@ public class ProfileFeed extends Fragment {
     private void addToStorage(Uri uri) {
         StorageReference mRef = fb.getStorageReference().child("images/" + fb.getUserId());
         Bitmap bmp = null;
-        byte[] compressedImage = compressImage();
-        mRef.putBytes(compressedImage)
-                .addOnSuccessListener(taskSnapshot -> mRef.getDownloadUrl().addOnSuccessListener(uri1 -> loadProfilePic(uri1.toString())))
-                .addOnFailureListener(exception -> {
-                    exception.printStackTrace();
-                    Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.d("Exception", exception.toString());
-                })
-                .addOnProgressListener(taskSnapshot -> {
-                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                });
+        byte[] compressedImage = compressImage(uri);
+        if (compressedImage != null) {
+            mRef.putBytes(compressedImage)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        mRef.getDownloadUrl().addOnSuccessListener((Uri uri1) -> {
+                            if (uri1 != null)
+                                loadProfilePic(uri1.toString(), true);
+                            else loadProfilePic(null, true);
+                        });
+                    })
+                    .addOnFailureListener(exception -> {
+                        exception.printStackTrace();
+                        Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d("Exception", exception.toString());
+                    })
+                    .addOnProgressListener(taskSnapshot -> {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                    });
+        }
         deleteCache();
     }
 
-    private void loadProfilePic(String url) {
+    private void loadProfilePic(String url, Boolean update) {
         if (url != null) {
             Glide.with(this)
                     .load(url)
                     .transform(new CircleCrop())
                     .into(pPic);
+            if (update) {
+                Utils.helper.setpPicPref(getContext(), url);
+                fb.getUserDocument().update("pic", url);
+            }
         } else {
             pPic.setImageResource(R.drawable.ic_person_black_24dp);
+            if (update) {
+                Utils.helper.setpPicPref(getContext(), null);
+                fb.getUserDocument().update("pic", null);
+            }
         }
-        fb.getUserDocument().update("pic", url);
-        Utils.helper.setpPicPref(getContext(), url);
     }
 
     private void deleteCache() {
@@ -303,7 +325,7 @@ public class ProfileFeed extends Fragment {
         }
     }
 
-    private byte[] compressImage() {
+    private byte[] compressImage(Uri uri) {
         try {
             Bitmap bmp = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

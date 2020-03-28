@@ -4,6 +4,7 @@ import com.PollBuzz.pollbuzz.navFragments.HomeFeed;
 import com.PollBuzz.pollbuzz.navFragments.ProfileFeed;
 import com.PollBuzz.pollbuzz.navFragments.VotedFeed;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
@@ -68,12 +69,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void replaceFragment(Fragment fragment1) {
-        fm.beginTransaction().hide(active).show(fragment1).commit();
+    private void replaceFragment(Fragment fragment) {
+        fm.beginTransaction().hide(active).show(fragment).commit();
     }
 
     private void createFragment(Fragment fragment, String id) {
         fm.beginTransaction().add(R.id.container, fragment, id).hide(active).commit();
     }
-
 }

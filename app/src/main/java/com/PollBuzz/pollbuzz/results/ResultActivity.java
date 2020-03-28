@@ -1,27 +1,5 @@
 package com.PollBuzz.pollbuzz.results;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.VoteDetails;
-import com.PollBuzz.pollbuzz.adapters.VoterPageAdapter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -29,10 +7,29 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.VoteDetails;
+import com.PollBuzz.pollbuzz.adapters.VoterPageAdapter;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ResultActivity extends AppCompatActivity {
 
@@ -105,19 +102,21 @@ public class ResultActivity extends AppCompatActivity {
                     if (querySnapshot != null) {
                         for (DocumentSnapshot dS : querySnapshot) {
                             userColRef.document(dS.getId()).get()
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task1) {
-                                            if (task1.isSuccessful() && task1.getResult() != null) {
-                                                DocumentSnapshot documentSnapshot = task1.getResult();
-                                                Object author = documentSnapshot.get("username");
-                                                Log.d("type", author.toString());
-                                                VoteDetails voteDetails = new VoteDetails(UID, type, author.toString(),dS.getId());
-                                                Log.d("TypeOf", voteDetails.getOption());
-                                                mVoteDetailsList.add(voteDetails);
-                                                mPageAdapter.notifyDataSetChanged();
-                                                Log.d("count", Integer.toString(mPageAdapter.getItemCount()));
-                                            }
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful() && task1.getResult() != null) {
+                                            DocumentSnapshot documentSnapshot = task1.getResult();
+                                            Object author = documentSnapshot.get("username");
+                                            Object imageUrl = documentSnapshot.get("pic");
+                                            Log.d("type", author.toString());
+                                            VoteDetails voteDetails;
+                                            if (imageUrl != null)
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), imageUrl.toString());
+                                            else
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null);
+                                            Log.d("TypeOf", voteDetails.getOption());
+                                            mVoteDetailsList.add(voteDetails);
+                                            mPageAdapter.notifyDataSetChanged();
+                                            Log.d("count", Integer.toString(mPageAdapter.getItemCount()));
                                         }
                                     });
                         }
