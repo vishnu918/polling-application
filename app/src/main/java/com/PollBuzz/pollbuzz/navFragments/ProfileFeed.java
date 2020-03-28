@@ -386,12 +386,11 @@ public class ProfileFeed extends Fragment {
     }
 
     private void logOut() {
-            Utils.helper.removeProfileSetUpPref(getContext());
+        Utils.helper.removeProfileSetUpPref(getContext());
         fb.signOut();
         Intent i = new Intent(getActivity(), LoginSignupActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
     }
 }
 

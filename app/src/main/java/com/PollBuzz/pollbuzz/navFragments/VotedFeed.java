@@ -80,14 +80,12 @@ public class VotedFeed extends Fragment {
     }
 
     private void addToRecyclerView(DocumentSnapshot dS1) {
-        PollDetails polldetails = dS1.toObject(PollDetails.class);
-        if (polldetails != null) {
-            polldetails.setUID(dS1.getId());
-        }
-        mArrayList.add(polldetails);
-        votedRV.setLayoutAnimation(controller);
-        mAdapter.notifyDataSetChanged();
-        votedRV.scheduleLayoutAnimation();
+//        PollDetails polldetails = dS1.toObject(PollDetails.class);
+//        polldetails.setUID(dS1.getId());
+//        mArrayList.add(polldetails);
+//        votedRV.setLayoutAnimation(controller);
+//        mAdapter.notifyDataSetChanged();
+//        votedRV.scheduleLayoutAnimation();
     }
 
     private void setGlobals(@NonNull View view) {
