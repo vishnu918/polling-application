@@ -199,5 +199,7 @@ public class Descriptive_type_response extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         ref=db.collection("Polls").document(key).collection("Response");
         response=new HashMap<>();
+        logout=view.findViewById(R.id.logout);
+        home=view.findViewById(R.id.home);
     }
 }
