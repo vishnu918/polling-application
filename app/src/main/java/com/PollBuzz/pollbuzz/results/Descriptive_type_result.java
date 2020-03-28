@@ -186,7 +186,7 @@ public class Descriptive_type_result extends AppCompatActivity {
     private void setAnswer() {
         String key = "";
         for (Map.Entry<String, Object> entry : response.entrySet()) {
-            key = key + entry.getKey();
+            key = key + entry.getValue();
         }
         answer.setText(key);
         dialog.dismiss();
