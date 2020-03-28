@@ -19,49 +19,84 @@
         tools:targetApi="q">
         <activity
                 android:name=".results.Image_type_result"
-                android:screenOrientation="fullSensor" />
+                android:screenOrientation="unspecified" />
         <activity
                 android:name=".results.Ranking_type_result"
-                android:screenOrientation="fullSensor" />
+                android:screenOrientation="unspecified" />
         <activity
                 android:name=".responses.Image_type_responses"
-                android:screenOrientation="fullSensor" />
+                android:screenOrientation="unspecified" />
         <activity
                 android:name=".responses.Ranking_type_response"
-                android:screenOrientation="fullSensor" />
-        <activity android:name=".results.ResultActivity" android:screenOrientation="fullSensor"/>
-        <activity android:name=".results.Descriptive_type_result" android:screenOrientation="fullSensor"/>
-        <activity android:name=".results.Multiple_type_result" android:screenOrientation="fullSensor"/>
-        <activity android:name=".results.Single_type_result" android:screenOrientation="fullSensor"/>
-        <activity android:name=".navFragments.VotedFeed" android:screenOrientation="fullSensor"/>
-        <activity android:name=".navFragments.HomeFeed" android:screenOrientation="fullSensor"/>
-        <activity android:name=".responses.Multiple_type_response" android:screenOrientation="fullSensor"/>
-        <activity android:name=".responses.Descriptive_type_response" android:screenOrientation="fullSensor"/>
-        <activity android:name=".LoginSignup.ProfileSetUp" android:screenOrientation="fullSensor"/>
-        <activity android:name="Utils.AuthCheck" android:screenOrientation="fullSensor">
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".results.ResultActivity"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".results.Descriptive_type_result"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".results.Multiple_type_result"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".results.Single_type_result"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".navFragments.VotedFeed"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".navFragments.HomeFeed"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".responses.Multiple_type_response"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".responses.Descriptive_type_response"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".LoginSignup.ProfileSetUp"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name="Utils.AuthCheck"
+                android:screenOrientation="unspecified">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="Utils.ImagePickerActivity" android:screenOrientation="fullSensor"/>
-        <activity android:name=".responses.Single_type_response" android:screenOrientation="fullSensor"/>
-        <activity android:name=".polls.Image_type_poll" android:screenOrientation="fullSensor"/>
-        <activity android:name=".polls.Ranking_type_poll" android:screenOrientation="fullSensor"/>
-        <activity android:name=".polls.Descriptive_type_poll" android:screenOrientation="fullSensor"/>
-        <activity android:name=".polls.Multiple_type_poll" android:screenOrientation="fullSensor"/>
-        <activity android:name=".PollList" android:screenOrientation="fullSensor"/>
-        <activity android:name=".polls.Single_type_poll" android:screenOrientation="fullSensor"/>
+        <activity
+                android:name="Utils.ImagePickerActivity"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".responses.Single_type_response"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".polls.Image_type_poll"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".polls.Ranking_type_poll"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".polls.Descriptive_type_poll"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".polls.Multiple_type_poll"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".PollList"
+                android:screenOrientation="unspecified" />
+        <activity
+                android:name=".polls.Single_type_poll"
+                android:screenOrientation="unspecified" />
         <activity
             android:name=".MainActivity"
                 android:configChanges="orientation|screenSize"
-                android:screenOrientation="fullSensor"
+                android:screenOrientation="unspecified"
                 android:theme="@style/NoActionBar" />
         <activity android:name=".LoginSignup.LoginSignupActivity" android:screenOrientation="fullSensor"/>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="fullSensor"
+                android:screenOrientation="unspecified"
             android:theme="@style/NoActionBar" />
         <provider
                 android:name="androidx.core.content.FileProvider"
