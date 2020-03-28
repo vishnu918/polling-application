@@ -145,6 +145,21 @@ public class ProfileFeed extends Fragment {
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (getFragmentManager() != null) {
+                        int index = getFragmentManager().getBackStackEntryCount() - 1;
+                        FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
+                        String tag = backEntry.getName();
+                        getFragmentManager().beginTransaction().hide(ProfileFeed.this)
+                                .show(getFragmentManager().findFragmentByTag(tag))
+                                .commit();
+                        if (tag.equals("1")) {
+                            MainActivity.bottomBar.setActiveItem(0);
+                            MainActivity.active = MainActivity.fragment1;
+                        } else if (tag.equals("2")) {
+                            MainActivity.bottomBar.setActiveItem(1);
+                            MainActivity.active = MainActivity.fragment2;
+                        }
+                    }
                 }
             });
         }
