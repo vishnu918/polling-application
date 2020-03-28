@@ -1,5 +1,21 @@
 package com.PollBuzz.pollbuzz.responses;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -13,28 +29,13 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Descriptive_type_response extends AppCompatActivity {
     Button submit;
@@ -49,8 +50,6 @@ public class Descriptive_type_response extends AppCompatActivity {
     CollectionReference ref;
     TextInputLayout answer;
     String key;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
