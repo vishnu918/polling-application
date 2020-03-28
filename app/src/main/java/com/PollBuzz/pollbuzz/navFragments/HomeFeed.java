@@ -60,7 +60,7 @@ public class HomeFeed extends Fragment {
             if (task.isSuccessful() && task.getResult() != null) {
                 recyclerView.hideShimmerAdapter();
                 for (QueryDocumentSnapshot dS : task.getResult()) {
-                    addToRecyclerView(dS);
+                        addToRecyclerView(dS);
                 }
             } else {
                 Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -78,10 +78,12 @@ public class HomeFeed extends Fragment {
     private void addToRecyclerView(QueryDocumentSnapshot dS) {
         PollDetails polldetails = dS.toObject(PollDetails.class);
         polldetails.setUID(dS.getId());
-        arrayList.add(polldetails);
-        recyclerView.setLayoutAnimation(controller);
-        adapter.notifyDataSetChanged();
-        recyclerView.scheduleLayoutAnimation();
+        if (polldetails.getAuthor() != Utils.helper.getusernamePref(getContext())) {
+            arrayList.add(polldetails);
+            recyclerView.setLayoutAnimation(controller);
+            adapter.notifyDataSetChanged();
+            recyclerView.scheduleLayoutAnimation();
+        }
     }
 
     private void setGlobals(@NonNull View view) {

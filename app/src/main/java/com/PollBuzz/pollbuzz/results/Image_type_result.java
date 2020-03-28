@@ -136,6 +136,8 @@ public class Image_type_result extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+        b1.setEnabled(false);
+        b2.setEnabled(false);
     }
 
     private void setGlobals(View view) {

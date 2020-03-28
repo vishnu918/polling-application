@@ -1,5 +1,24 @@
 package com.PollBuzz.pollbuzz.polls;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+import com.bumptech.glide.Glide;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,33 +37,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.bumptech.glide.Glide;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +50,10 @@ import java.util.Map;
 import Utils.ImagePickerActivity;
 import Utils.firebase;
 import Utils.helper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Image_type_poll extends AppCompatActivity {
     Button add;
@@ -287,32 +283,7 @@ public class Image_type_poll extends AppCompatActivity {
                                                 Log.d("ImagePath",imagePath1);
                                                 map.put(imagePath1, 0);
                                                 polldetails.setMap(map);
-                                                fb.getPollsCollection().add(polldetails)
-                                                        .addOnCompleteListener(task -> {
-                                                            if (task.isSuccessful()) {
-                                                                deleteCache();
-                                                                Map<String,String> m=new HashMap<>();
-                                                                m.put("pollId",task.getResult().getId());
-                                                                fb.getUserDocument().collection("Created").document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                        if(task.isSuccessful()){
-                                                                            Toast.makeText(Image_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
-                                                                            Intent i = new Intent(Image_type_poll.this, MainActivity.class);
-                                                                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                                            startActivity(i);
-                                                                        }
-                                                                        else{
-                                                                            Toast.makeText(Image_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                                        }
-                                                                    }
-                                                                });
-
-                                                            } else {
-                                                                Toast.makeText(Image_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                                Log.d("Exception", task.getException().toString());
-                                                            }
-                                                        });
+                                                addToDatabase(polldetails);
                                             }).addOnFailureListener(exception -> {
                                                 exception.printStackTrace();
                                                 Log.d("Exception", exception.toString());
@@ -336,6 +307,34 @@ public class Image_type_poll extends AppCompatActivity {
                     });
         }
 
+    }
+
+    private void addToDatabase(PollDetails polldetails) {
+        fb.getPollsCollection().add(polldetails)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        deleteCache();
+                        Map<String, String> m = new HashMap<>();
+                        m.put("pollId", task.getResult().getId());
+                        fb.getUserDocument().collection("Created").document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(Image_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
+                                    Intent i = new Intent(Image_type_poll.this, MainActivity.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
+                                } else {
+                                    Toast.makeText(Image_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+                    } else {
+                        Toast.makeText(Image_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d("Exception", task.getException().toString());
+                    }
+                });
     }
 
     private void deleteCache() {

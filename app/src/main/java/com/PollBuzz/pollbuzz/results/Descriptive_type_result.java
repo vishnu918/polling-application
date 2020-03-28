@@ -1,5 +1,16 @@
 package com.PollBuzz.pollbuzz.results;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -11,25 +22,14 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 public class Descriptive_type_result extends AppCompatActivity {
     TextView title, query, answer;
@@ -40,7 +40,6 @@ public class Descriptive_type_result extends AppCompatActivity {
     FirebaseAuth.AuthStateListener listener;
     String key, uid;
     Integer integer;
-    FirebaseAuth auth = FirebaseAuth.getInstance();
     firebase fb = new firebase();
 
     @Override
@@ -159,13 +158,6 @@ public class Descriptive_type_result extends AppCompatActivity {
 
         typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
         dialog = new Dialog(Descriptive_type_result.this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth.addAuthStateListener(listener);
-
     }
 
     private void showDialog() {
