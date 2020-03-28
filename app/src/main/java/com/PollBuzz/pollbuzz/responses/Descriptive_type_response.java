@@ -60,46 +60,54 @@ public class Descriptive_type_response extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         Intent intent = getIntent();
-        key = intent.getExtras().getString("UID");
+        getIntentExtras(intent);
         View view =getSupportActionBar().getCustomView();
-        home = view.findViewById(R.id.home);
-        logout = view.findViewById(R.id.logout);
-        response=new HashMap<>();
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Descriptive_type_response.this, MainActivity.class);
-                startActivity(i);
-            }
-        });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                auth.signOut();
-            }
-        });
-        title=findViewById(R.id.title);
-        submit=findViewById(R.id.submit);
-        query=findViewById(R.id.query);
-        answer=findViewById(R.id.answer);
-        db=FirebaseFirestore.getInstance();
-        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
-        dialog=new Dialog(Descriptive_type_response.this);
+        setGlobals( view);
+        setActionBarFunctionality();
         showDialog();
-        auth = FirebaseAuth.getInstance();
-        listener=new FirebaseAuth.AuthStateListener() {
+        setAuthStateListener();
+        retrieveData();
+
+
+
+
+
+        submit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Descriptive_type_response.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
+            public void onClick(View v) {
+                submitResponse();
 
             }
-        };
+        });
 
+
+    }
+
+    private void submitResponse() {
+        response.put("option",answer.getEditText().getText().toString());
+        System.out.println(response);
+        ref.document(auth.getCurrentUser().getUid()).set(response);
+        Map<String,String> mapi = new HashMap<>();
+        mapi.put("pollId",auth.getCurrentUser().getUid());
+        db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(Descriptive_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
+                        Intent i=new Intent(Descriptive_type_response.this,MainActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(Descriptive_type_response.this, "Unable to submit.Please tey again ", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void retrieveData() {
         db.collection("Polls").document(key).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -117,36 +125,47 @@ public class Descriptive_type_response extends AppCompatActivity {
                 }
             }
         });
-        ref=db.collection("Polls").document(key).collection("Response");
-        submit.setOnClickListener(new View.OnClickListener() {
+
+    }
+
+    private void setAuthStateListener() {
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Descriptive_type_response.this, LoginSignupActivity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
+
+    }
+
+    private void setActionBarFunctionality() {
+        home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 response.put("option",answer.getEditText().getText().toString());
-                System.out.println(response);
-                ref.document(auth.getCurrentUser().getUid()).set(response);
-                Map<String,String> mapi = new HashMap<>();
-                mapi.put("pollId",auth.getCurrentUser().getUid());
-                db.collection("Users").document(auth.getCurrentUser().getUid()).collection("Voted").document(key).set(mapi)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(Descriptive_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                                Intent i=new Intent(Descriptive_type_response.this,MainActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(i);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(Descriptive_type_response.this, "Unable to submit.Please tey again ", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                Intent i = new Intent(Descriptive_type_response.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                auth.signOut();
             }
         });
 
 
     }
+
+    private void getIntentExtras(Intent intent) {
+        key = intent.getExtras().getString("UID");
+    }
+
     private void showDialog()
     {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -167,5 +186,18 @@ public class Descriptive_type_response extends AppCompatActivity {
         super.onStart();
         auth.addAuthStateListener(listener);
 
+    }
+    private void setGlobals(View view)
+    {
+        title=findViewById(R.id.title);
+        submit=findViewById(R.id.submit);
+        query=findViewById(R.id.query);
+        answer=findViewById(R.id.answer);
+        db=FirebaseFirestore.getInstance();
+        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
+        dialog=new Dialog(Descriptive_type_response.this);
+        auth = FirebaseAuth.getInstance();
+        ref=db.collection("Polls").document(key).collection("Response");
+        response=new HashMap<>();
     }
 }
