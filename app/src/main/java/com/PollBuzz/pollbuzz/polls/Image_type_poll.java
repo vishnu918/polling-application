@@ -273,7 +273,8 @@ public class Image_type_poll extends AppCompatActivity {
         polldetails.setPoll_type("IMAGE POLL");
         polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
         Map<String, Integer> map = new HashMap<>();
-        StorageReference mRef = fb.getStorageReference().child("polls/"+fb.getUserId()+"/option1/"+uri1.toString());
+        String uri1String=uri1.toString().replace("\\","");
+        StorageReference mRef = fb.getStorageReference().child("polls/"+fb.getUserId()+"/"+uri1String+"/option1");
         Log.d("ImagePath",uri1.toString());
         byte[] compressedImage = compressImage(uri1);
         if (compressedImage != null) {
@@ -283,7 +284,8 @@ public class Image_type_poll extends AppCompatActivity {
                             String imagePath = uri.toString();
                             Log.d("ImagePath",imagePath);
                             map.put(imagePath, 0);
-                            StorageReference mRef1 = fb.getStorageReference().child("polls/"+fb.getUserId()+"/option2/"+uri2.toString());
+                            String uri2String=uri2.toString().replace("\\","");
+                            StorageReference mRef1 = fb.getStorageReference().child("polls/"+fb.getUserId()+"/"+uri2String+"/option2");
                             Log.d("ImagePath",uri2.toString());
                             byte[] compressedImage1 = compressImage(uri2);
                             if (compressedImage1 != null) {
