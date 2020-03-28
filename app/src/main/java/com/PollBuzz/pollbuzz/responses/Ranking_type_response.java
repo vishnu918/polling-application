@@ -229,7 +229,7 @@ public class Ranking_type_response extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Ranking_type_response.this, "Unable to submit your.Please try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Ranking_type_response.this, "Unable to submit your.\nPlease try again", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
