@@ -55,7 +55,9 @@
         <activity android:name=".polls.Single_type_poll" android:screenOrientation="fullSensor"/>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/NoActionBar" android:screenOrientation="fullSensor"/>
+                android:configChanges="orientation|screenSize"
+                android:screenOrientation="fullSensor"
+                android:theme="@style/NoActionBar" />
         <activity android:name=".LoginSignup.LoginSignupActivity" android:screenOrientation="fullSensor"/>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
