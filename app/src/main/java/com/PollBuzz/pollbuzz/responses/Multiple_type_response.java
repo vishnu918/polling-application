@@ -106,7 +106,7 @@ public class Multiple_type_response extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Multiple_type_response.this, "Unable to submit. \nPlease try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Multiple_type_response.this, "Unable to submit.\nPlease try again", Toast.LENGTH_SHORT).show();
                     }
                 });
 
