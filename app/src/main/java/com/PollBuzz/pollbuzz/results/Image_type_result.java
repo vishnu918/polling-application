@@ -1,15 +1,9 @@
 package com.PollBuzz.pollbuzz.results;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,18 +13,21 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+
+import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.responses.Image_type_responses;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
-import com.google.api.Distribution;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,17 +36,17 @@ import Utils.firebase;
 
 public class Image_type_result extends AppCompatActivity {
 
-    MaterialTextView title , query;
+    MaterialTextView title, query;
     LinearLayout group;
     firebase fb = new firebase();
-    RadioButton b1,b2;
-    ImageView image1,image2;
-    String key,uid;
+    RadioButton b1, b2;
+    ImageView image1, image2;
+    String key, uid;
     Typeface typeface;
     Dialog dialog;
-    ImageButton logout;
-    Map<String,Object> response;
-    Map<String,Integer> options;
+    ImageButton logout, home;
+    Map<String, Object> response;
+    Map<String, Integer> options;
     Integer integer;
 
     @Override
@@ -59,41 +56,40 @@ public class Image_type_result extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
-        View view =getSupportActionBar().getCustomView();
-        logout = findViewById(R.id.logout);
-        group=findViewById(R.id.options);
+        View view = getSupportActionBar().getCustomView();
+
+
+        setGlobals(view);
         Intent intent = getIntent();
+        getIntentExtras(intent);
+        setActionBarFunctionality();
+        showDialog();
+        retriveData(fb);
+
+        showDialog();
+    }
+
+    private void getIntentExtras(Intent intent) {
+
         key = intent.getExtras().getString("UID");
         integer = intent.getExtras().getInt("flag");
 
-        if(integer == 1)
-        {
+        if (integer == 1) {
             uid = intent.getExtras().getString("UIDUser");
         }
-        if(integer == 0)
-        {
+        if (integer == 0) {
             uid = fb.getUserId();
         }
 
-        response = new HashMap<>();
-        options = new HashMap<>();
-        typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
-        dialog=new Dialog(Image_type_result.this);
-        showDialog();
+    }
 
-        title = findViewById(R.id.title_imageresult);
-        query = findViewById(R.id.query_imageresult);
-        group = findViewById(R.id.options);
-        image1 = findViewById(R.id.image1);
-        image2 = findViewById(R.id.image2);
-        b1 = findViewById(R.id.option1);
-        b2 = findViewById(R.id.option2);
+    private void retriveData(firebase fb) {
 
         fb.getPollsCollection().document(key).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             if (documentSnapshot.exists()) {
                                 PollDetails pollDetails = documentSnapshot.toObject(PollDetails.class);
@@ -111,58 +107,73 @@ public class Image_type_result extends AppCompatActivity {
                                     i++;
                                 }
 
-                                    fb.getPollsCollection().document(key).collection("Response").document(uid).get()
-                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                @Override
-                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                    Toast.makeText(Image_type_result.this, "Added", Toast.LENGTH_SHORT).show();
-                                                    if (documentSnapshot.exists()) {
-                                                        response = documentSnapshot.getData();
-                                                        if (response.containsValue("Option 2")) {
-                                                            b2.setChecked(true);
-                                                        } else
-                                                            b1.setChecked(true);
-
-                                                    }
-
+                                fb.getPollsCollection().document(key).collection("Response").document(uid).get()
+                                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                Toast.makeText(Image_type_result.this, "Added", Toast.LENGTH_SHORT).show();
+                                                if (documentSnapshot.exists()) {
+                                                    response = documentSnapshot.getData();
+                                                    if (response.containsValue("Option 2")) {
+                                                        b2.setChecked(true);
+                                                    } else
+                                                        b1.setChecked(true);
 
                                                 }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Toast.makeText(Image_type_result.this, "Failed", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                          /*      if(integer == 1){
-                                    fb.getPollsCollection().document(key).collection("Response")
-                                            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if(task.isSuccessful())
-                                            {
-                                                QuerySnapshot querySnapshot = task.getResult();
-                                                if(querySnapshot != null)
-                                                {
-                                                    for(DocumentSnapshot documentSnapshot : querySnapshot)
-                                                    {
-                                                        response = documentSnapshot.getData();
-                                                        if (response.containsValue("Option 2")) {
-                                                            b2.setChecked(true);
-                                                        } else
-                                                            b1.setChecked(true);
-                                                    }
-                                                }
+
+
                                             }
-                                        }
-                                    });
-                                }*/
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(Image_type_result.this, "Failed", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
 
                             }
                         }
                         dialog.dismiss();
                     }
                 });
+    }
+
+    private void setGlobals(View view) {
+
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+
+        group = findViewById(R.id.options);
+        response = new HashMap<>();
+        options = new HashMap<>();
+
+        title = findViewById(R.id.title_imageresult);
+        query = findViewById(R.id.query_imageresult);
+        group = findViewById(R.id.options);
+        image1 = findViewById(R.id.image1);
+        image2 = findViewById(R.id.image2);
+        b1 = findViewById(R.id.option1);
+        b2 = findViewById(R.id.option2);
+
+
+        typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
+        dialog = new Dialog(Image_type_result.this);
+    }
+
+    private void setActionBarFunctionality() {
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Image_type_result.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fb.signOut();
+            }
+        });
     }
 
     private void loadProfilePic(ImageView view, String url) {
@@ -176,8 +187,7 @@ public class Image_type_result extends AppCompatActivity {
         }
     }
 
-    private void showDialog()
-    {
+    private void showDialog() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.loading_dialog);
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();

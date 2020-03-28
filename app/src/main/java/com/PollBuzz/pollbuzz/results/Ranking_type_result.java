@@ -15,7 +15,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -25,13 +24,11 @@ import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
-import com.google.api.Distribution;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
+
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -42,7 +39,7 @@ public class Ranking_type_result extends AppCompatActivity {
 
     MaterialTextView title_ranking_result, query_ranking_result;
     LinearLayout group;
-    firebase fb;
+    firebase fb = new firebase();
     FirebaseAuth auth;
     FirebaseAuth.AuthStateListener listener;
     String key,uid;
@@ -61,22 +58,76 @@ public class Ranking_type_result extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
-        home = view.findViewById(R.id.home);
-        logout = view.findViewById(R.id.logout);
-        auth = FirebaseAuth.getInstance();
-        options=new TreeMap<>();
-        Intent intent = getIntent();
-        key = intent.getExtras().getString("UID");
-        integer = intent.getExtras().getInt("flag");
 
-        if(integer == 1)
-        {
-            uid = intent.getExtras().getString("UIDUser");
-        }
-        if(integer == 0)
-        {
-            uid = auth.getCurrentUser().getUid();
-        }
+
+
+        setGlobals(view);
+        Intent intent = getIntent();
+        getIntentExtras(intent);
+        setActionBarFunctionality();
+        setAuthStateListener();
+        showDialog();
+        retriveData(fb);
+
+    }
+
+    private void setAuthStateListener() {
+
+
+
+        listener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user==null)
+                {
+                    Intent i=new Intent(Ranking_type_result.this, LoginSignupActivity.class);
+                    startActivity(i);
+                }
+
+            }
+        };
+    }
+
+    private void retriveData(firebase fb) {
+
+        fb.getPollsCollection().document(key).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot data = task.getResult();
+                            if (data.exists()) {
+                                group.removeAllViews();
+
+                                PollDetails polldetails = data.toObject(PollDetails.class);
+                                title_ranking_result.setText(polldetails.getTitle());
+                                title_ranking_result.setPaintFlags(title_ranking_result.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                                query_ranking_result.setText(polldetails.getQuestion());
+                                fb.getPollsCollection().document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot documentSnapshot = task.getResult();
+                                            if (documentSnapshot != null) {
+                                                response = documentSnapshot.getData();
+
+                                                setAccordingToPriority();
+
+
+                                            }
+                                        }
+
+                                    }
+                                });
+                            }
+                        }
+
+                    }
+                });
+    }
+
+    private void setActionBarFunctionality() {
 
         home.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,85 +142,40 @@ public class Ranking_type_result extends AppCompatActivity {
                 auth.signOut();
             }
         });
+    }
 
-        listener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if(user==null)
-                {
-                    Intent i=new Intent(Ranking_type_result.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
+    private void getIntentExtras(Intent intent) {
 
-            }
-        };
 
+        key = intent.getExtras().getString("UID");
+        integer = intent.getExtras().getInt("flag");
+
+        if(integer == 1)
+        {
+            uid = intent.getExtras().getString("UIDUser");
+        }
+        if(integer == 0)
+        {
+            uid = auth.getCurrentUser().getUid();
+        }
+
+
+    }
+
+    private void setGlobals(View view) {
+
+        home = view.findViewById(R.id.home);
+        logout = view.findViewById(R.id.logout);
+        auth = FirebaseAuth.getInstance();
+        options=new TreeMap<>();
         title_ranking_result = findViewById(R.id.title_ranking_result);
         query_ranking_result = findViewById(R.id.query_ranking_result);
         group = findViewById(R.id.options_ranking_result);
 
-        fb = new firebase();
-
         typeface = ResourcesCompat.getFont(getApplicationContext(), R.font.didact_gothic);
         dialog = new Dialog(Ranking_type_result.this);
-        showDialog();
-        fb.getPollsCollection().document(key).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot data = task.getResult();
-                            if (data.exists()) {
-                                group.removeAllViews();
-
-                                PollDetails polldetails = data.toObject(PollDetails.class);
-                                title_ranking_result.setText(polldetails.getTitle());
-                                title_ranking_result.setPaintFlags(title_ranking_result.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                                query_ranking_result.setText(polldetails.getQuestion());
-                                    fb.getPollsCollection().document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                DocumentSnapshot documentSnapshot = task.getResult();
-                                                if (documentSnapshot != null) {
-                                                    response = documentSnapshot.getData();
-
-                                                    setAccordingToPriority();
 
 
-                                                }
-                                            }
-
-                                        }
-                                    });
-                             /*   if(integer == 1){
-                                    fb.getPollsCollection().document(key).collection("Response")
-                                            .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if(task.isSuccessful())
-                                            {
-                                                QuerySnapshot querySnapshot = task.getResult();
-                                                if(querySnapshot != null)
-                                                {
-                                                    for(DocumentSnapshot documentSnapshot : querySnapshot)
-                                                    {
-                                                        response = documentSnapshot.getData();
-                                                        setAccordingToPriority();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                                }*/
-
-
-                            }
-                        }
-
-                    }
-                });
     }
 
     private void setAccordingToPriority() {
