@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.polls.Single_type_poll;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,6 +37,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.kinda.alert.KAlertDialog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -47,6 +49,7 @@ import java.util.Map;
 
 import Utils.ImagePickerActivity;
 import Utils.firebase;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ProfileSetUp extends AppCompatActivity {
     TextInputLayout name, Uname, date;
@@ -59,6 +62,7 @@ public class ProfileSetUp extends AppCompatActivity {
     int age = 0;
     String gender = null;
     firebase fb;
+    private KAlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +177,7 @@ public class ProfileSetUp extends AppCompatActivity {
         female.setAlpha(0.5f);
         female.setElevation(-0.5f);
         save = findViewById(R.id.save);
+        dialog=new KAlertDialog(ProfileSetUp.this, SweetAlertDialog.PROGRESS_TYPE);
         fb = new firebase();
         if (fb.getUser().getDisplayName() != null)
             name.getEditText().setText(fb.getUser().getDisplayName());
@@ -303,6 +308,8 @@ public class ProfileSetUp extends AppCompatActivity {
     }
 
     private void addToDatabase(String unameS, Map<String, String> data) {
+        showDialog();
+        save.setEnabled(false);
         fb.getUserDocument()
                 .set(data)
                 .addOnCompleteListener(task -> {
@@ -311,17 +318,22 @@ public class ProfileSetUp extends AppCompatActivity {
                             setSharedPreference(unameS, fb.getUser().getPhotoUrl().toString());
                         else
                             setSharedPreference(unameS, null);
+                        dialog.dismissWithAnimation();
                         Intent i = new Intent(ProfileSetUp.this, MainActivity.class);
                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(i);
                     } else {
                         Toast.makeText(ProfileSetUp.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         Log.d("Exception", task.getException().toString());
+                        dialog.dismissWithAnimation();
+                        save.setEnabled(true);
                     }
                 });
     }
 
     private void addToStorage(String unameS, Map<String, String> data) {
+        showDialog();
+
         StorageReference mRef = fb.getStorageReference().child("images/" + fb.getUserId());
         byte[] compressedImage = compressImage();
         if (compressedImage != null) {
@@ -335,12 +347,15 @@ public class ProfileSetUp extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         setSharedPreference(unameS, imagePath);
                                         deleteCache();
+                                        dialog.dismissWithAnimation();
                                         Intent i = new Intent(ProfileSetUp.this, MainActivity.class);
                                         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(i);
                                     } else {
                                         Toast.makeText(ProfileSetUp.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                         Log.d("Exception", task.getException().toString());
+                                        dialog.dismissWithAnimation();
+                                        save.setEnabled(true);
                                     }
                                 });
                     }))
@@ -425,4 +440,11 @@ public class ProfileSetUp extends AppCompatActivity {
             return false;
         }
     }
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Uploading your poll");
+        dialog.setCancelable(false);
+        dialog.show();
+    }
+
 }
