@@ -107,6 +107,7 @@
                 android:textSize="17sp"
                 app:backgroundTint="@color/white"
                 android:textColor="@color/colorPrimaryDark"
+                android:layout_gravity="center"
                 android:id="@+id/add"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/post"
