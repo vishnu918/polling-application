@@ -19,6 +19,7 @@ import com.kinda.alert.KAlertDialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -27,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -92,6 +94,7 @@ public class Ranking_type_poll extends AppCompatActivity {
     }
     private void setListeners(String formatteddate) {
         add.setOnClickListener(v -> {
+            closeKeyboard();
             final RadioButton button = new RadioButton(getApplicationContext());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                    LinearLayout.LayoutParams.MATCH_PARENT,
@@ -127,6 +130,7 @@ public class Ranking_type_poll extends AppCompatActivity {
             }
         });
         post_ranking.setOnClickListener(view -> {
+            closeKeyboard();
            if (question_ranking.getText().toString().isEmpty()) {
                 question_ranking.setError("Please enter the question");
                 question_ranking.requestFocus();
@@ -335,5 +339,12 @@ public class Ranking_type_poll extends AppCompatActivity {
         uniqueoptions.clear();
         uniqueoptions.add("Option 1");
         uniqueoptions.add("Option 2");
+    }
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

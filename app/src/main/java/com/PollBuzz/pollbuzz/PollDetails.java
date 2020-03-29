@@ -6,6 +6,15 @@ public class PollDetails {
 
     private String title, question, created_date, expiry_date, poll_type, author, UID,authorUID;
     private Map<String, Integer> map;
+    private Integer pollcount=0;
+
+    public Integer getPollcount() {
+        return pollcount;
+    }
+
+    public void setPollcount(Integer pollcount) {
+        this.pollcount = pollcount;
+    }
     private long timestamp;
 
     public void setTimestamp(long timestamp) {

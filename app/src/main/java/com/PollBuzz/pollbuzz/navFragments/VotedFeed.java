@@ -1,6 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -40,6 +41,7 @@ public class VotedFeed extends Fragment {
     private CollectionReference userVotedRef;
     private firebase fb;
     private LayoutAnimationController controller;
+    private MaterialTextView viewed;
 
     public VotedFeed() {
     }
@@ -82,6 +84,7 @@ public class VotedFeed extends Fragment {
                     }
                 } else {
                     votedRV.hideShimmerAdapter();
+                    viewed.setVisibility(View.VISIBLE);
                 }
             }else{
                 votedRV.hideShimmerAdapter();
@@ -109,6 +112,7 @@ public class VotedFeed extends Fragment {
 
     private void setGlobals(@NonNull View view) {
         controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
+        viewed=view.findViewById(R.id.viewed);
         fab = view.findViewById(R.id.fab);
         votedRV = view.findViewById(R.id.votedrecyclerview);
         votedRV.setHasFixedSize(true);

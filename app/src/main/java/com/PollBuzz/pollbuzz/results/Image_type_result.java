@@ -66,7 +66,6 @@ public class Image_type_result extends AppCompatActivity {
         showDialog();
         retriveData(fb);
 
-        showDialog();
     }
 
     private void getIntentExtras(Intent intent) {

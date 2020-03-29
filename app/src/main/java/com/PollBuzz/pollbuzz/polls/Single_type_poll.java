@@ -23,6 +23,7 @@ import com.kinda.alert.KAlertDialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -112,8 +114,10 @@ public class Single_type_poll extends AppCompatActivity {
             RadioButton button = (RadioButton) findViewById(checkedId);
             button.setChecked(false);
             button.showContextMenu();
+            closeKeyboard();
         });
         button.setOnClickListener(view -> {
+            closeKeyboard();
             if (question.getText().toString().isEmpty()) {
                 question.setError("Please enter the question");
                 question.requestFocus();
@@ -307,6 +311,13 @@ public class Single_type_poll extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
     private boolean doesContain(String word)
     {
