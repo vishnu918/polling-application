@@ -1,10 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.PollList;
@@ -83,28 +80,27 @@ public class HomeFeed extends Fragment {
         PollDetails polldetails = dS.toObject(PollDetails.class);
         polldetails.setUID(dS.getId());
         if (polldetails.getAuthorUID() != null && !polldetails.getAuthorUID().equals(fb.getUserId())) {
-            fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if(task.isSuccessful() && task.getResult()!=null){
-                        Log.d("HomeFeed","Here");
-                        if(task.getResult().size()==0){
+            fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    if (task.getResult().isEmpty()) {
+                        Log.d("HomeFeedEmpty", dS.getId() + fb.getUserId());
+                        arrayList.add(polldetails);
+                        recyclerView.setLayoutAnimation(controller);
+                        adapter.notifyDataSetChanged();
+                        recyclerView.scheduleLayoutAnimation();
+                    } else {
+                        Boolean flag = Boolean.TRUE;
+                        for (QueryDocumentSnapshot dS1 : task.getResult()) {
+                            if (dS1.getId().equals(fb.getUserId())) {
+                                flag = Boolean.FALSE;
+                                break;
+                            }
+                        }
+                        if (flag) {
                             arrayList.add(polldetails);
                             recyclerView.setLayoutAnimation(controller);
                             adapter.notifyDataSetChanged();
                             recyclerView.scheduleLayoutAnimation();
-                        }
-                        else {
-                            for (QueryDocumentSnapshot dS1 : task.getResult()) {
-                                Log.d("HomeFeed", "Here1");
-                                if (!dS1.getId().equals(fb.getUserId())) {
-                                    Log.d("HomeFeed", "Here");
-                                    arrayList.add(polldetails);
-                                    recyclerView.setLayoutAnimation(controller);
-                                    adapter.notifyDataSetChanged();
-                                    recyclerView.scheduleLayoutAnimation();
-                                }
-                            }
                         }
                     }
                 }
