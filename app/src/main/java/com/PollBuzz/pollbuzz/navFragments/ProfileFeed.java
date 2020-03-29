@@ -73,6 +73,7 @@ public class ProfileFeed extends Fragment {
     private firebase fb;
     private FloatingActionButton fab;
     private LayoutAnimationController controller;
+    private MaterialTextView viewed;
 
     public ProfileFeed() {
     }
@@ -140,6 +141,7 @@ public class ProfileFeed extends Fragment {
                     }
                 }else{
                     profileRV.hideShimmerAdapter();
+                    viewed.setVisibility(View.VISIBLE);
                 }
             }else{
                 profileRV.hideShimmerAdapter();
@@ -173,6 +175,7 @@ public class ProfileFeed extends Fragment {
             onBackArrowPressed(toolbar);
         }
         controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
+        viewed=view.findViewById(R.id.viewed);
         fb = new firebase();
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);

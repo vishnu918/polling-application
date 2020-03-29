@@ -1,6 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
@@ -13,6 +14,7 @@ import com.daimajia.androidanimations.library.YoYo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +41,7 @@ public class HomeFeed extends Fragment {
     private FloatingActionButton fab;
     private firebase fb;
     private LayoutAnimationController controller;
+    MaterialTextView viewed;
 
     public HomeFeed() {
     }
@@ -55,6 +58,16 @@ public class HomeFeed extends Fragment {
         setGlobals(view);
         setListeners();
         getData();
+        Handler handler=new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(arrayList.isEmpty()){
+                    recyclerView.hideShimmerAdapter();
+                    viewed.setVisibility(View.VISIBLE);
+                }
+            }
+        },3000);
     }
 
     private void getData() {
@@ -66,6 +79,7 @@ public class HomeFeed extends Fragment {
                     }
                 } else {
                     recyclerView.hideShimmerAdapter();
+                    viewed.setVisibility(View.VISIBLE);
                 }
             } else {
                 recyclerView.hideShimmerAdapter();
@@ -101,10 +115,10 @@ public class HomeFeed extends Fragment {
                                     return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
                                 }
                             });
+                            adapter.notifyDataSetChanged();
+                            recyclerView.hideShimmerAdapter();
+                            recyclerView.scheduleLayoutAnimation();
                         }
-                    adapter.notifyDataSetChanged();
-                    recyclerView.hideShimmerAdapter();
-                    recyclerView.scheduleLayoutAnimation();
                 }
             });
     }
@@ -112,6 +126,7 @@ public class HomeFeed extends Fragment {
     private void setGlobals(@NonNull View view) {
         arrayList = new ArrayList<>();
         fab = view.findViewById(R.id.fab);
+        viewed=view.findViewById(R.id.viewed);
         controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
