@@ -78,7 +78,6 @@ public class HomeFeed extends Fragment {
     private void addToRecyclerView(QueryDocumentSnapshot dS) {
         PollDetails polldetails = dS.toObject(PollDetails.class);
         polldetails.setUID(dS.getId());
-        if (polldetails.getAuthorUID() != null && !polldetails.getAuthorUID().equals(fb.getUserId())) {
             fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                         Boolean flag = Boolean.TRUE;
@@ -96,7 +95,6 @@ public class HomeFeed extends Fragment {
                         }
                 }
             });
-        }
     }
 
     private void setGlobals(@NonNull View view) {
