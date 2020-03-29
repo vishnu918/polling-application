@@ -15,6 +15,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,22 +59,13 @@ public class HomeFeed extends Fragment {
         setGlobals(view);
         setListeners();
         getData();
-        Handler handler=new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(arrayList.isEmpty()){
-                    recyclerView.hideShimmerAdapter();
-                    viewed.setVisibility(View.VISIBLE);
-                }
-            }
-        },3000);
     }
 
     private void getData() {
         fb.getPollsCollection().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 if (!task.getResult().isEmpty()) {
+                    viewed.setVisibility(View.VISIBLE);
                     for (QueryDocumentSnapshot dS : task.getResult()) {
                         addToRecyclerView(dS);
                     }
@@ -104,6 +96,7 @@ public class HomeFeed extends Fragment {
                         for (QueryDocumentSnapshot dS1 : task.getResult()) {
                             if (dS1.getId().equals(fb.getUserId())) {
                                 flag = Boolean.FALSE;
+                                recyclerView.hideShimmerAdapter();
                                 break;
                             }
                         }
@@ -115,6 +108,7 @@ public class HomeFeed extends Fragment {
                                     return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
                                 }
                             });
+                            viewed.setVisibility(View.GONE);
                             adapter.notifyDataSetChanged();
                             recyclerView.hideShimmerAdapter();
                             recyclerView.scheduleLayoutAnimation();

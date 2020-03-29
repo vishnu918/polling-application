@@ -1,10 +1,29 @@
 package com.PollBuzz.pollbuzz.LoginSignup;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.kinda.alert.KAlertDialog;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,32 +31,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.DatePicker;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.polls.Single_type_poll;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.kinda.alert.KAlertDialog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,6 +47,9 @@ import java.util.Map;
 
 import Utils.ImagePickerActivity;
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ProfileSetUp extends AppCompatActivity {
@@ -74,26 +75,29 @@ public class ProfileSetUp extends AppCompatActivity {
 
     private void setListeners() {
         date.getEditText().setOnClickListener(view -> {
+            closeKeyboard();
             final Calendar cldr = Calendar.getInstance();
             final int dayT = cldr.get(Calendar.DAY_OF_MONTH);
             final int monthT = cldr.get(Calendar.MONTH);
             final int yearT = cldr.get(Calendar.YEAR);
             mDatePickerDialog = new DatePickerDialog(ProfileSetUp.this,
-                    new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            date.getEditText().setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
-                            age = yearT - year;
-                            isDateValid(year, monthOfYear, dayOfMonth, yearT, monthT, dayT);
-                        }
+                    (view1, year, monthOfYear, dayOfMonth) -> {
+                        date.getEditText().setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                        age = yearT - year;
+                        isDateValid(year, monthOfYear, dayOfMonth, yearT, monthT, dayT);
                     }, yearT, monthT, dayT);
             mDatePickerDialog.show();
         });
         male.setOnClickListener(view -> {
+            closeKeyboard();
             isMale();
         });
-        female.setOnClickListener(view -> isFemale());
+        female.setOnClickListener(view -> {
+            closeKeyboard();
+            isFemale();
+        });
         edit.setOnClickListener(view -> {
+            closeKeyboard();
             try {
                 Dexter.withActivity(ProfileSetUp.this)
                         .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -119,8 +123,17 @@ public class ProfileSetUp extends AppCompatActivity {
             }
         });
         save.setOnClickListener(view -> {
+            closeKeyboard();
             saveProfile();
         });
+    }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void isFemale() {

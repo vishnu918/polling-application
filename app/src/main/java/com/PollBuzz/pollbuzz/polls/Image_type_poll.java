@@ -25,6 +25,7 @@ import com.kinda.alert.KAlertDialog;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -33,6 +34,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -53,12 +55,11 @@ import java.util.Map;
 import Utils.ImagePickerActivity;
 import Utils.firebase;
 import Utils.helper;
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class Image_type_poll extends AppCompatActivity {
     Button add;
@@ -89,6 +90,7 @@ public class Image_type_poll extends AppCompatActivity {
 
     private void setListeners() {
         b1.setOnClickListener(v -> {
+            closeKeyboard();
             v.showContextMenu();
             b1.setChecked(false);
             try {
@@ -117,6 +119,7 @@ public class Image_type_poll extends AppCompatActivity {
             }
         });
         b2.setOnClickListener(v -> {
+            closeKeyboard();
             v.showContextMenu();
             b2.setChecked(false);
             try {
@@ -143,7 +146,7 @@ public class Image_type_poll extends AppCompatActivity {
             }
         });
         post_image.setOnClickListener(view -> {
-
+            closeKeyboard();
             if (question_image.getText().toString().isEmpty()) {
                 question_image.setError("Please enter the question");
                 question_image.requestFocus();
@@ -420,6 +423,14 @@ public class Image_type_poll extends AppCompatActivity {
             return dir.delete();
         } else {
             return false;
+        }
+    }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 }

@@ -1,8 +1,15 @@
 package com.PollBuzz.pollbuzz.results;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.R;
+import com.bumptech.glide.Glide;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -17,26 +24,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-
-import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.responses.Single_type_response;
-import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class PercentageResult extends AppCompatActivity {
 
@@ -142,13 +138,15 @@ public class PercentageResult extends AppCompatActivity {
                 relativeLayout.addView(progressBar);
                 TextView textView = new TextView(this);
                 Log.d("option", entry.getKey());
-                Integer per = (entry.getValue() / total) * 100;
-                textView.setText(entry.getKey()+" - "+per+"%");
-                progressBar.setProgress(per);
-                textView.setLayoutParams(layoutParams);
-                textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                relativeLayout.addView(textView);
-                linearLayout.addView(relativeLayout);
+                if (total != 0) {
+                    Integer per = (entry.getValue() / total) * 100;
+                    textView.setText(entry.getKey() + " - " + per + "%");
+                    progressBar.setProgress(per);
+                    textView.setLayoutParams(layoutParams);
+                    textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                    relativeLayout.addView(textView);
+                    linearLayout.addView(relativeLayout);
+                }
             }
         }
     }

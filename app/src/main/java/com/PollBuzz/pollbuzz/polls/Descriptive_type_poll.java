@@ -13,13 +13,13 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
-
-import com.PollBuzz.pollbuzz.responses.Descriptive_type_response;
 import com.kinda.alert.KAlertDialog;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -31,11 +31,10 @@ import java.util.Map;
 
 import Utils.firebase;
 import Utils.helper;
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class Descriptive_type_poll extends AppCompatActivity {
     MaterialButton post_descriptive;
@@ -73,6 +72,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
 
     private void setListeners(String formatteddate) {
         post_descriptive.setOnClickListener(view -> {
+            closeKeyboard();
               if (question_descriptive.getText().toString().isEmpty()) {
                 question_descriptive.setError("Please enter the question");
                 question_descriptive.requestFocus();
@@ -80,6 +80,14 @@ public class Descriptive_type_poll extends AppCompatActivity {
                 addToDatabase(formatteddate);
             }
         });
+    }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void addToDatabase(String formatteddate) {

@@ -16,6 +16,7 @@ import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -82,6 +84,7 @@ public class Multiple_type_poll extends AppCompatActivity {
 
     private void setListeners(String formatteddate) {
         add.setOnClickListener(v -> {
+            closeKeyboard();
             final RadioButton button = new RadioButton(getApplicationContext());
             button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             String t = "Option" + (c + 1);
@@ -99,6 +102,7 @@ public class Multiple_type_poll extends AppCompatActivity {
         });
 
         post_multi.setOnClickListener(view -> {
+            closeKeyboard();
            if (question_multi.getText().toString().isEmpty()) {
                 question_multi.setError("Please enter the question");
                 question_multi.requestFocus();
@@ -236,5 +240,12 @@ public class Multiple_type_poll extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }
