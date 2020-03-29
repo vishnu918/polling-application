@@ -47,6 +47,8 @@ public class Single_type_response extends AppCompatActivity {
     Map<String,String> response;
     String resp;
     firebase fb;
+    PollDetails polldetails;
+    Map<String,Integer> update;
 
 
     @Override
@@ -73,7 +75,15 @@ public class Single_type_response extends AppCompatActivity {
     }
 
     private void submitResponse(firebase fb) {
+
+        Integer i = polldetails.getPollcount();
+        i++;
         response.put("option",resp);
+        Integer p = update.get(resp);
+        p++;
+        update.put(resp,p);
+        fb.getPollsCollection().document(key).update("pollcount",i);
+        fb.getPollsCollection().document(key).update("map",update);
 
         fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).set(response);
 
@@ -109,7 +119,7 @@ public class Single_type_response extends AppCompatActivity {
                                 if (data.exists()) {
                                     group.removeAllViews();
                                     dialog.dismiss();
-                                    PollDetails polldetails = data.toObject(PollDetails.class);
+                                     polldetails = data.toObject(PollDetails.class);
                                     title.setText(polldetails.getTitle());
                                     title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                     query.setText(polldetails.getQuestion());
@@ -122,6 +132,7 @@ public class Single_type_response extends AppCompatActivity {
                                         button.setLayoutParams(layoutParams);
                                         button.setTypeface(typeface);
                                         button.setText(entry.getKey());
+                                        update.put(entry.getKey(), entry.getValue());
                                         button.setTextSize(20.0f);
                                         group.addView(button);
                                         button.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +181,7 @@ public class Single_type_response extends AppCompatActivity {
         group=findViewById(R.id.options);
         options=new HashMap<>();
         response=new HashMap<>();
+        update = new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Single_type_response.this);
         fb = new firebase();

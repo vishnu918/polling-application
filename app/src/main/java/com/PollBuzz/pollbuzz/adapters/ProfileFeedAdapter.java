@@ -2,6 +2,7 @@ package com.PollBuzz.pollbuzz.adapters;
 
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.PollBuzz.pollbuzz.results.PercentageResult;
 import com.PollBuzz.pollbuzz.results.ResultActivity;
 
 import android.content.Context;
@@ -43,7 +44,7 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
 
     private void clickListener(@NonNull ProfileViewHolder holder, int position) {
         holder.cardV.setOnClickListener(view -> {
-            Intent intent = new Intent(mContext, ResultActivity.class);
+            Intent intent = new Intent(mContext, PercentageResult.class);
             intent.putExtra("UID", mPollDetails.get(position).getUID());
             intent.putExtra("type", mPollDetails.get(position).getPoll_type());
             mContext.startActivity(intent);

@@ -45,13 +45,14 @@ public class Image_type_responses extends AppCompatActivity {
     RadioGroup group;
     RadioButton b1,b2;
     MaterialButton submit;
-    Map<String,Integer> options;
+    Map<String,Integer> options,update;
     Map<String,String> response;
-    String key;
+    String key,imageoption1,imageoption2;
     Typeface typeface;
     Dialog dialog;
     firebase fb;
     ImageButton logout,home;
+    PollDetails polldetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,14 +101,26 @@ public class Image_type_responses extends AppCompatActivity {
     }
 
     private void submitResponse() {
+
+        Integer i = polldetails.getPollcount();
+        i++;
+        Integer p=0;
+        fb.getPollsCollection().document(key).update("pollcount",i);
         if(b1.isChecked())
         {
             response.put("option",b1.getText().toString().trim());
+            p = update.get(imageoption1);
+            p++;
+            update.put(imageoption1,p);
         }
         if(b2.isChecked())
         {
             response.put("option",b2.getText().toString().trim());
+            p = update.get(imageoption2);
+            p++;
+            update.put(imageoption2,p);
         }
+        fb.getPollsCollection().document(key).update("map",update);
         if (fb.getUser() != null)
         {
             fb.getPollsCollection().document(key).collection("Response")
@@ -145,20 +158,23 @@ public class Image_type_responses extends AppCompatActivity {
                             if(snapshot.exists())
                             {
                                 dialog.dismiss();
-                                PollDetails polldetails = snapshot.toObject(PollDetails.class);
+                                 polldetails = snapshot.toObject(PollDetails.class);
                                 title.setText(polldetails.getTitle().trim());
                                 query.setText(polldetails.getQuestion().trim());
                                 options =polldetails.getMap();
                                 int i=0;
                                 for(Map.Entry<String,Integer> entry : options.entrySet())
                                 {
+                                    update.put(entry.getKey(),entry.getValue());
                                     if(i==0)
                                     {
                                         loadProfilePic(image1,entry.getKey());
+                                        imageoption1 = entry.getKey();
                                     }
                                     if(i==1)
                                     {
                                         loadProfilePic(image2,entry.getKey());
+                                        imageoption2 = entry.getKey();
                                     }
                                     i++;
                                 }
@@ -193,8 +209,9 @@ public class Image_type_responses extends AppCompatActivity {
         logout =view.findViewById(R.id.logout);
         home=view.findViewById(R.id.home);
         group=findViewById(R.id.options);
-        options=new HashMap<>();
-        response=new HashMap<>();
+        options = new HashMap<>();
+        response = new HashMap<>();
+        update = new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Image_type_responses.this);
         title = findViewById(R.id.title);
