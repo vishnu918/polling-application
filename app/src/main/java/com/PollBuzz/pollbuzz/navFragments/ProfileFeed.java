@@ -154,7 +154,6 @@ public class ProfileFeed extends Fragment {
                 return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
             }
         });
-        profileRV.setLayoutAnimation(controller);
         mAdapter.notifyDataSetChanged();
         profileRV.hideShimmerAdapter();
         profileRV.scheduleLayoutAnimation();

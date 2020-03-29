@@ -85,7 +85,6 @@ public class ResultActivity extends AppCompatActivity {
                                                     return Long.compare(t1.getTimestamp(), voteDetails.getTimestamp());
                                                 }
                                             });
-                                            voteRV.setLayoutAnimation(controller);
                                             mPageAdapter.notifyDataSetChanged();
                                             voteRV.hideShimmerAdapter();
                                             voteRV.scheduleLayoutAnimation();

@@ -97,7 +97,6 @@ public class HomeFeed extends Fragment {
                                     return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
                                 }
                             });
-                            recyclerView.setLayoutAnimation(controller);
                             adapter.notifyDataSetChanged();
                             recyclerView.hideShimmerAdapter();
                             recyclerView.scheduleLayoutAnimation();

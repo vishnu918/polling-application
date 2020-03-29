@@ -99,7 +99,6 @@ public class VotedFeed extends Fragment {
                 return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
             }
         });
-        votedRV.setLayoutAnimation(controller);
         mAdapter.notifyDataSetChanged();
         votedRV.hideShimmerAdapter();
         votedRV.scheduleLayoutAnimation();
