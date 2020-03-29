@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.results;
 
+import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.responses.Ranking_type_response;
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import Utils.firebase;
@@ -52,18 +55,17 @@ public class ResultActivity extends AppCompatActivity {
         Intent intent = getIntent();
         getIntentExtras(intent);
         setActionBarFunctionality();
-        retriveData(fb);
+        retrieveData(fb);
     }
 
 
-    private void retriveData(firebase fb) {
+    private void retrieveData(firebase fb) {
         if (UID != null) {
-            fb.getPollsCollection().document(UID).collection("Response").orderBy("timestamp", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
-                voteRV.hideShimmerAdapter();
-                if (task.isSuccessful()) {
+            fb.getPollsCollection().document(UID).collection("Response").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult()!=null) {
                     QuerySnapshot querySnapshot = task.getResult();
-                    if (querySnapshot != null) {
                         for (DocumentSnapshot dS : querySnapshot) {
+                            long timestamp=(long) dS.get("timestamp");
                             fb.getUsersCollection().document(dS.getId()).get()
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful() && task1.getResult() != null) {
@@ -73,20 +75,25 @@ public class ResultActivity extends AppCompatActivity {
                                             Log.d("type", author.toString());
                                             VoteDetails voteDetails;
                                             if (imageUrl != null)
-                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), imageUrl.toString());
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), imageUrl.toString(),timestamp);
                                             else
-                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null);
-                                            Log.d("TypeOf", voteDetails.getOption());
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null,timestamp);
                                             mVoteDetailsList.add(voteDetails);
+                                            Collections.sort(mVoteDetailsList, new Comparator<VoteDetails>() {
+                                                @Override
+                                                public int compare(VoteDetails voteDetails, VoteDetails t1) {
+                                                    return Long.compare(t1.getTimestamp(), voteDetails.getTimestamp());
+                                                }
+                                            });
                                             voteRV.setLayoutAnimation(controller);
                                             mPageAdapter.notifyDataSetChanged();
+                                            voteRV.hideShimmerAdapter();
                                             voteRV.scheduleLayoutAnimation();
-                                            Log.d("count", Integer.toString(mPageAdapter.getItemCount()));
                                         }
                                     });
                         }
-                    }
                 } else {
+                    voteRV.hideShimmerAdapter();
                     Toast.makeText(ResultActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -122,15 +129,16 @@ public class ResultActivity extends AppCompatActivity {
         logout = view.findViewById(R.id.logout);
         page_title=view.findViewById(R.id.page_title);
         fb=new firebase();
+        controller = AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
         page_title.setText("Results");
         voteRV = findViewById(R.id.voterListRV);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         voteRV.setLayoutManager(linearLayoutManager);
+        mVoteDetailsList = new ArrayList<>();
         mPageAdapter = new VoterPageAdapter(getApplicationContext(), mVoteDetailsList);
         voteRV.setAdapter(mPageAdapter);
+        voteRV.setLayoutAnimation(controller);
         voteRV.showShimmerAdapter();
-        mVoteDetailsList = new ArrayList<>();
-        controller = AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
     }
 }

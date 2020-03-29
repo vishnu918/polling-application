@@ -1,7 +1,6 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
@@ -22,6 +21,8 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import Utils.firebase;
 import androidx.annotation.NonNull;
@@ -57,13 +58,13 @@ public class HomeFeed extends Fragment {
     }
 
     private void getData() {
-        fb.getPollsCollection().orderBy("timestamp", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
+        fb.getPollsCollection().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                recyclerView.hideShimmerAdapter();
                 for (QueryDocumentSnapshot dS : task.getResult()) {
                         addToRecyclerView(dS);
                 }
             } else {
+                recyclerView.hideShimmerAdapter();
                 Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -90,8 +91,15 @@ public class HomeFeed extends Fragment {
                         }
                         if (flag) {
                             arrayList.add(polldetails);
+                            Collections.sort(arrayList, new Comparator<PollDetails>() {
+                                @Override
+                                public int compare(PollDetails pollDetails, PollDetails t1) {
+                                    return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
+                                }
+                            });
                             recyclerView.setLayoutAnimation(controller);
                             adapter.notifyDataSetChanged();
+                            recyclerView.hideShimmerAdapter();
                             recyclerView.scheduleLayoutAnimation();
                         }
                 }
