@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -126,6 +127,7 @@ public class Ranking_type_poll extends AppCompatActivity {
             polldetails.setCreated_date(formatteddate);
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
+            polldetails.setTimestamp(Timestamp.now().getSeconds());
             Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < group.getChildCount(); i++) {
                 RadioButton v = (RadioButton) group.getChildAt(i);
@@ -139,9 +141,11 @@ public class Ranking_type_poll extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+
                             dialog.dismissWithAnimation();
-                            Map<String, String> m = new HashMap<>();
+                            Map<String, Object> m = new HashMap<>();
                             m.put("pollId", doc.getId());
+                            m.put("timestamp",Timestamp.now().getSeconds());
                             docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
