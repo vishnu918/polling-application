@@ -16,7 +16,9 @@ import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -28,9 +30,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,7 +43,6 @@ import java.util.Map;
 import Utils.firebase;
 import Utils.helper;
 import cn.pedant.SweetAlert.SweetAlertDialog;
-
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -55,6 +58,8 @@ public class Multiple_type_poll extends AppCompatActivity {
     firebase fb;
     ImageButton home, logout;
     KAlertDialog dialog;
+    RadioButton option1,option2;
+    ArrayList<String> uniqueoptions=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,12 +88,16 @@ public class Multiple_type_poll extends AppCompatActivity {
     private void setListeners(String formatteddate) {
         add.setOnClickListener(v -> {
             final RadioButton button = new RadioButton(getApplicationContext());
-            button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 20, 0, 20);
+            button.setLayoutParams(params);
             String t = "Option" + (c + 1);
             showDialog(Multiple_type_poll.this, button, 0);
             button.setTag(t.toLowerCase());
-            group.removeView(findViewById(R.id.option1));
-            group.removeView(findViewById(R.id.option2));
             group.addView(button);
             group.setVisibility(View.VISIBLE);
             registerForContextMenu(button);
@@ -97,13 +106,27 @@ public class Multiple_type_poll extends AppCompatActivity {
                 button.setChecked(false);
             });
         });
+        option1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.showContextMenu();
+                option1.setChecked(false);
+            }
+        });
+        option2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.showContextMenu();
+                option1.setChecked(false);
+            }
+        });
 
         post_multi.setOnClickListener(view -> {
            if (question_multi.getText().toString().isEmpty()) {
                 question_multi.setError("Please enter the question");
                 question_multi.requestFocus();
-            } else if (group.getChildCount() == 0) {
-                Toast.makeText(Multiple_type_poll.this, "Please enter atleast two options", Toast.LENGTH_SHORT).show();
+            } else if (group.getChildCount() <2) {
+                Toast.makeText(Multiple_type_poll.this, "Please add at least two options", Toast.LENGTH_SHORT).show();
             } else {
                 addToDatabase(formatteddate);
             }
@@ -172,12 +195,18 @@ public class Multiple_type_poll extends AppCompatActivity {
         post_multi = findViewById(R.id.post_multi);
         question_multi = findViewById(R.id.question_multi);
         dialog=new KAlertDialog(Multiple_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+        option1=findViewById(R.id.option1);
+        option2=findViewById(R.id.option2);
+        registerForContextMenu(option1);
+        registerForContextMenu(option2);
+        uniqueoptions.add("Option 1");
+        uniqueoptions.add("Option 2");
 
         if (group.getChildCount() == 0)
             group.setVisibility(View.INVISIBLE);
     }
 
-    public void showDialog(Activity activity, final RadioButton button,int flag){
+    public void showDialog(Activity activity, final RadioButton button, int flag){
         final Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.set_name_dialog);
@@ -192,7 +221,17 @@ public class Multiple_type_poll extends AppCompatActivity {
             text.getEditText().setText(b.getText().toString().trim());
         }
 
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                String t=text.getEditText().getText().toString().trim();
+                if( flag==0)
+                {
+                    group.removeView(button);
+                }
+            }
+        });
         dialog.show();
         window.setAttributes(lp);
 
@@ -205,9 +244,23 @@ public class Multiple_type_poll extends AppCompatActivity {
                 text.setError("Please enter tit");
                 text.requestFocus();
             } else {
-                button.setText(name);
-                Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-                dialog.dismiss();
+                if(!doesContain(name))
+                {
+                    uniqueoptions.remove(button.getText().toString());
+                    uniqueoptions.add(name);
+                    button.setText(name);
+                    Toast.makeText(getApplicationContext(),"Option Added",Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"The option is already added",Toast.LENGTH_LONG).show();
+                    if(flag==0)
+                        group.removeView(button);
+
+                    dialog.dismiss();
+
+                }
             }
         });
 
@@ -236,5 +289,22 @@ public class Multiple_type_poll extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+    private boolean doesContain(String word)
+    {
+        for(int i=0;i<uniqueoptions.size();i++)
+        {
+            if(uniqueoptions.get(i).equalsIgnoreCase(word))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        uniqueoptions.clear();
+        uniqueoptions.add("Option 1");
+        uniqueoptions.add("Option 2");
     }
 }

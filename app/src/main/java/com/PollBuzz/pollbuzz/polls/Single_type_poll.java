@@ -22,7 +22,9 @@ import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -37,6 +39,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +65,8 @@ public class Single_type_poll extends AppCompatActivity {
     firebase fb;
     ImageButton home,logout;
     KAlertDialog dialog;
+    RadioButton option1,option2;
+    ArrayList<String> uniqueoptions=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +95,15 @@ public class Single_type_poll extends AppCompatActivity {
     private void setListeners(String formattedDate) {
         add.setOnClickListener(v -> {
             RadioButton button = new RadioButton(getApplicationContext());
-            button.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT));
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
+                    RadioGroup.LayoutParams.MATCH_PARENT,
+                    RadioGroup.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 20, 0, 20);
+            button.setLayoutParams(params);
             String t = "Option" + (c + 1);
             showDialog(Single_type_poll.this, button, 0);
             button.setTag(t.toLowerCase());
-            group.removeView(findViewById(R.id.option1));
-            group.removeView(findViewById(R.id.option2));
             group.addView(button);
             group.setVisibility(View.VISIBLE);
             registerForContextMenu(button);
@@ -109,64 +117,69 @@ public class Single_type_poll extends AppCompatActivity {
             if (question.getText().toString().isEmpty()) {
                 question.setError("Please enter the question");
                 question.requestFocus();
-            } else if (group.getChildCount() == 0) {
-                Toast.makeText(Single_type_poll.this, "U shld have atleast two options", Toast.LENGTH_SHORT).show();
+            } else if (group.getChildCount()<2) {
+                Toast.makeText(Single_type_poll.this, "Please add atleast two options", Toast.LENGTH_SHORT).show();
             } else {
                 addToDatabase(formattedDate);
             }
         });
+
     }
 
     private void addToDatabase(String formattedDate) {
         showDialog();
         button.setEnabled(false);
         if (fb.getUser() != null) {
-            PollDetails polldetails = new PollDetails();
-            polldetails.setQuestion(question.getText().toString());
-            polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
-            polldetails.setAuthorUID(fb.getUserId());
-            polldetails.setTimestamp(Timestamp.now().getSeconds());
-            Map<String, Integer> map = new HashMap<>();
-            for (int i = 0; i < group.getChildCount(); i++) {
-                RadioButton v = (RadioButton) group.getChildAt(i);
-                map.put(v.getText().toString(), 0);
-            }
-            polldetails.setMap(map);
-            polldetails.setPoll_type("SINGLE ANSWER POLL");
-            polldetails.setCreated_date(formattedDate);
-            CollectionReference docCreated = fb.getUserDocument().collection("Created");
-            DocumentReference doc = fb.getPollsCollection().document();
-            doc.set(polldetails)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            dialog.dismissWithAnimation();
-                            Map<String, Object> m = new HashMap<>();
-                            m.put("pollId", doc.getId());
-                            m.put("timestamp",Timestamp.now().getSeconds());
-                            docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(Single_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(Single_type_poll.this, MainActivity.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-                                    } else
-                                    {
-                                        Toast.makeText(Single_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                        dialog.dismissWithAnimation();
-                                        button.setEnabled(true);
+
+                PollDetails polldetails = new PollDetails();
+                polldetails.setQuestion(question.getText().toString());
+                polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+                polldetails.setAuthorUID(fb.getUserId());
+                polldetails.setTimestamp(Timestamp.now().getSeconds());
+                Map<String, Integer> map = new HashMap<>();
+                for (int i = 0; i < group.getChildCount(); i++) {
+                    RadioButton v = (RadioButton) group.getChildAt(i);
+                    map.put(v.getText().toString(), 0);
+                }
+                polldetails.setMap(map);
+                polldetails.setPoll_type("SINGLE ANSWER POLL");
+                polldetails.setCreated_date(formattedDate);
+                CollectionReference docCreated = fb.getUserDocument().collection("Created");
+                DocumentReference doc = fb.getPollsCollection().document();
+                doc.set(polldetails)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                dialog.dismissWithAnimation();
+                                Map<String, Object> m = new HashMap<>();
+                                m.put("pollId", doc.getId());
+                                m.put("timestamp",Timestamp.now().getSeconds());
+                                docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(Single_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(Single_type_poll.this, MainActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(intent);
+                                        } else
+                                        {
+                                            Toast.makeText(Single_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            dialog.dismissWithAnimation();
+                                            button.setEnabled(true);
+                                        }
                                     }
-                                }
-                            });
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(Single_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
-                        dialog.dismissWithAnimation();
-                        button.setEnabled(true);
-                    });
+                                });
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(Single_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                            dialog.dismissWithAnimation();
+                            button.setEnabled(true);
+                        });
+
+
+
         }
     }
 
@@ -185,6 +198,12 @@ public class Single_type_poll extends AppCompatActivity {
         button = findViewById(R.id.post);
         question = findViewById(R.id.question);
         dialog=new KAlertDialog(Single_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+        option1=findViewById(R.id.option1);
+        option2=findViewById(R.id.option2);
+        uniqueoptions.add("Option 1");
+        uniqueoptions.add("Option 2");
+        registerForContextMenu(option1);
+        registerForContextMenu(option2);
 
         if(group.getChildCount()==0)
             group.setVisibility(View.INVISIBLE);
@@ -213,15 +232,21 @@ public class Single_type_poll extends AppCompatActivity {
             text.getEditText().setText(b.getText().toString().trim());
         }
 
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                String t=text.getEditText().getText().toString().trim();
+                if( flag==0)
+                {
+                    group.removeView(button);
+                }
+
+            }
+        });
+
         dialog.show();
         window.setAttributes(lp);
-
-
-
-
-
-
         Button dialogButton = (Button) dialog.findViewById(R.id.done);
         dialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,9 +257,24 @@ public class Single_type_poll extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please Enter the option name", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    button.setText(name);
-                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-                    dialog.dismiss();
+                    if(!doesContain(name))
+                    {
+                        uniqueoptions.remove(button.getText().toString());
+                        uniqueoptions.add(name);
+                        button.setText(name);
+                        Toast.makeText(getApplicationContext(),"Option Added",Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(),"The option is already added",Toast.LENGTH_LONG).show();
+                        if(flag==0)
+                            group.removeView(button);
+
+                        dialog.dismiss();
+
+                    }
+
                 }
 
             }
@@ -260,11 +300,29 @@ public class Single_type_poll extends AppCompatActivity {
         }
         else if(item.getItemId()==R.id.delete){
             group.removeView(b);
+            uniqueoptions.remove(b.getText().toString());
             if(group.getChildCount()==0)
                 group.setVisibility(View.INVISIBLE);
         }else{
             return false;
         }
         return true;
+    }
+    private boolean doesContain(String word)
+    {
+        for(int i=0;i<uniqueoptions.size();i++)
+        {
+            if(uniqueoptions.get(i).equalsIgnoreCase(word))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        uniqueoptions.clear();
+        uniqueoptions.add("Option 1");
+        uniqueoptions.add("Option 2");
     }
 }

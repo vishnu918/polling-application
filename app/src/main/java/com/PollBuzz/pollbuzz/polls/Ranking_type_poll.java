@@ -18,6 +18,7 @@ import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -30,14 +31,17 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import Utils.firebase;
 import Utils.helper;
@@ -60,6 +64,8 @@ public class Ranking_type_poll extends AppCompatActivity {
     Date date = Calendar.getInstance().getTime();
     firebase fb;
     KAlertDialog dialog;
+    RadioButton option1,option2;
+    private ArrayList<String> uniqueoptions=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,12 +93,15 @@ public class Ranking_type_poll extends AppCompatActivity {
     private void setListeners(String formatteddate) {
         add.setOnClickListener(v -> {
             final RadioButton button = new RadioButton(getApplicationContext());
-            button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                   LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 20, 0, 20);
+            button.setLayoutParams(params);
             String t = "Option" + (c + 1);
             showDialog(Ranking_type_poll.this, button, 0);
             button.setTag(t.toLowerCase());
-            group.removeView(findViewById(R.id.option1));
-            group.removeView(findViewById(R.id.option2));
             group.addView(button);
             group.setVisibility(View.VISIBLE);
             registerForContextMenu(button);
@@ -102,6 +111,20 @@ public class Ranking_type_poll extends AppCompatActivity {
             });
 
 
+        });
+        option1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.showContextMenu();
+                option1.setChecked(false);
+            }
+        });
+        option2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.showContextMenu();
+                option1.setChecked(false);
+            }
         });
         post_ranking.setOnClickListener(view -> {
            if (question_ranking.getText().toString().isEmpty()) {
@@ -183,6 +206,12 @@ public class Ranking_type_poll extends AppCompatActivity {
         question_ranking = findViewById(R.id.question_ranking);
         post_ranking = findViewById(R.id.post_ranking);
         dialog=new KAlertDialog(Ranking_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+        option1=findViewById(R.id.option1);
+        option2=findViewById(R.id.option2);
+        uniqueoptions.add("Option 1");
+        uniqueoptions.add("Option 2");
+        registerForContextMenu(option1);
+        registerForContextMenu(option2);
 
 
         if (group.getChildCount() == 0)
@@ -212,12 +241,22 @@ public class Ranking_type_poll extends AppCompatActivity {
             text.getEditText().setText(b.getText().toString().trim());
         }
 
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                String t=text.getEditText().getText().toString().trim();
+                if( flag==0)
+                {
+                    group.removeView(button);
+                }
+
+            }
+        });
+
         dialog.show();
         window.setAttributes(lp);
-
-
-
         Button dialogButton = (Button) dialog.findViewById(R.id.done);
         dialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,16 +264,33 @@ public class Ranking_type_poll extends AppCompatActivity {
                 name=text.getEditText().getText().toString();
                 if(name.isEmpty())
                 {
-                    text.setError("Please enter tit");
-                    text.requestFocus();
+                    Toast.makeText(getApplicationContext(), "Please Enter the option name", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    button.setText(name);
-                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-                    dialog.dismiss();
+                    if(!doesContain(name))
+                    {
+                        uniqueoptions.remove(button.getText().toString());
+                        uniqueoptions.add(name);
+                        button.setText(name);
+                        Toast.makeText(getApplicationContext(),"Option Added",Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(),"The option is already added",Toast.LENGTH_LONG).show();
+                        if(flag==0)
+                            group.removeView(button);
+
+                        dialog.dismiss();
+
+                    }
+
                 }
+
             }
         });
+
+
 
 
 
@@ -255,11 +311,29 @@ public class Ranking_type_poll extends AppCompatActivity {
         }
         else if(item.getItemId()==R.id.delete){
             group.removeView(b);
+            uniqueoptions.remove(b.getText().toString());
             if(group.getChildCount()==0)
                 group.setVisibility(View.INVISIBLE);
         }else{
             return false;
         }
         return true;
+    }
+    private boolean doesContain(String word)
+    {
+        for(int i=0;i<uniqueoptions.size();i++)
+        {
+            if(uniqueoptions.get(i).equalsIgnoreCase(word))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        uniqueoptions.clear();
+        uniqueoptions.add("Option 1");
+        uniqueoptions.add("Option 2");
     }
 }
