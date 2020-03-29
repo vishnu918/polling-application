@@ -78,7 +78,6 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
 
         private void setGlobals(@NonNull View itemView) {
             cardV = itemView.findViewById(R.id.cardV);
-            card_title = itemView.findViewById(R.id.card_title);
             card_type = itemView.findViewById(R.id.card_type);
             card_query = itemView.findViewById(R.id.card_query);
             card_author = itemView.findViewById(R.id.card_author);
