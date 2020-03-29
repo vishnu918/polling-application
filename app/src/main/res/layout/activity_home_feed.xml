@@ -17,7 +17,7 @@
         android:id="@+id/text"
         android:textAlignment="center"
         android:gravity="center"
-        app:drawableLeftCompat="@drawable/poll_primary_dark_foreground"
+
         />
 
 
