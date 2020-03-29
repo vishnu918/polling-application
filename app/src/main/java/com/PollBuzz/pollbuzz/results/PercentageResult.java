@@ -43,7 +43,7 @@ public class PercentageResult extends AppCompatActivity {
     String uid,type;
     Map<String,Integer> map;
     LinearLayout linearLayout;
-    Integer total;
+    Double total;
     MaterialButton result;
 
     @Override
@@ -85,7 +85,7 @@ public class PercentageResult extends AppCompatActivity {
                             question_percentage.setText(pollDetails.getQuestion());
                             date_percentage.setText(pollDetails.getCreated_date());
                             map = pollDetails.getMap();
-                            total = pollDetails.getPollcount();
+                            total = Double.valueOf(pollDetails.getPollcount());
                             setProgressbar(map);
                         }
                         else
@@ -106,7 +106,8 @@ public class PercentageResult extends AppCompatActivity {
                 loadProfilePic(imageView,entry.getKey());
                 linearLayout.addView(imageView);
                 RelativeLayout relativeLayout1 = new RelativeLayout(getApplicationContext());
-                RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams layoutParams2;
+                layoutParams2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(5, 10, 5, 10);
                 ProgressBar progressBar = new ProgressBar(PercentageResult.this, null, android.R.attr.progressBarStyleHorizontal);
                 progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
@@ -115,7 +116,7 @@ public class PercentageResult extends AppCompatActivity {
                 relativeLayout1.addView(progressBar);
                 TextView textView = new TextView(this);
                 if(total!=0) {
-                    Integer per = (entry.getValue() / total) * 100;
+                    Integer per = (int) ((entry.getValue() / total) * 100);
                     textView.setText(per + "%");
                     progressBar.setProgress(per);
                     textView.setLayoutParams(layoutParams);
@@ -149,7 +150,7 @@ public class PercentageResult extends AppCompatActivity {
                 TextView textView = new TextView(this);
                 Log.d("option", entry.getKey());
                 if (total != 0) {
-                    Integer per = (entry.getValue() / total) * 100;
+                    Integer per = (int) ((entry.getValue() / total) * 100);
                     textView.setText(entry.getKey() + " - " + per + "%");
                     progressBar.setProgress(per);
                 }
