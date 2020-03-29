@@ -62,7 +62,7 @@ public class PercentageResult extends AppCompatActivity {
         setGlobals(view);
         getIntentExtras(intent);
         setActionBarFunctionality();
-        retrivedata(fb);
+        retrievedata(fb);
 
         result.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,7 +77,7 @@ public class PercentageResult extends AppCompatActivity {
 
     }
 
-    private void retrivedata(firebase fb) {
+    private void retrievedata(firebase fb) {
 
         fb.getPollsCollection().document(uid).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
