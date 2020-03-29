@@ -442,7 +442,7 @@ public class ProfileSetUp extends AppCompatActivity {
     }
     private void showDialog() {
         dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        dialog.setTitleText("Uploading your poll");
+        dialog.setTitleText("Uploading your profile");
         dialog.setCancelable(false);
         dialog.show();
     }
