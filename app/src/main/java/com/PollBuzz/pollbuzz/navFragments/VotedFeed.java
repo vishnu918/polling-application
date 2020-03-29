@@ -3,7 +3,6 @@ package com.PollBuzz.pollbuzz.navFragments;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
@@ -69,16 +68,20 @@ public class VotedFeed extends Fragment {
     private void getData() {
         userVotedRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                for (QueryDocumentSnapshot dS : task.getResult()) {
-                    if (dS.exists()) {
-                        long timestamp= (long) dS.get("timestamp");
-                        fb.getPollsCollection().document(dS.getId())
-                                .get().addOnCompleteListener(task1 -> {
-                            if (task1.isSuccessful() && task1.getResult() != null) {
-                                addToRecyclerView(task1.getResult(),timestamp);
-                            }
-                        });
+                if (!task.getResult().isEmpty()) {
+                    for (QueryDocumentSnapshot dS : task.getResult()) {
+                        if (dS.exists()) {
+                            long timestamp = (long) dS.get("timestamp");
+                            fb.getPollsCollection().document(dS.getId())
+                                    .get().addOnCompleteListener(task1 -> {
+                                if (task1.isSuccessful() && task1.getResult() != null) {
+                                    addToRecyclerView(task1.getResult(), timestamp);
+                                }
+                            });
+                        }
                     }
+                } else {
+                    votedRV.hideShimmerAdapter();
                 }
             }else{
                 votedRV.hideShimmerAdapter();
