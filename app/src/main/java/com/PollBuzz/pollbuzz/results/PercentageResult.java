@@ -147,6 +147,15 @@ public class PercentageResult extends AppCompatActivity {
                     relativeLayout.addView(textView);
                     linearLayout.addView(relativeLayout);
                 }
+                else {
+                    Integer per = 0;
+                    textView.setText(entry.getKey() + " - " + per + "%");
+                    progressBar.setProgress(per);
+                    textView.setLayoutParams(layoutParams);
+                    textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                    relativeLayout.addView(textView);
+                    linearLayout.addView(relativeLayout);
+                }
             }
         }
     }
