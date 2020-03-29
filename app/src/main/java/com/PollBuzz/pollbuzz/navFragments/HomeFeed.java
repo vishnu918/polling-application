@@ -13,7 +13,6 @@ import com.daimajia.androidanimations.library.YoYo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,13 +81,6 @@ public class HomeFeed extends Fragment {
         if (polldetails.getAuthorUID() != null && !polldetails.getAuthorUID().equals(fb.getUserId())) {
             fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
-                    if (task.getResult().isEmpty()) {
-                        Log.d("HomeFeedEmpty", dS.getId() + fb.getUserId());
-                        arrayList.add(polldetails);
-                        recyclerView.setLayoutAnimation(controller);
-                        adapter.notifyDataSetChanged();
-                        recyclerView.scheduleLayoutAnimation();
-                    } else {
                         Boolean flag = Boolean.TRUE;
                         for (QueryDocumentSnapshot dS1 : task.getResult()) {
                             if (dS1.getId().equals(fb.getUserId())) {
@@ -102,7 +94,6 @@ public class HomeFeed extends Fragment {
                             adapter.notifyDataSetChanged();
                             recyclerView.scheduleLayoutAnimation();
                         }
-                    }
                 }
             });
         }
