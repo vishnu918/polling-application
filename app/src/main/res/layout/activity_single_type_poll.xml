@@ -35,32 +35,7 @@
                 android:fontFamily="@font/maven_pro"
                 android:textStyle="bold"
                 />
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                app:boxStrokeWidth="0dp"
-                app:boxStrokeColor="@color/white"
-                android:id="@+id/title"
-                app:boxBackgroundColor="@color/white"
-                android:layout_marginHorizontal="5dp"
-                android:layout_marginVertical="10dp"
-                app:boxCornerRadiusTopEnd="10dp"
-                app:boxCornerRadiusTopStart="10dp"
-                app:endIconDrawable="@drawable/ic_email_black_24dp"
-                android:hint="Poll Title"
 
-              >
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/title1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/maven_pro"
-                    android:textSize="20sp"
-                    android:layout_marginHorizontal="5dp"
-
-                    />
-            </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
