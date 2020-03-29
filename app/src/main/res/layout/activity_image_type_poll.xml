@@ -154,16 +154,7 @@
 
 
                 </LinearLayout>
-                <com.google.android.material.button.MaterialButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:text="ADD option"
-                        android:textAllCaps="true"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:layout_marginHorizontal="5dp"
-                        android:textSize="20sp"
-                        android:id="@+id/add"/>
+
                 <com.google.android.material.button.MaterialButton
                         android:id="@+id/post_imagetype"
                         android:layout_width="wrap_content"

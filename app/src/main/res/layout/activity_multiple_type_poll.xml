@@ -121,14 +121,15 @@
 
                 </LinearLayout>
                 <com.google.android.material.button.MaterialButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:text="ADD option"
-                        android:textAllCaps="true"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:layout_marginHorizontal="5dp"
-                        android:textSize="20sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cornerRadius="20dp"
+                    android:text="+Add option"
+                    android:fontFamily="@font/maven_pro"
+                    android:textStyle="bold"
+                    android:layout_margin="10dp"
+                    android:padding="12dp"
+                    android:textSize="15sp"
                         android:id="@+id/add"/>
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/post_multi"
@@ -141,7 +142,8 @@
                         android:textStyle="bold"
                         android:layout_marginTop="50dp"
                         android:padding="10dp"
-                        android:textSize="15sp"/>
+                        android:textSize="15sp"
+                    android:stateListAnimator="@animator/button_anim"/>
 
 
             </LinearLayout>
