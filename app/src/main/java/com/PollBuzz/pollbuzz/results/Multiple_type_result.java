@@ -34,7 +34,7 @@ import java.util.Map;
 import Utils.firebase;
 
 public class Multiple_type_result extends AppCompatActivity {
-    TextView title, query;
+    TextView query;
     LinearLayout group;
     Map<String, Integer> options;
     String key, uid;
@@ -81,8 +81,6 @@ public class Multiple_type_result extends AppCompatActivity {
                                 group.removeAllViews();
                                 dialog.dismiss();
                                 PollDetails polldetails = data.toObject(PollDetails.class);
-                                title.setText(polldetails.getTitle());
-                                title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                 query.setText(polldetails.getQuestion());
                                 options = polldetails.getMap();
                                 fb.getPollsCollection().document(key)
@@ -185,7 +183,6 @@ public class Multiple_type_result extends AppCompatActivity {
     }
 
     private void setGlobals(View view) {
-        title = findViewById(R.id.title);
         query = findViewById(R.id.query);
         group = findViewById(R.id.options);
         options = new HashMap<>();

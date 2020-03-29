@@ -3,6 +3,7 @@ package com.PollBuzz.pollbuzz.polls;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -11,6 +12,7 @@ import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.responses.Multiple_type_response;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -36,13 +38,15 @@ import java.util.Map;
 
 import Utils.firebase;
 import Utils.helper;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class Multiple_type_poll extends AppCompatActivity {
     Button add;
     MaterialButton post_multi;
-    TextInputEditText title_multi,question_multi;
+    TextInputEditText question_multi;
     LinearLayout group;
     String name;
     int c;
@@ -50,6 +54,7 @@ public class Multiple_type_poll extends AppCompatActivity {
     Date date = Calendar.getInstance().getTime();
     firebase fb;
     ImageButton home, logout;
+    KAlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +99,7 @@ public class Multiple_type_poll extends AppCompatActivity {
         });
 
         post_multi.setOnClickListener(view -> {
-            if (title_multi.getText().toString().isEmpty()) {
-                title_multi.setError("Please enter the title");
-                title_multi.requestFocus();
-            } else if (question_multi.getText().toString().isEmpty()) {
+           if (question_multi.getText().toString().isEmpty()) {
                 question_multi.setError("Please enter the question");
                 question_multi.requestFocus();
             } else if (group.getChildCount() == 0) {
@@ -107,16 +109,25 @@ public class Multiple_type_poll extends AppCompatActivity {
             }
         });
     }
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Uploading your poll");
+        dialog.setCancelable(false);
+        dialog.show();
+    }
+
 
     private void addToDatabase(String formatteddate) {
+        showDialog();
+        post_multi.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
-            polldetails.setTitle(title_multi.getText().toString().trim());
             polldetails.setQuestion(question_multi.getText().toString().trim());
             polldetails.setCreated_date(formatteddate);
             polldetails.setPoll_type("MULTI ANSWER POLL");
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
+            polldetails.setTimestamp(Timestamp.now().getSeconds());
             Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < group.getChildCount(); i++) {
                 RadioButton v = (RadioButton) group.getChildAt(i);
@@ -127,15 +138,22 @@ public class Multiple_type_poll extends AppCompatActivity {
             DocumentReference doc = fb.getPollsCollection().document();
             doc.set(polldetails)
                     .addOnSuccessListener(aVoid -> {
-                        Map<String, String> m = new HashMap<>();
+                        dialog.dismissWithAnimation();
+                        Map<String, Object> m = new HashMap<>();
                         m.put("pollId", doc.getId());
+                        m.put("timestamp",Timestamp.now().getSeconds());
                         docCreated.document().set(m);
                         Toast.makeText(Multiple_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(Multiple_type_poll.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     })
-                    .addOnFailureListener(e -> Toast.makeText(Multiple_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(Multiple_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                        dialog.dismissWithAnimation();
+                        post_multi.setEnabled(true);
+                    });
+
         }
     }
 
@@ -152,8 +170,9 @@ public class Multiple_type_poll extends AppCompatActivity {
         add = findViewById(R.id.add);
         c = group.getChildCount();
         post_multi = findViewById(R.id.post_multi);
-        title_multi = findViewById(R.id.title_multi);
         question_multi = findViewById(R.id.question_multi);
+        dialog=new KAlertDialog(Multiple_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+
         if (group.getChildCount() == 0)
             group.setVisibility(View.INVISIBLE);
     }

@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -127,13 +128,23 @@ public class Image_type_responses extends AppCompatActivity {
                     .document(fb.getUserId()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    Map<String,String> mapi = new HashMap<>();
+                    Map<String,Object> mapi = new HashMap<>();
                     mapi.put("pollId", fb.getUserId());
-                    Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                    fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi);
-                    Intent i=new Intent(Image_type_responses.this, MainActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
+                    mapi.put("timestamp", Timestamp.now().getSeconds());
+                    fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
+                                Intent i=new Intent(Image_type_responses.this, MainActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(i);
+                            }
+                            else{
+                                Toast.makeText(Image_type_responses.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
             })
                     .addOnFailureListener(new OnFailureListener() {

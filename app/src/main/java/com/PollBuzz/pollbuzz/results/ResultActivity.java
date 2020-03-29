@@ -1,9 +1,12 @@
 package com.PollBuzz.pollbuzz.results;
 
+import com.PollBuzz.pollbuzz.PollDetails;
+import com.PollBuzz.pollbuzz.responses.Ranking_type_response;
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -23,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import Utils.firebase;
@@ -37,65 +42,30 @@ public class ResultActivity extends AppCompatActivity {
     ShimmerRecyclerView voteRV;
     VoterPageAdapter mPageAdapter;
     List<VoteDetails> mVoteDetailsList;
-    FirebaseAuth mAuth;
     ImageButton home,logout;
     TextView page_title;
     String UID,type;
-    firebase fb = new firebase();
-    FirebaseAuth.AuthStateListener listener;
+    firebase fb;
     private LayoutAnimationController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_result);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.action_bar);
-        View view = getSupportActionBar().getCustomView();
-
-        setGlobals(view);
+        setGlobals();
         Intent intent = getIntent();
         getIntentExtras(intent);
         setActionBarFunctionality();
-        setAuthStateListener();
-        retriveData(fb);
-
-
+        retrieveData(fb);
     }
 
-    private void setAuthStateListener() {
 
-        listener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user == null) {
-                    Intent i = new Intent(ResultActivity.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
-    }
-
-    private void retriveData(firebase fb) {
-        voteRV = findViewById(R.id.voterListRV);
-
-        voteRV.showShimmerAdapter();
-        mVoteDetailsList = new ArrayList<>();
-        mPageAdapter = new VoterPageAdapter(getApplicationContext(), mVoteDetailsList);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        voteRV.setLayoutManager(linearLayoutManager);
+    private void retrieveData(firebase fb) {
         if (UID != null) {
             fb.getPollsCollection().document(UID).collection("Response").get().addOnCompleteListener(task -> {
-                voteRV.setAdapter(mPageAdapter);
-                voteRV.hideShimmerAdapter();
-                if (task.isSuccessful()) {
+                if (task.isSuccessful() && task.getResult()!=null) {
                     QuerySnapshot querySnapshot = task.getResult();
-                    if (querySnapshot != null) {
                         for (DocumentSnapshot dS : querySnapshot) {
+                            long timestamp=(long) dS.get("timestamp");
                             fb.getUsersCollection().document(dS.getId()).get()
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful() && task1.getResult() != null) {
@@ -105,20 +75,24 @@ public class ResultActivity extends AppCompatActivity {
                                             Log.d("type", author.toString());
                                             VoteDetails voteDetails;
                                             if (imageUrl != null)
-                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), imageUrl.toString());
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), imageUrl.toString(),timestamp);
                                             else
-                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null);
-                                            Log.d("TypeOf", voteDetails.getOption());
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null,timestamp);
                                             mVoteDetailsList.add(voteDetails);
-                                            voteRV.setLayoutAnimation(controller);
+                                            Collections.sort(mVoteDetailsList, new Comparator<VoteDetails>() {
+                                                @Override
+                                                public int compare(VoteDetails voteDetails, VoteDetails t1) {
+                                                    return Long.compare(t1.getTimestamp(), voteDetails.getTimestamp());
+                                                }
+                                            });
                                             mPageAdapter.notifyDataSetChanged();
+                                            voteRV.hideShimmerAdapter();
                                             voteRV.scheduleLayoutAnimation();
-                                            Log.d("count", Integer.toString(mPageAdapter.getItemCount()));
                                         }
                                     });
                         }
-                    }
                 } else {
+                    voteRV.hideShimmerAdapter();
                     Toast.makeText(ResultActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -131,35 +105,39 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void setActionBarFunctionality() {
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ResultActivity.this, MainActivity.class);
-                startActivity(i);
-            }
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(ResultActivity.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fb.signOut();
-            }
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(ResultActivity.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
     }
 
-    private void setGlobals(View view) {
+    private void setGlobals() {
+        setContentView(R.layout.activity_result);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
+        View view = getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
         page_title=view.findViewById(R.id.page_title);
-        mAuth = FirebaseAuth.getInstance();
+        fb=new firebase();
+        controller = AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
         page_title.setText("Results");
-        controller =
-                AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(listener);
-
+        voteRV = findViewById(R.id.voterListRV);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        voteRV.setLayoutManager(linearLayoutManager);
+        mVoteDetailsList = new ArrayList<>();
+        mPageAdapter = new VoterPageAdapter(getApplicationContext(), mVoteDetailsList);
+        voteRV.setAdapter(mPageAdapter);
+        voteRV.setLayoutAnimation(controller);
+        voteRV.showShimmerAdapter();
     }
 }

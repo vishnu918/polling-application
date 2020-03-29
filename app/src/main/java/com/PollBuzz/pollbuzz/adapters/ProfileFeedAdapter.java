@@ -52,8 +52,6 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
     }
 
     private void setData(@NonNull ProfileViewHolder holder, int position) {
-        if (mPollDetails.get(position).getTitle() != null)
-            holder.card_title.setText(mPollDetails.get(position).getTitle().trim());
         if (mPollDetails.get(position).getPoll_type() != null)
             holder.card_type.setText(mPollDetails.get(position).getPoll_type());
         if (mPollDetails.get(position).getQuestion() != null)

@@ -37,7 +37,7 @@ import Utils.firebase;
 
 public class Ranking_type_result extends AppCompatActivity {
 
-    MaterialTextView title_ranking_result, query_ranking_result;
+    MaterialTextView query_ranking_result;
     LinearLayout group;
     firebase fb = new firebase();
     FirebaseAuth auth;
@@ -101,8 +101,6 @@ public class Ranking_type_result extends AppCompatActivity {
                                 group.removeAllViews();
 
                                 PollDetails polldetails = data.toObject(PollDetails.class);
-                                title_ranking_result.setText(polldetails.getTitle());
-                                title_ranking_result.setPaintFlags(title_ranking_result.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                 query_ranking_result.setText(polldetails.getQuestion());
                                 fb.getPollsCollection().document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
@@ -168,7 +166,6 @@ public class Ranking_type_result extends AppCompatActivity {
         logout = view.findViewById(R.id.logout);
         auth = FirebaseAuth.getInstance();
         options=new TreeMap<>();
-        title_ranking_result = findViewById(R.id.title_ranking_result);
         query_ranking_result = findViewById(R.id.query_ranking_result);
         group = findViewById(R.id.options_ranking_result);
 

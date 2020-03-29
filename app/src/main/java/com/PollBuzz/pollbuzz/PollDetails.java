@@ -14,6 +14,14 @@ public class PollDetails {
 
     public void setPollcount(Integer pollcount) {
         this.pollcount = pollcount;
+    private long timestamp;
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public void setAuthorUID(String authorUID) {

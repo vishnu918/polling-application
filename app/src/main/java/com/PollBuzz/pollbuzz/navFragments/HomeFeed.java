@@ -1,6 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
@@ -13,6 +14,7 @@ import com.daimajia.androidanimations.library.YoYo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,8 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import Utils.firebase;
 import androidx.annotation.NonNull;
@@ -37,6 +41,7 @@ public class HomeFeed extends Fragment {
     private FloatingActionButton fab;
     private firebase fb;
     private LayoutAnimationController controller;
+    MaterialTextView viewed;
 
     public HomeFeed() {
     }
@@ -53,16 +58,31 @@ public class HomeFeed extends Fragment {
         setGlobals(view);
         setListeners();
         getData();
+        Handler handler=new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(arrayList.isEmpty()){
+                    recyclerView.hideShimmerAdapter();
+                    viewed.setVisibility(View.VISIBLE);
+                }
+            }
+        },3000);
     }
 
     private void getData() {
         fb.getPollsCollection().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                recyclerView.hideShimmerAdapter();
-                for (QueryDocumentSnapshot dS : task.getResult()) {
+                if (!task.getResult().isEmpty()) {
+                    for (QueryDocumentSnapshot dS : task.getResult()) {
                         addToRecyclerView(dS);
+                    }
+                } else {
+                    recyclerView.hideShimmerAdapter();
+                    viewed.setVisibility(View.VISIBLE);
                 }
             } else {
+                recyclerView.hideShimmerAdapter();
                 Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -89,8 +109,14 @@ public class HomeFeed extends Fragment {
                         }
                         if (flag) {
                             arrayList.add(polldetails);
-                            recyclerView.setLayoutAnimation(controller);
+                            Collections.sort(arrayList, new Comparator<PollDetails>() {
+                                @Override
+                                public int compare(PollDetails pollDetails, PollDetails t1) {
+                                    return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
+                                }
+                            });
                             adapter.notifyDataSetChanged();
+                            recyclerView.hideShimmerAdapter();
                             recyclerView.scheduleLayoutAnimation();
                         }
                 }
@@ -100,14 +126,16 @@ public class HomeFeed extends Fragment {
     private void setGlobals(@NonNull View view) {
         arrayList = new ArrayList<>();
         fab = view.findViewById(R.id.fab);
+        viewed=view.findViewById(R.id.viewed);
+        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         adapter = new HomePageAdapter(getContext(), arrayList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutAnimation(controller);
         recyclerView.showShimmerAdapter();
-        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(view.findViewById(R.id.text));
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
         fb = new firebase();

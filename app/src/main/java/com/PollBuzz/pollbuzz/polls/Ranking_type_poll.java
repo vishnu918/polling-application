@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -13,6 +14,7 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -39,6 +41,8 @@ import java.util.Map;
 
 import Utils.firebase;
 import Utils.helper;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,7 +51,7 @@ public class Ranking_type_poll extends AppCompatActivity {
     Button add;
     LinearLayout group;
     String name;
-    TextInputEditText title_ranking, question_ranking;
+    TextInputEditText question_ranking;
     MaterialButton post_ranking;
     int c;
     RadioButton b;
@@ -55,6 +59,7 @@ public class Ranking_type_poll extends AppCompatActivity {
     ImageButton home,logout;
     Date date = Calendar.getInstance().getTime();
     firebase fb;
+    KAlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,10 +104,7 @@ public class Ranking_type_poll extends AppCompatActivity {
 
         });
         post_ranking.setOnClickListener(view -> {
-            if (title_ranking.getText().toString().isEmpty()) {
-                title_ranking.setError("Please enter the question");
-                title_ranking.requestFocus();
-            } else if (question_ranking.getText().toString().isEmpty()) {
+           if (question_ranking.getText().toString().isEmpty()) {
                 question_ranking.setError("Please enter the question");
                 question_ranking.requestFocus();
             } else {
@@ -113,13 +115,15 @@ public class Ranking_type_poll extends AppCompatActivity {
     }
 
     private void addToDatabase(String formatteddate) {
+        showDialog();
+        post_ranking.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
-            polldetails.setTitle(title_ranking.getText().toString().trim());
             polldetails.setQuestion(question_ranking.getText().toString().trim());
             polldetails.setCreated_date(formatteddate);
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
+            polldetails.setTimestamp(Timestamp.now().getSeconds());
             Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < group.getChildCount(); i++) {
                 RadioButton v = (RadioButton) group.getChildAt(i);
@@ -133,8 +137,11 @@ public class Ranking_type_poll extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Map<String, String> m = new HashMap<>();
+
+                            dialog.dismissWithAnimation();
+                            Map<String, Object> m = new HashMap<>();
                             m.put("pollId", doc.getId());
+                            m.put("timestamp",Timestamp.now().getSeconds());
                             docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -145,12 +152,18 @@ public class Ranking_type_poll extends AppCompatActivity {
                                         startActivity(intent);
                                     } else {
                                         Toast.makeText(Ranking_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        dialog.dismissWithAnimation();
+                                        post_ranking.setEnabled(true);
                                     }
                                 }
                             });
                         }
                     })
-                    .addOnFailureListener(e -> Toast.makeText(Ranking_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(Ranking_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                        post_ranking.setEnabled(true);
+                        dialog.dismissWithAnimation();
+                    });
         }
     }
 
@@ -167,11 +180,20 @@ public class Ranking_type_poll extends AppCompatActivity {
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
         c = group.getChildCount();
-        title_ranking = findViewById(R.id.title_ranking);
         question_ranking = findViewById(R.id.question_ranking);
         post_ranking = findViewById(R.id.post_ranking);
+        dialog=new KAlertDialog(Ranking_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+
+
         if (group.getChildCount() == 0)
             group.setVisibility(View.INVISIBLE);
+    }
+
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Uploading your poll");
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     public void showDialog(Activity activity, final RadioButton button,int flag){
