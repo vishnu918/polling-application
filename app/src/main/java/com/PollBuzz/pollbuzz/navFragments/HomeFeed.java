@@ -112,14 +112,15 @@ public class HomeFeed extends Fragment {
     private void setGlobals(@NonNull View view) {
         arrayList = new ArrayList<>();
         fab = view.findViewById(R.id.fab);
+        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         adapter = new HomePageAdapter(getContext(), arrayList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutAnimation(controller);
         recyclerView.showShimmerAdapter();
-        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(view.findViewById(R.id.text));
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
         fb = new firebase();
