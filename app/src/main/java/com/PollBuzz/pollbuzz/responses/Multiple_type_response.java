@@ -2,6 +2,7 @@ package com.PollBuzz.pollbuzz.responses;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -44,7 +45,7 @@ public class Multiple_type_response extends AppCompatActivity {
     Button submit;
     firebase fb;
     int c;
-    Map<String,String> response;
+    Map<String,Object> response;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,19 +71,18 @@ public class Multiple_type_response extends AppCompatActivity {
     }
 
     private void submitResponse() {
+        response.put("timestamp", Timestamp.now().getSeconds());
         fb.getPollsCollection().document(key).collection("Response")
                 .document(fb.getUserId()).set(response);
-        Map<String,String> mapi = new HashMap<>();
+        Map<String,Object> mapi = new HashMap<>();
         mapi.put("pollId", fb.getUserId());
-        fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(Multiple_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                        Intent i=new Intent(Multiple_type_response.this,MainActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(i);
-                    }
+        mapi.put("timestamp", Timestamp.now().getSeconds());
+        fb.getUserDocument().collection("Voted").document(key).set(mapi)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(Multiple_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
+                    Intent i=new Intent(Multiple_type_response.this,MainActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -129,8 +129,6 @@ public class Multiple_type_response extends AppCompatActivity {
                                             response.put("option" + finalI, b.getText().toString());
                                         else
                                             response.values().remove(b.getText().toString());
-
-
                                     }
                                 });
                                 i++;

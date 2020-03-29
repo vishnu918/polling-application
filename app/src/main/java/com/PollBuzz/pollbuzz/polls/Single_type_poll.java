@@ -6,8 +6,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ServerTimestamp;
+import com.google.firestore.v1.DocumentTransform;
+import com.google.firestore.v1.DocumentTransform.FieldTransform.ServerValue;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
@@ -119,6 +123,7 @@ public class Single_type_poll extends AppCompatActivity {
             polldetails.setQuestion(question.getText().toString());
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
+            polldetails.setTimestamp(Timestamp.now().getSeconds());
             Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < group.getChildCount(); i++) {
                 RadioButton v = (RadioButton) group.getChildAt(i);
@@ -133,8 +138,9 @@ public class Single_type_poll extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Map<String, String> m = new HashMap<>();
+                            Map<String, Object> m = new HashMap<>();
                             m.put("pollId", doc.getId());
+                            m.put("timestamp",Timestamp.now().getSeconds());
                             docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {

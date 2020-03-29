@@ -3,6 +3,7 @@ package com.PollBuzz.pollbuzz.navFragments;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
 
@@ -119,7 +120,7 @@ public class ProfileFeed extends Fragment {
     }
 
     private void getData() {
-        fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
+        fb.getUserDocument().collection("Created").orderBy("timestamp", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
             profileRV.hideShimmerAdapter();
             if (task.isSuccessful() && task.getResult() != null) {
                 for (QueryDocumentSnapshot dS : task.getResult()) {

@@ -3,6 +3,7 @@ package com.PollBuzz.pollbuzz.navFragments;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
@@ -63,7 +64,7 @@ public class VotedFeed extends Fragment {
     }
 
     private void getData() {
-        userVotedRef.get().addOnCompleteListener(task -> {
+        userVotedRef.orderBy("timestamp", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 votedRV.hideShimmerAdapter();
                 for (QueryDocumentSnapshot dS : task.getResult()) {

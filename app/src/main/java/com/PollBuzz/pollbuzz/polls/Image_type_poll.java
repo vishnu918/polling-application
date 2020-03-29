@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.Timestamp;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -271,6 +272,7 @@ public class Image_type_poll extends AppCompatActivity {
         polldetails.setPoll_type("IMAGE POLL");
         polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
         polldetails.setAuthorUID(fb.getUserId());
+        polldetails.setTimestamp(Timestamp.now().getSeconds());
         Map<String, Integer> map = new HashMap<>();
         String uri1String=uri1.toString().replace("\\","");
         StorageReference mRef = fb.getStorageReference().child("polls/"+fb.getUserId()+"/"+uri1String+"/option1");
@@ -326,8 +328,9 @@ public class Image_type_poll extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         deleteCache();
-                        Map<String, String> m = new HashMap<>();
+                        Map<String, Object> m = new HashMap<>();
                         m.put("pollId", task.getResult().getId());
+                        m.put("timestamp",Timestamp.now().getSeconds());
                         fb.getUserDocument().collection("Created").document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {

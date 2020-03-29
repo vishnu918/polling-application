@@ -1,9 +1,11 @@
 package com.PollBuzz.pollbuzz.results;
 
+import com.PollBuzz.pollbuzz.responses.Ranking_type_response;
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -37,60 +39,26 @@ public class ResultActivity extends AppCompatActivity {
     ShimmerRecyclerView voteRV;
     VoterPageAdapter mPageAdapter;
     List<VoteDetails> mVoteDetailsList;
-    FirebaseAuth mAuth;
     ImageButton home,logout;
     TextView page_title;
     String UID,type;
-    firebase fb = new firebase();
-    FirebaseAuth.AuthStateListener listener;
+    firebase fb;
     private LayoutAnimationController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_result);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.action_bar);
-        View view = getSupportActionBar().getCustomView();
-
-        setGlobals(view);
+        setGlobals();
         Intent intent = getIntent();
         getIntentExtras(intent);
         setActionBarFunctionality();
-        setAuthStateListener();
         retriveData(fb);
-
-
     }
 
-    private void setAuthStateListener() {
-
-        listener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user == null) {
-                    Intent i = new Intent(ResultActivity.this, LoginSignupActivity.class);
-                    startActivity(i);
-                }
-
-            }
-        };
-    }
 
     private void retriveData(firebase fb) {
-        voteRV = findViewById(R.id.voterListRV);
-
-        voteRV.showShimmerAdapter();
-        mVoteDetailsList = new ArrayList<>();
-        mPageAdapter = new VoterPageAdapter(getApplicationContext(), mVoteDetailsList);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        voteRV.setLayoutManager(linearLayoutManager);
         if (UID != null) {
-            fb.getPollsCollection().document(UID).collection("Response").get().addOnCompleteListener(task -> {
-                voteRV.setAdapter(mPageAdapter);
+            fb.getPollsCollection().document(UID).collection("Response").orderBy("timestamp", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
                 voteRV.hideShimmerAdapter();
                 if (task.isSuccessful()) {
                     QuerySnapshot querySnapshot = task.getResult();
@@ -131,35 +99,38 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void setActionBarFunctionality() {
-        home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ResultActivity.this, MainActivity.class);
-                startActivity(i);
-            }
+        home.setOnClickListener(v -> {
+            Intent i = new Intent(ResultActivity.this, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fb.signOut();
-            }
+        logout.setOnClickListener(v -> {
+            fb.signOut();
+            Intent i = new Intent(ResultActivity.this, LoginSignupActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         });
     }
 
-    private void setGlobals(View view) {
+    private void setGlobals() {
+        setContentView(R.layout.activity_result);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
+        View view = getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
         page_title=view.findViewById(R.id.page_title);
-        mAuth = FirebaseAuth.getInstance();
+        fb=new firebase();
         page_title.setText("Results");
-        controller =
-                AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(listener);
-
+        voteRV = findViewById(R.id.voterListRV);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        voteRV.setLayoutManager(linearLayoutManager);
+        mPageAdapter = new VoterPageAdapter(getApplicationContext(), mVoteDetailsList);
+        voteRV.setAdapter(mPageAdapter);
+        voteRV.showShimmerAdapter();
+        mVoteDetailsList = new ArrayList<>();
+        controller = AnimationUtils.loadLayoutAnimation(getApplicationContext(), R.anim.animation_down_to_up);
     }
 }

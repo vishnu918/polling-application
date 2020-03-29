@@ -3,6 +3,7 @@ package com.PollBuzz.pollbuzz.polls;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -117,6 +118,7 @@ public class Multiple_type_poll extends AppCompatActivity {
             polldetails.setPoll_type("MULTI ANSWER POLL");
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
+            polldetails.setTimestamp(Timestamp.now().getSeconds());
             Map<String, Integer> map = new HashMap<>();
             for (int i = 0; i < group.getChildCount(); i++) {
                 RadioButton v = (RadioButton) group.getChildAt(i);
@@ -127,8 +129,9 @@ public class Multiple_type_poll extends AppCompatActivity {
             DocumentReference doc = fb.getPollsCollection().document();
             doc.set(polldetails)
                     .addOnSuccessListener(aVoid -> {
-                        Map<String, String> m = new HashMap<>();
+                        Map<String, Object> m = new HashMap<>();
                         m.put("pollId", doc.getId());
+                        m.put("timestamp",Timestamp.now().getSeconds());
                         docCreated.document().set(m);
                         Toast.makeText(Multiple_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(Multiple_type_poll.this, MainActivity.class);

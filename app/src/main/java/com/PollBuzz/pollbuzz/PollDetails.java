@@ -6,6 +6,15 @@ public class PollDetails {
 
     private String title, question, created_date, expiry_date, poll_type, author, UID,authorUID;
     private Map<String, Integer> map;
+    private long timestamp;
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 
     public void setAuthorUID(String authorUID) {
         this.authorUID = authorUID;
