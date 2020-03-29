@@ -69,7 +69,7 @@ public class Image_type_poll extends AppCompatActivity {
     ImageView view1, view2;
     RadioButton b1, b2;
     MaterialButton post_image;
-    TextInputEditText title_image, question_image;
+    TextInputEditText question_image;
     firebase fb;
     Date date = Calendar.getInstance().getTime();
     private int requestCode = 0;
@@ -143,10 +143,8 @@ public class Image_type_poll extends AppCompatActivity {
             }
         });
         post_image.setOnClickListener(view -> {
-            if (title_image.getText().toString().isEmpty()) {
-                title_image.setError("Please enter the title");
-                title_image.requestFocus();
-            } else if (question_image.getText().toString().isEmpty()) {
+
+            if (question_image.getText().toString().isEmpty()) {
                 question_image.setError("Please enter the question");
                 question_image.requestFocus();
             } else {
@@ -188,7 +186,6 @@ public class Image_type_poll extends AppCompatActivity {
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
         post_image = findViewById(R.id.post_imagetype);
-        title_image = findViewById(R.id.title_imagetype);
         question_image = findViewById(R.id.question_imagetype);
         c = group.getChildCount();
         dialog=new KAlertDialog(Image_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
@@ -281,7 +278,6 @@ public class Image_type_poll extends AppCompatActivity {
         showDialog();
         post_image.setEnabled(false);
         PollDetails polldetails = new PollDetails();
-        polldetails.setTitle(title_image.getText().toString().trim());
         polldetails.setQuestion(question_image.getText().toString().trim());
         polldetails.setCreated_date(formatteddate);
         polldetails.setPoll_type("IMAGE POLL");

@@ -32,7 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 public class Descriptive_type_result extends AppCompatActivity {
-    TextView title, query, answer;
+    TextView  query, answer;
     Map<String, Object> response;
     Typeface typeface;
     Dialog dialog;
@@ -90,8 +90,6 @@ public class Descriptive_type_result extends AppCompatActivity {
                                                          if (data.exists()) {
                                                              dialog.dismiss();
                                                              PollDetails polldetails = data.toObject(PollDetails.class);
-                                                             title.setText(polldetails.getTitle());
-                                                             title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                                              query.setText(polldetails.getQuestion());
                                                              fb.getPollsCollection().document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                  @Override
@@ -151,7 +149,6 @@ public class Descriptive_type_result extends AppCompatActivity {
     private void setGlobals(View view) {
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
-        title = findViewById(R.id.title);
         query = findViewById(R.id.query);
         answer = findViewById(R.id.answer);
         response = new HashMap<>();

@@ -36,7 +36,7 @@ import Utils.firebase;
 
 public class Image_type_result extends AppCompatActivity {
 
-    MaterialTextView title, query;
+    MaterialTextView query;
     LinearLayout group;
     firebase fb = new firebase();
     RadioButton b1, b2;
@@ -93,7 +93,6 @@ public class Image_type_result extends AppCompatActivity {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             if (documentSnapshot.exists()) {
                                 PollDetails pollDetails = documentSnapshot.toObject(PollDetails.class);
-                                title.setText(pollDetails.getTitle());
                                 query.setText(pollDetails.getQuestion());
                                 options = pollDetails.getMap();
                                 int i = 0;
@@ -148,8 +147,6 @@ public class Image_type_result extends AppCompatActivity {
         group = findViewById(R.id.options);
         response = new HashMap<>();
         options = new HashMap<>();
-
-        title = findViewById(R.id.title_imageresult);
         query = findViewById(R.id.query_imageresult);
         group = findViewById(R.id.options);
         image1 = findViewById(R.id.image1);

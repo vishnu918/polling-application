@@ -39,8 +39,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class Descriptive_type_poll extends AppCompatActivity {
     MaterialButton post_descriptive;
-    TextInputLayout title, query;
-    TextInputEditText title_descriptive,question_descriptive;
+    TextInputLayout query;
+    TextInputEditText question_descriptive;
     firebase fb;
     ImageButton home,logout;
     Date date = Calendar.getInstance().getTime();
@@ -73,10 +73,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
 
     private void setListeners(String formatteddate) {
         post_descriptive.setOnClickListener(view -> {
-            if (title_descriptive.getText().toString().isEmpty()) {
-                title_descriptive.setError("Please enter the title");
-                title_descriptive.requestFocus();
-            } else if (question_descriptive.getText().toString().isEmpty()) {
+              if (question_descriptive.getText().toString().isEmpty()) {
                 question_descriptive.setError("Please enter the question");
                 question_descriptive.requestFocus();
             } else {
@@ -90,7 +87,6 @@ public class Descriptive_type_poll extends AppCompatActivity {
         post_descriptive.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
-            polldetails.setTitle(title_descriptive.getText().toString().trim());
             polldetails.setQuestion(question_descriptive.getText().toString().trim());
             polldetails.setCreated_date(formatteddate);
             polldetails.setPoll_type("DESCRIPTIVE POLL");
@@ -146,7 +142,6 @@ public class Descriptive_type_poll extends AppCompatActivity {
         home=findViewById(R.id.home);
         logout=findViewById(R.id.logout);
         post_descriptive = findViewById(R.id.post_descriptive);
-        title_descriptive = findViewById(R.id.title_descriptive);
         question_descriptive = findViewById(R.id.question_descriptive);
         dialog=new KAlertDialog(Descriptive_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
 

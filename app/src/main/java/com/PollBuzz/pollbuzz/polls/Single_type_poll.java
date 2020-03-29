@@ -56,7 +56,7 @@ public class Single_type_poll extends AppCompatActivity {
     String name;
     int c;
     RadioButton b;
-    TextInputEditText title,question;
+    TextInputEditText question;
     MaterialButton button;
     Date date = Calendar.getInstance().getTime();
     firebase fb;
@@ -106,10 +106,7 @@ public class Single_type_poll extends AppCompatActivity {
             button.showContextMenu();
         });
         button.setOnClickListener(view -> {
-            if (title.getText().toString().isEmpty()) {
-                title.setError("Please enter the title");
-                title.requestFocus();
-            } else if (question.getText().toString().isEmpty()) {
+            if (question.getText().toString().isEmpty()) {
                 question.setError("Please enter the question");
                 question.requestFocus();
             } else if (group.getChildCount() == 0) {
@@ -125,7 +122,6 @@ public class Single_type_poll extends AppCompatActivity {
         button.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
-            polldetails.setTitle(title.getText().toString());
             polldetails.setQuestion(question.getText().toString());
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
@@ -186,7 +182,6 @@ public class Single_type_poll extends AppCompatActivity {
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
         c = group.getChildCount();
-        title = findViewById(R.id.title1);
         button = findViewById(R.id.post);
         question = findViewById(R.id.question);
         dialog=new KAlertDialog(Single_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);

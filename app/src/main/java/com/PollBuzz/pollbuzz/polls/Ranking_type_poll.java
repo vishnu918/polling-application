@@ -51,7 +51,7 @@ public class Ranking_type_poll extends AppCompatActivity {
     Button add;
     LinearLayout group;
     String name;
-    TextInputEditText title_ranking, question_ranking;
+    TextInputEditText question_ranking;
     MaterialButton post_ranking;
     int c;
     RadioButton b;
@@ -104,10 +104,7 @@ public class Ranking_type_poll extends AppCompatActivity {
 
         });
         post_ranking.setOnClickListener(view -> {
-            if (title_ranking.getText().toString().isEmpty()) {
-                title_ranking.setError("Please enter the question");
-                title_ranking.requestFocus();
-            } else if (question_ranking.getText().toString().isEmpty()) {
+           if (question_ranking.getText().toString().isEmpty()) {
                 question_ranking.setError("Please enter the question");
                 question_ranking.requestFocus();
             } else {
@@ -122,7 +119,6 @@ public class Ranking_type_poll extends AppCompatActivity {
         post_ranking.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
-            polldetails.setTitle(title_ranking.getText().toString().trim());
             polldetails.setQuestion(question_ranking.getText().toString().trim());
             polldetails.setCreated_date(formatteddate);
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
@@ -184,7 +180,6 @@ public class Ranking_type_poll extends AppCompatActivity {
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
         c = group.getChildCount();
-        title_ranking = findViewById(R.id.title_ranking);
         question_ranking = findViewById(R.id.question_ranking);
         post_ranking = findViewById(R.id.post_ranking);
         dialog=new KAlertDialog(Ranking_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);

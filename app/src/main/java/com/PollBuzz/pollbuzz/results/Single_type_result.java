@@ -35,7 +35,7 @@ import androidx.core.content.res.ResourcesCompat;
 import Utils.firebase;
 
 public class Single_type_result extends AppCompatActivity {
-    TextView title, query;
+    TextView  query;
     RadioGroup group;
     Map<String, Integer> options;
     String key;
@@ -82,8 +82,6 @@ public class Single_type_result extends AppCompatActivity {
                                 group.removeAllViews();
                                 dialog.dismiss();
                                 PollDetails polldetails = data.toObject(PollDetails.class);
-                                title.setText(polldetails.getTitle());
-                                title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                 query.setText(polldetails.getQuestion());
                                 options = polldetails.getMap();
                                 fb.getPollsCollection().document(key).collection("Response").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -157,8 +155,6 @@ public class Single_type_result extends AppCompatActivity {
 
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
-
-        title = findViewById(R.id.title);
         query = findViewById(R.id.query);
         group = findViewById(R.id.options);
         options = new HashMap<>();
