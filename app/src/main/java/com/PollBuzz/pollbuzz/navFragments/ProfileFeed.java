@@ -3,6 +3,7 @@ package com.PollBuzz.pollbuzz.navFragments;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
 
@@ -47,6 +48,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import Utils.ImagePickerActivity;
@@ -120,7 +123,6 @@ public class ProfileFeed extends Fragment {
 
     private void getData() {
         fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
-            profileRV.hideShimmerAdapter();
             if (task.isSuccessful() && task.getResult() != null) {
                 for (QueryDocumentSnapshot dS : task.getResult()) {
                     if (dS.get("pollId") != null)
@@ -135,6 +137,9 @@ public class ProfileFeed extends Fragment {
                             }
                         });
                 }
+            }else{
+                profileRV.hideShimmerAdapter();
+                Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -143,8 +148,14 @@ public class ProfileFeed extends Fragment {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
         polldetails.setUID(dS1.getId());
         mArrayList.add(polldetails);
-        profileRV.setLayoutAnimation(controller);
+        Collections.sort(mArrayList, new Comparator<PollDetails>() {
+            @Override
+            public int compare(PollDetails pollDetails, PollDetails t1) {
+                return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
+            }
+        });
         mAdapter.notifyDataSetChanged();
+        profileRV.hideShimmerAdapter();
         profileRV.scheduleLayoutAnimation();
     }
 
@@ -157,6 +168,7 @@ public class ProfileFeed extends Fragment {
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             onBackArrowPressed(toolbar);
         }
+        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         fb = new firebase();
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);
@@ -169,11 +181,11 @@ public class ProfileFeed extends Fragment {
         mArrayList = new ArrayList<>();
         mAdapter = new ProfileFeedAdapter(getContext(), mArrayList);
         profileRV.setAdapter(mAdapter);
+        profileRV.setLayoutAnimation(controller);
         profileRV.showShimmerAdapter();
         fab = view.findViewById(R.id.fab);
         Uname.setText(Utils.helper.getusernamePref(getContext()));
         loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
-        controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
     }
 
     private void onBackArrowPressed(Toolbar toolbar) {

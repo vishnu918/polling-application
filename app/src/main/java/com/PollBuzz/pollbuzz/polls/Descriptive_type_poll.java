@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -12,6 +13,7 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+
 import com.PollBuzz.pollbuzz.responses.Descriptive_type_response;
 import com.kinda.alert.KAlertDialog;
 
@@ -94,6 +96,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
             polldetails.setPoll_type("DESCRIPTIVE POLL");
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
+            polldetails.setTimestamp(Timestamp.now().getSeconds());
             CollectionReference docCreated = fb.getUserDocument().collection("Created");
             DocumentReference doc = fb.getPollsCollection().document();
             doc.set(polldetails)
@@ -101,6 +104,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
                         dialog.dismissWithAnimation();
                         Map<String, String> m = new HashMap<>();
                         m.put("pollId", doc.getId());
+                        m.put("timestamp",Timestamp.now().getSeconds());
                         docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {

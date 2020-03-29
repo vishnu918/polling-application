@@ -2,13 +2,27 @@ package com.PollBuzz.pollbuzz;
 
 public class VoteDetails {
     private String UserId,option,username,PollId,profileUrl;
+    private long timestamp;
 
-    public VoteDetails(String PollId, String option, String username,String UserId,String profileUrl) {
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getProfileUrl() {
+        return profileUrl;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public VoteDetails(String PollId, String option, String username, String UserId, String profileUrl, long timestamp) {
         this.PollId = PollId;
         this.UserId = UserId;
         this.option = option;
         this.username = username;
         this.profileUrl=profileUrl;
+        this.timestamp=timestamp;
     }
 
     public String getProgfileUrl() {

@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -46,7 +47,7 @@ public class Ranking_type_response extends AppCompatActivity {
     LinearLayout group,sequence;
     CollectionReference ref;
     Map<String,Integer> options;
-    Map<String,String> response;
+    Map<String, Object> response;
     String key;
     Typeface typeface;
     Dialog dialog;
@@ -174,6 +175,7 @@ public class Ranking_type_response extends AppCompatActivity {
             response.put("option"+i,resp.get(i));
 
         }
+        response.put("timestamp", Timestamp.now().getSeconds());
         submitResponse(fb);
         return;
     }
@@ -183,13 +185,23 @@ public class Ranking_type_response extends AppCompatActivity {
         fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Map<String,String> mapi = new HashMap<>();
+                Map<String, Object> mapi = new HashMap<>();
                 mapi.put("pollId", fb.getUserId());
-                Toast.makeText(getApplicationContext(),"Successfully submitted your response",Toast.LENGTH_LONG).show();
-                fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi);
-                Intent i=new Intent(Ranking_type_response.this,MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
+                mapi.put("timestamp", Timestamp.now().getSeconds());
+                fb.getUserDocument().collection("Voted").document(key).set(mapi).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), "Successfully submitted your response", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(Ranking_type_response.this, MainActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(i);
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
             }
         })
                 .addOnFailureListener(new OnFailureListener() {

@@ -2,6 +2,7 @@ package com.PollBuzz.pollbuzz.responses;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,7 +45,7 @@ public class Single_type_response extends AppCompatActivity {
      Dialog dialog;
     ImageButton home,logout;
     Button submit;
-    Map<String,String> response;
+    Map<String,Object> response;
     String resp;
     firebase fb;
 
@@ -74,12 +75,14 @@ public class Single_type_response extends AppCompatActivity {
 
     private void submitResponse(firebase fb) {
         response.put("option",resp);
+        response.put("timestamp",Timestamp.now().getSeconds());
 
         fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).set(response);
 
-        Map<String,String> mapi = new HashMap<>();
+        Map<String,Object> mapi = new HashMap<>();
         mapi.put("pollId",fb.getUserId());
-        fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi)
+        mapi.put("timestamp",Timestamp.now().getSeconds());
+        fb.getUserDocument().collection("Voted").document(key).set(mapi)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

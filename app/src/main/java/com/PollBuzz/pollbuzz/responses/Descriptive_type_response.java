@@ -3,6 +3,7 @@ package com.PollBuzz.pollbuzz.responses;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -73,9 +74,10 @@ public class Descriptive_type_response extends AppCompatActivity {
         System.out.println(response);
         fb.getPollsCollection().document(key).collection("Response")
                 .document(fb.getUserId()).set(response);
-        Map<String,String> mapi = new HashMap<>();
+        Map<String,Object> mapi = new HashMap<>();
         mapi.put("pollId", fb.getUserId());
-        fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi)
+        mapi.put("timestamp", Timestamp.now().getSeconds());
+        fb.getUserDocument().collection("Voted").document(key).set(mapi)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(Descriptive_type_response.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(Descriptive_type_response.this, MainActivity.class);
