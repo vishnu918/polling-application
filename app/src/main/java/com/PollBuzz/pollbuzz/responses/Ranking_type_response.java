@@ -43,7 +43,7 @@ import androidx.core.content.res.ResourcesCompat;
 public class Ranking_type_response extends AppCompatActivity {
 
     MaterialButton submit;
-    MaterialTextView title_ranking , query_ranking;
+    MaterialTextView query_ranking;
     LinearLayout group,sequence;
     CollectionReference ref;
     Map<String,Integer> options;
@@ -133,7 +133,6 @@ public class Ranking_type_response extends AppCompatActivity {
         response=new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Ranking_type_response.this);
-        title_ranking = findViewById(R.id.title);
         query_ranking = findViewById(R.id.query);
         submit = findViewById(R.id.submit);
         fb = new firebase();

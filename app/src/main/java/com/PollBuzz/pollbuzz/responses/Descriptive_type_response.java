@@ -34,7 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 public class Descriptive_type_response extends AppCompatActivity {
     Button submit;
-    TextView title,query;
+    TextView query;
     Map<String,String> response;
     Typeface typeface;
     Dialog dialog;
@@ -141,7 +141,6 @@ public class Descriptive_type_response extends AppCompatActivity {
 
     private void setGlobals(View view)
     {
-        title=findViewById(R.id.title);
         submit=findViewById(R.id.submit);
         query=findViewById(R.id.query);
         answer=findViewById(R.id.answer);

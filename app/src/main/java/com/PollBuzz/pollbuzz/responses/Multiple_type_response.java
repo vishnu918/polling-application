@@ -35,7 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 public class Multiple_type_response extends AppCompatActivity {
-    TextView title, query;
+    TextView query;
     LinearLayout group;
     Map<String,Integer> options;
     String key;
@@ -170,7 +170,6 @@ public class Multiple_type_response extends AppCompatActivity {
         home = view.findViewById(R.id.home);
         logout = view.findViewById(R.id.logout);
         c=0;
-        title=findViewById(R.id.title);
         submit=findViewById(R.id.submit);
         query=findViewById(R.id.query);
         group=findViewById(R.id.options);

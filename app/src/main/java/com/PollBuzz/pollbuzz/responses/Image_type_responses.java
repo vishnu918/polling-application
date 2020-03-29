@@ -41,7 +41,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 public class Image_type_responses extends AppCompatActivity {
 
-    TextView title , query;
+    TextView  query;
     ImageView image1 ,image2;
     RadioGroup group;
     RadioButton b1,b2;
@@ -224,7 +224,6 @@ public class Image_type_responses extends AppCompatActivity {
         update = new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Image_type_responses.this);
-        title = findViewById(R.id.title);
         query = findViewById(R.id.query);
         submit = findViewById(R.id.submit);
         image1 = findViewById(R.id.image1);
