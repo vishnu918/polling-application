@@ -45,6 +45,8 @@ public class Multiple_type_response extends AppCompatActivity {
     Button submit;
     firebase fb;
     int c;
+    Map<String,Integer> update;
+    PollDetails polldetails;
     Map<String,Object> response;
 
     @Override
@@ -71,6 +73,17 @@ public class Multiple_type_response extends AppCompatActivity {
     }
 
     private void submitResponse() {
+
+        Integer p = polldetails.getPollcount();
+        p++;
+        for(Map.Entry<String,String> e : response.entrySet()){
+            Integer i = update.get(e.getValue());
+            i++;
+            update.put(e.getValue(),i);
+        }
+        fb.getPollsCollection().document(key).update("pollcount",p);
+        fb.getPollsCollection().document(key).update("map",update);
+
         response.put("timestamp", Timestamp.now().getSeconds());
         fb.getPollsCollection().document(key).collection("Response")
                 .document(fb.getUserId()).set(response);
@@ -101,7 +114,7 @@ public class Multiple_type_response extends AppCompatActivity {
                         if (data.exists()) {
 
                             dialog.dismiss();
-                            PollDetails polldetails = data.toObject(PollDetails.class);
+                             polldetails = data.toObject(PollDetails.class);
                             title.setText(polldetails.getTitle());
                             title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                             query.setText(polldetails.getQuestion());
@@ -118,6 +131,7 @@ public class Multiple_type_response extends AppCompatActivity {
                                 button.setTypeface(typeface);
 
                                 button.setText(entry.getKey());
+                                update.put(entry.getKey(),entry.getValue());
                                 button.setTextSize(20.0f);
                                 group.addView(button);
                                 int finalI = i;
@@ -164,6 +178,7 @@ public class Multiple_type_response extends AppCompatActivity {
         group=findViewById(R.id.options);
         options=new HashMap<>();
         response=new HashMap<>();
+        update = new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Multiple_type_response.this);
         fb = new firebase();
