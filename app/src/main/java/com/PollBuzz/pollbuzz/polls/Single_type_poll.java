@@ -18,6 +18,7 @@ import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.responses.Single_type_response;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -43,6 +44,8 @@ import java.util.Map;
 
 import Utils.firebase;
 import Utils.helper;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,6 +61,7 @@ public class Single_type_poll extends AppCompatActivity {
     Date date = Calendar.getInstance().getTime();
     firebase fb;
     ImageButton home,logout;
+    KAlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +121,8 @@ public class Single_type_poll extends AppCompatActivity {
     }
 
     private void addToDatabase(String formattedDate) {
+        showDialog();
+        button.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
             polldetails.setTitle(title.getText().toString());
@@ -138,7 +144,8 @@ public class Single_type_poll extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Map<String, Object> m = new HashMap<>();
+                            dialog.dismissWithAnimation();
+                            Map<String, String> m = new HashMap<>();
                             m.put("pollId", doc.getId());
                             m.put("timestamp",Timestamp.now().getSeconds());
                             docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -150,12 +157,20 @@ public class Single_type_poll extends AppCompatActivity {
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
                                     } else
+                                    {
                                         Toast.makeText(Single_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        dialog.dismissWithAnimation();
+                                        button.setEnabled(true);
+                                    }
                                 }
                             });
                         }
                     })
-                    .addOnFailureListener(e -> Toast.makeText(Single_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(Single_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                        dialog.dismissWithAnimation();
+                        button.setEnabled(true);
+                    });
         }
     }
 
@@ -174,9 +189,18 @@ public class Single_type_poll extends AppCompatActivity {
         title = findViewById(R.id.title1);
         button = findViewById(R.id.post);
         question = findViewById(R.id.question);
+        dialog=new KAlertDialog(Single_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+
         if(group.getChildCount()==0)
             group.setVisibility(View.INVISIBLE);
     }
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Uploading your poll");
+        dialog.setCancelable(false);
+        dialog.show();
+    }
+
 
 
     public void showDialog(Activity activity, final RadioButton button,int flag){
