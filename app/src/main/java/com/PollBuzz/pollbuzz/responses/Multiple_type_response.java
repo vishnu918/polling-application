@@ -76,10 +76,10 @@ public class Multiple_type_response extends AppCompatActivity {
 
         Integer p = polldetails.getPollcount();
         p++;
-        for(Map.Entry<String,String> e : response.entrySet()){
+        for(Map.Entry<String,Object> e : response.entrySet()){
             Integer i = update.get(e.getValue());
             i++;
-            update.put(e.getValue(),i);
+            update.put(e.getValue().toString(),i);
         }
         fb.getPollsCollection().document(key).update("pollcount",p);
         fb.getPollsCollection().document(key).update("map",update);

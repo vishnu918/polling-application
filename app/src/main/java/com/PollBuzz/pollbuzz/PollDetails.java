@@ -14,6 +14,7 @@ public class PollDetails {
 
     public void setPollcount(Integer pollcount) {
         this.pollcount = pollcount;
+    }
     private long timestamp;
 
     public void setTimestamp(long timestamp) {
