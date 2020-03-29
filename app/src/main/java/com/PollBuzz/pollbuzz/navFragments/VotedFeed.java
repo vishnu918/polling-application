@@ -37,7 +37,7 @@ public class VotedFeed extends Fragment {
     private VotedFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
     private LinearLayoutManager layoutManager;
-    private FloatingActionButton fab;
+//    private FloatingActionButton fab;
     private CollectionReference userVotedRef;
     private firebase fb;
     private LayoutAnimationController controller;
@@ -56,16 +56,16 @@ public class VotedFeed extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setGlobals(view);
-        setListeners();
+//        setListeners();
         getData();
     }
 
-    private void setListeners() {
-        fab.setOnClickListener(view1 -> {
-            Intent i = new Intent(getContext(), PollList.class);
-            startActivity(i);
-        });
-    }
+//    private void setListeners() {
+//        fab.setOnClickListener(view1 -> {
+//            Intent i = new Intent(getContext(), PollList.class);
+//            startActivity(i);
+//        });
+//    }
 
     private void getData() {
         userVotedRef.get().addOnCompleteListener(task -> {
@@ -113,7 +113,7 @@ public class VotedFeed extends Fragment {
     private void setGlobals(@NonNull View view) {
         controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         viewed=view.findViewById(R.id.viewed);
-        fab = view.findViewById(R.id.fab);
+//        fab = view.findViewById(R.id.fab);
         votedRV = view.findViewById(R.id.votedrecyclerview);
         votedRV.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());

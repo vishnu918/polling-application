@@ -1,9 +1,14 @@
 package com.PollBuzz.pollbuzz;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import com.PollBuzz.pollbuzz.navFragments.HomeFeed;
 import com.PollBuzz.pollbuzz.navFragments.ProfileFeed;
 import com.PollBuzz.pollbuzz.navFragments.VotedFeed;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,22 +21,33 @@ public class MainActivity extends AppCompatActivity {
     public static Fragment active;
     public static Fragment fragment1, fragment2, fragment3;
     private FragmentManager fm;
+    private FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setGlobals();
         setBottomBar();
+        setListeners();
     }
 
     private void setGlobals() {
         bottomBar = findViewById(R.id.bottom);
+        fab = findViewById(R.id.fab);
+        YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
         fragment1 = new HomeFeed();
         fragment2 = new VotedFeed();
         fragment3 = new ProfileFeed();
         fm = getSupportFragmentManager();
         fm.beginTransaction().addToBackStack("1").add(R.id.container, fragment1, "1").commit();
         active = fragment1;
+    }
+    private void setListeners() {
+        fab.setOnClickListener(view1 -> {
+            Intent i = new Intent(MainActivity.this, PollList.class);
+            startActivity(i);
+        });
     }
 
     private void setBottomBar() {

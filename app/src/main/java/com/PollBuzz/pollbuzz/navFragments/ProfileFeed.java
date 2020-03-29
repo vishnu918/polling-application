@@ -71,7 +71,7 @@ public class ProfileFeed extends Fragment {
     private ProfileFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
     private firebase fb;
-    private FloatingActionButton fab;
+//    private FloatingActionButton fab;
     private LayoutAnimationController controller;
     private MaterialTextView viewed;
 
@@ -93,10 +93,10 @@ public class ProfileFeed extends Fragment {
     }
 
     private void setListeners() {
-        fab.setOnClickListener(view1 -> {
-            Intent i = new Intent(getContext(), PollList.class);
-            startActivity(i);
-        });
+//        fab.setOnClickListener(view1 -> {
+//            Intent i = new Intent(getContext(), PollList.class);
+//            startActivity(i);
+//        });
         edit.setOnClickListener(view1 -> {
             try {
                 Dexter.withActivity(getActivity())
@@ -190,7 +190,7 @@ public class ProfileFeed extends Fragment {
         profileRV.setAdapter(mAdapter);
         profileRV.setLayoutAnimation(controller);
         profileRV.showShimmerAdapter();
-        fab = view.findViewById(R.id.fab);
+//        fab = view.findViewById(R.id.fab);
         Uname.setText(Utils.helper.getusernamePref(getContext()));
         loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
     }
