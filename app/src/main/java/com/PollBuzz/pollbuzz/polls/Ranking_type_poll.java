@@ -13,6 +13,7 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -39,6 +40,8 @@ import java.util.Map;
 
 import Utils.firebase;
 import Utils.helper;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,6 +58,7 @@ public class Ranking_type_poll extends AppCompatActivity {
     ImageButton home,logout;
     Date date = Calendar.getInstance().getTime();
     firebase fb;
+    KAlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +117,8 @@ public class Ranking_type_poll extends AppCompatActivity {
     }
 
     private void addToDatabase(String formatteddate) {
+        showDialog();
+        post_ranking.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
             polldetails.setTitle(title_ranking.getText().toString().trim());
@@ -133,6 +139,7 @@ public class Ranking_type_poll extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            dialog.dismissWithAnimation();
                             Map<String, String> m = new HashMap<>();
                             m.put("pollId", doc.getId());
                             docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -145,12 +152,18 @@ public class Ranking_type_poll extends AppCompatActivity {
                                         startActivity(intent);
                                     } else {
                                         Toast.makeText(Ranking_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        dialog.dismissWithAnimation();
+                                        post_ranking.setEnabled(true);
                                     }
                                 }
                             });
                         }
                     })
-                    .addOnFailureListener(e -> Toast.makeText(Ranking_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(Ranking_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                        post_ranking.setEnabled(true);
+                        dialog.dismissWithAnimation();
+                    });
         }
     }
 
@@ -170,8 +183,18 @@ public class Ranking_type_poll extends AppCompatActivity {
         title_ranking = findViewById(R.id.title_ranking);
         question_ranking = findViewById(R.id.question_ranking);
         post_ranking = findViewById(R.id.post_ranking);
+        dialog=new KAlertDialog(Ranking_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+
+
         if (group.getChildCount() == 0)
             group.setVisibility(View.INVISIBLE);
+    }
+
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Uploading your poll");
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     public void showDialog(Activity activity, final RadioButton button,int flag){

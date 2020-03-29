@@ -19,6 +19,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.kinda.alert.KAlertDialog;
 
 import android.Manifest;
 import android.app.Activity;
@@ -51,6 +52,8 @@ import java.util.Map;
 import Utils.ImagePickerActivity;
 import Utils.firebase;
 import Utils.helper;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -71,6 +74,7 @@ public class Image_type_poll extends AppCompatActivity {
     private int requestCode = 0;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     final String formatteddate = dateFormat.format(date);
+    KAlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +190,8 @@ public class Image_type_poll extends AppCompatActivity {
         title_image = findViewById(R.id.title_imagetype);
         question_image = findViewById(R.id.question_imagetype);
         c = group.getChildCount();
+        dialog=new KAlertDialog(Image_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+
     }
 
     private void showImagePickerOptions() {
@@ -209,6 +215,13 @@ public class Image_type_poll extends AppCompatActivity {
             }
         });
     }
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Uploading your poll");
+        dialog.setCancelable(false);
+        dialog.show();
+    }
+
 
     private void launchCameraIntent() {
         Intent intent = new Intent(Image_type_poll.this, ImagePickerActivity.class);
@@ -264,6 +277,8 @@ public class Image_type_poll extends AppCompatActivity {
     }
 
     private void addToStorage() {
+        showDialog();
+        post_image.setEnabled(false);
         PollDetails polldetails = new PollDetails();
         polldetails.setTitle(title_image.getText().toString().trim());
         polldetails.setQuestion(question_image.getText().toString().trim());
@@ -290,6 +305,7 @@ public class Image_type_poll extends AppCompatActivity {
                             if (compressedImage1 != null) {
                                 mRef1.putBytes(compressedImage1)
                                         .addOnSuccessListener(taskSnapshot1 -> {
+                                            dialog.dismissWithAnimation();
                                             mRef1.getDownloadUrl().addOnSuccessListener(uri1 -> {
                                                 String imagePath1 = uri1.toString();
                                                 Log.d("ImagePath",imagePath1);
@@ -306,6 +322,8 @@ public class Image_type_poll extends AppCompatActivity {
                                             public void onFailure(@NonNull Exception exception) {
                                                 exception.printStackTrace();
                                                 Log.d("Exception", exception.toString());
+                                                dialog.dismissWithAnimation();
+                                                post_image.setEnabled(true);
                                             }
                                         })
                                         .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {

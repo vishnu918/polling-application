@@ -13,6 +13,7 @@ import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.responses.Descriptive_type_response;
+import com.kinda.alert.KAlertDialog;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ import java.util.Map;
 
 import Utils.firebase;
 import Utils.helper;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +42,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
     firebase fb;
     ImageButton home,logout;
     Date date = Calendar.getInstance().getTime();
+   KAlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,8 @@ public class Descriptive_type_poll extends AppCompatActivity {
     }
 
     private void addToDatabase(String formatteddate) {
+        showDialog();
+        post_descriptive.setEnabled(false);
         if (fb.getUser() != null) {
             PollDetails polldetails = new PollDetails();
             polldetails.setTitle(title_descriptive.getText().toString().trim());
@@ -92,6 +98,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
             DocumentReference doc = fb.getPollsCollection().document();
             doc.set(polldetails)
                     .addOnSuccessListener(aVoid -> {
+                        dialog.dismissWithAnimation();
                         Map<String, String> m = new HashMap<>();
                         m.put("pollId", doc.getId());
                         docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -104,14 +111,27 @@ public class Descriptive_type_poll extends AppCompatActivity {
                                     startActivity(intent);
                                 } else {
                                     Toast.makeText(Descriptive_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    dialog.dismissWithAnimation();
+                                    post_descriptive.setEnabled(true);
                                 }
                             }
                         });
 
                     })
-                    .addOnFailureListener(e -> Toast.makeText(Descriptive_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(Descriptive_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                        dialog.dismissWithAnimation();
+                        post_descriptive.setEnabled(true);
+                    });
         }
     }
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Uploading your poll");
+        dialog.setCancelable(false);
+        dialog.show();
+    }
+
 
     private void setGlobals() {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -124,5 +144,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
         post_descriptive = findViewById(R.id.post_descriptive);
         title_descriptive = findViewById(R.id.title_descriptive);
         question_descriptive = findViewById(R.id.question_descriptive);
+        dialog=new KAlertDialog(Descriptive_type_poll.this,SweetAlertDialog.PROGRESS_TYPE);
+
     }
 }
