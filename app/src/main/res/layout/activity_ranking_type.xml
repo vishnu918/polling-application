@@ -95,15 +95,19 @@
                     />
 
 
-
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/white"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="10dp"
+                    >
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:id="@+id/options"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_marginVertical="10dp"
-                    android:background="@drawable/circle"
+                    android:padding="10dp"
                     android:tag="Options"
                     >
                     <RadioButton
@@ -120,16 +124,19 @@
 
 
                 </LinearLayout>
-                <com.google.android.material.button.MaterialButton
+                </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:cornerRadius="20dp"
-                    android:text="+Add option"
+                    android:text="Add option"
                     android:fontFamily="@font/maven_pro"
                     android:textStyle="bold"
                     android:layout_margin="10dp"
-                    android:padding="12dp"
-                    android:textSize="15sp"
+                    android:padding="10dp"
+                    android:textSize="17sp"
+                    app:backgroundTint="@color/white"
+                    android:textColor="@color/colorPrimaryDark"
                     android:id="@+id/add"/>
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/post_ranking"
@@ -143,6 +150,7 @@
                     android:layout_marginTop="50dp"
                     android:padding="10dp"
                     android:textSize="15sp"
+                    app:elevation="10dp"
                     android:stateListAnimator="@animator/button_anim"/>
 
 

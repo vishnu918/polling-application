@@ -167,6 +167,7 @@
                         android:layout_marginTop="50dp"
                         android:padding="10dp"
                         android:textSize="15sp"
+                        app:elevation="10dp"
                         android:stateListAnimator="@animator/button_anim"/>
 
 
