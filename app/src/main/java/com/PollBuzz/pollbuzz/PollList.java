@@ -40,10 +40,10 @@ public class PollList extends AppCompatActivity {
             startActivity(intent);
         });
 
-        card3.setOnClickListener(view -> {
-            Intent intent = new Intent(PollList.this, Descriptive_type_poll.class);
-            startActivity(intent);
-        });
+//        card3.setOnClickListener(view -> {
+//            Intent intent = new Intent(PollList.this, Descriptive_type_poll.class);
+//            startActivity(intent);
+//        });
 
         card4.setOnClickListener(view -> {
             Intent intent = new Intent(PollList.this, Ranking_type_poll.class);
@@ -67,7 +67,7 @@ public class PollList extends AppCompatActivity {
         view.findViewById(R.id.logout).setVisibility(View.INVISIBLE);
         card1 = findViewById(R.id.card1);
         card2 = findViewById(R.id.card2);
-        card3 = findViewById(R.id.card3);
+//        card3 = findViewById(R.id.card3);
         card4 = findViewById(R.id.card4);
         card5 = findViewById(R.id.card5);
     }

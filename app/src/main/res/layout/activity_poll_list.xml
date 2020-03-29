@@ -54,13 +54,14 @@
                     android:layout_gravity="center_horizontal"
                     android:fontFamily="@font/maven_pro"
                     android:padding="10dp"
-                    android:text="SINGLE ANSWER POLL"
+                    android:text="SINGLE CHOICE"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     />
                 <TextView
+                    android:gravity="center_horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="12dp"
@@ -103,13 +104,14 @@
                 android:textAlignment="center"
                 android:textStyle="bold"
                 android:textColor="@color/white"
-                android:text="MULTI ANSWER POLL"
+                android:text="MULTI SELECT"
                 android:fontFamily="@font/maven_pro"
                 />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="12dp"
+                android:gravity="center_horizontal"
                 android:textSize="15sp"
                 android:textColor="@color/white"
                 android:text="Multiple options can be selected"/>
@@ -117,44 +119,44 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="10dp"
-        android:layout_marginVertical="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        app:cardBackgroundColor="@color/colorPrimaryDark"
-        android:stateListAnimator="@animator/card_anim">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:padding="10dp"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:text="DESCRIPTIVE POLL"
-                android:fontFamily="@font/maven_pro"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:padding="12dp"
-                android:textColor="@color/white"
-                android:text="Descriptive responses have to be entered"/>
-        </LinearLayout>
+<!--    <com.google.android.material.card.MaterialCardView-->
+<!--        android:id="@+id/card3"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:cardCornerRadius="12dp"-->
+<!--        app:cardElevation="10dp"-->
+<!--        android:layout_marginVertical="20dp"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginLeft="20dp"-->
+<!--        android:layout_marginRight="20dp"-->
+<!--        android:layout_marginEnd="20dp"-->
+<!--        app:cardBackgroundColor="@color/colorPrimaryDark"-->
+<!--        android:stateListAnimator="@animator/card_anim">-->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center_horizontal"-->
+<!--                android:padding="10dp"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textAlignment="center"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:text="DESCRIPTIVE POLL"-->
+<!--                android:fontFamily="@font/maven_pro"/>-->
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textSize="15sp"-->
+<!--                android:padding="12dp"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:text="Descriptive responses have to be entered"/>-->
+<!--        </LinearLayout>-->
 
-    </com.google.android.material.card.MaterialCardView>
+<!--    </com.google.android.material.card.MaterialCardView>-->
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card4"
@@ -182,9 +184,10 @@
                 android:textAlignment="center"
                 android:textStyle="bold"
                 android:textColor="@color/white"
-                android:text="PRIORITY POLL"
+                android:text="RANKED"
                 android:fontFamily="@font/maven_pro"/>
             <TextView
+                android:gravity="center_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="12dp"
@@ -210,9 +213,6 @@
         app:cardBackgroundColor="@color/colorPrimaryDark"
         android:stateListAnimator="@animator/card_anim"
         >
-
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -224,12 +224,13 @@
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/maven_pro"
                 android:padding="10dp"
-                android:text="IMAGE POLL"
+                android:text="PICTURE BASED"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
             <TextView
+                android:gravity="center_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="12dp"

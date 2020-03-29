@@ -114,13 +114,23 @@ public class PercentageResult extends AppCompatActivity {
                 progressBar.setScaleY(5);
                 relativeLayout1.addView(progressBar);
                 TextView textView = new TextView(this);
-                Integer per = (entry.getValue() / total) * 100;
-                textView.setText(per+"%");
-                progressBar.setProgress(per);
-                textView.setLayoutParams(layoutParams);
-                textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                relativeLayout1.addView(textView);
-                linearLayout.addView(relativeLayout1);
+                if(total!=0) {
+                    Integer per = (entry.getValue() / total) * 100;
+                    textView.setText(per + "%");
+                    progressBar.setProgress(per);
+                    textView.setLayoutParams(layoutParams);
+                    textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                    relativeLayout1.addView(textView);
+                    linearLayout.addView(relativeLayout1);
+                }else{
+                    Integer per = 0;
+                    textView.setText(per + "%");
+                    progressBar.setProgress(per);
+                    textView.setLayoutParams(layoutParams);
+                    textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                    relativeLayout1.addView(textView);
+                    linearLayout.addView(relativeLayout1);
+                }
 
             }
 
@@ -128,34 +138,31 @@ public class PercentageResult extends AppCompatActivity {
         else {
 
             for (Map.Entry<String, Integer> entry : map.entrySet()) {
-                RelativeLayout relativeLayout = new RelativeLayout(getApplicationContext());
+                LinearLayout linearLayout1 = new LinearLayout(getApplicationContext());
+                linearLayout1.setOrientation(LinearLayout.VERTICAL);
                 ProgressBar progressBar = new ProgressBar(PercentageResult.this, null, android.R.attr.progressBarStyleHorizontal);
                 progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(30, 10, 30, 10);
                 progressBar.setLayoutParams(layoutParams);
                 progressBar.setScaleY(5);
-                relativeLayout.addView(progressBar);
                 TextView textView = new TextView(this);
                 Log.d("option", entry.getKey());
                 if (total != 0) {
                     Integer per = (entry.getValue() / total) * 100;
                     textView.setText(entry.getKey() + " - " + per + "%");
                     progressBar.setProgress(per);
-                    textView.setLayoutParams(layoutParams);
-                    textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                    relativeLayout.addView(textView);
-                    linearLayout.addView(relativeLayout);
                 }
                 else {
                     Integer per = 0;
                     textView.setText(entry.getKey() + " - " + per + "%");
                     progressBar.setProgress(per);
-                    textView.setLayoutParams(layoutParams);
-                    textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                    relativeLayout.addView(textView);
-                    linearLayout.addView(relativeLayout);
                 }
+                textView.setLayoutParams(layoutParams);
+                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout1.addView(textView);
+                linearLayout1.addView(progressBar);
+                linearLayout.addView(linearLayout1);
             }
         }
     }
