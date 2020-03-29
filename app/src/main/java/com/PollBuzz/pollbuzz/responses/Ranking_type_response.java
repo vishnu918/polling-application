@@ -97,8 +97,6 @@ public class Ranking_type_response extends AppCompatActivity {
                     {   group.removeAllViews();
                         dialog.dismiss();
                         PollDetails polldetails=data.toObject(PollDetails.class);
-                        title_ranking.setText(polldetails.getTitle());
-                        title_ranking.setPaintFlags(title_ranking.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                         query_ranking.setText(polldetails.getQuestion());
                         options=polldetails.getMap();
                         c=options.size();

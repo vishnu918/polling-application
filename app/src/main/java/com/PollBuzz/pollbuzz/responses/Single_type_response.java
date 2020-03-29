@@ -123,8 +123,6 @@ public class Single_type_response extends AppCompatActivity {
                                     group.removeAllViews();
                                     dialog.dismiss();
                                      polldetails = data.toObject(PollDetails.class);
-                                    title.setText(polldetails.getTitle());
-                                    title.setPaintFlags(title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                                     query.setText(polldetails.getQuestion());
                                     options = polldetails.getMap();
 

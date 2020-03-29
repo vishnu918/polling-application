@@ -170,7 +170,6 @@ public class Image_type_responses extends AppCompatActivity {
                             {
                                 dialog.dismiss();
                                  polldetails = snapshot.toObject(PollDetails.class);
-                                title.setText(polldetails.getTitle().trim());
                                 query.setText(polldetails.getQuestion().trim());
                                 options =polldetails.getMap();
                                 int i=0;

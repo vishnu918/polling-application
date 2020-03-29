@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class PollDetails {
 
-    private String title, question, created_date, expiry_date, poll_type, author, UID,authorUID;
+    private String question, created_date, expiry_date, poll_type, author, UID,authorUID;
     private Map<String, Integer> map;
     private Integer pollcount=0;
 
@@ -55,14 +55,6 @@ public class PollDetails {
 
     public void setMap(Map<String, Integer> map) {
         this.map = map;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getQuestion() {

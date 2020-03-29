@@ -98,8 +98,6 @@ public class Descriptive_type_response extends AppCompatActivity {
                     {
                         dialog.dismiss();
                         PollDetails polldetails=data.toObject(PollDetails.class);
-                        title.setText(polldetails.getTitle());
-                        title.setPaintFlags(title.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
                         query.setText(polldetails.getQuestion());
                     }
                 }
