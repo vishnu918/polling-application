@@ -46,7 +46,12 @@
             android:layout_alignParentRight="true"
             android:layout_marginEnd="10dp"
             app:backgroundTint="@color/white"
-        android:src="@drawable/ic_add_primary_dark_24dp"
-        app:elevation="10dp"/>
+            android:tooltipText="Add Poll"
+            app:maxImageSize="40dp"
+            app:borderWidth="0dp"
+            app:pressedTranslationZ="12dp"
+            app:rippleColor="@color/colorPrimary"
+            android:src="@drawable/ic_add_primary_dark_24dp"
+            app:elevation="10dp"/>
 
 </RelativeLayout>

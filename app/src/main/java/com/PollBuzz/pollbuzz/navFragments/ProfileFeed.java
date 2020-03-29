@@ -124,18 +124,22 @@ public class ProfileFeed extends Fragment {
     private void getData() {
         fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                for (QueryDocumentSnapshot dS : task.getResult()) {
-                    if (dS.get("pollId") != null)
-                        fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
-                            if (task1.isSuccessful() && task1.getResult() != null) {
-                                DocumentSnapshot dS1 = task1.getResult();
-                                if (dS1.exists()) {
-                                    addToRecyclerView(dS1);
+                if(!task.getResult().isEmpty()) {
+                    for (QueryDocumentSnapshot dS : task.getResult()) {
+                        if (dS.get("pollId") != null)
+                            fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
+                                if (task1.isSuccessful() && task1.getResult() != null) {
+                                    DocumentSnapshot dS1 = task1.getResult();
+                                    if (dS1.exists()) {
+                                        addToRecyclerView(dS1);
+                                    }
+                                } else {
+                                    Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                            });
+                    }
+                }else{
+                    profileRV.hideShimmerAdapter();
                 }
             }else{
                 profileRV.hideShimmerAdapter();
@@ -284,7 +288,6 @@ public class ProfileFeed extends Fragment {
 
     private void addToStorage(Uri uri) {
         StorageReference mRef = fb.getStorageReference().child("images/" + fb.getUserId());
-        Bitmap bmp = null;
         byte[] compressedImage = compressImage(uri);
         if (compressedImage != null) {
             mRef.putBytes(compressedImage)

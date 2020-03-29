@@ -60,8 +60,12 @@ public class HomeFeed extends Fragment {
     private void getData() {
         fb.getPollsCollection().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                for (QueryDocumentSnapshot dS : task.getResult()) {
+                if (!task.getResult().isEmpty()) {
+                    for (QueryDocumentSnapshot dS : task.getResult()) {
                         addToRecyclerView(dS);
+                    }
+                } else {
+                    recyclerView.hideShimmerAdapter();
                 }
             } else {
                 recyclerView.hideShimmerAdapter();
@@ -97,10 +101,10 @@ public class HomeFeed extends Fragment {
                                     return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
                                 }
                             });
-                            adapter.notifyDataSetChanged();
-                            recyclerView.hideShimmerAdapter();
-                            recyclerView.scheduleLayoutAnimation();
                         }
+                    adapter.notifyDataSetChanged();
+                    recyclerView.hideShimmerAdapter();
+                    recyclerView.scheduleLayoutAnimation();
                 }
             });
     }
