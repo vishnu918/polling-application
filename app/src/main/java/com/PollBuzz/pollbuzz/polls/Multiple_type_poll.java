@@ -143,7 +143,7 @@ public class Multiple_type_poll extends AppCompatActivity {
             doc.set(polldetails)
                     .addOnSuccessListener(aVoid -> {
                         dialog.dismissWithAnimation();
-                        Map<String, String> m = new HashMap<>();
+                        Map<String, Object> m = new HashMap<>();
                         m.put("pollId", doc.getId());
                         m.put("timestamp",Timestamp.now().getSeconds());
                         docCreated.document().set(m);

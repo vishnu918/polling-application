@@ -145,7 +145,7 @@ public class Single_type_poll extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             dialog.dismissWithAnimation();
-                            Map<String, String> m = new HashMap<>();
+                            Map<String, Object> m = new HashMap<>();
                             m.put("pollId", doc.getId());
                             m.put("timestamp",Timestamp.now().getSeconds());
                             docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
