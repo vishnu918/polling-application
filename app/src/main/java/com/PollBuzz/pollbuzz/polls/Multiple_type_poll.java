@@ -120,7 +120,7 @@ public class Multiple_type_poll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 v.showContextMenu();
-                option1.setChecked(false);
+                option2.setChecked(false);
             }
         });
 
