@@ -100,7 +100,7 @@
             android:theme="@style/NoActionBar" />
         <activity
             android:name=".LoginSignup.LoginSignupActivity"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="unspecified" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="unspecified"
