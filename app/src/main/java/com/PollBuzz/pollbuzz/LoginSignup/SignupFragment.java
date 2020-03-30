@@ -4,6 +4,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import com.PollBuzz.pollbuzz.R;
+import com.kinda.alert.KAlertDialog;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,12 +17,14 @@ import Utils.firebase;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class SignupFragment extends Fragment {
 
     private TextInputLayout emailL, passwordL, password2L;
     private Button signup;
     private firebase fb;
+    private KAlertDialog dialog;
 
     public SignupFragment() {
     }
@@ -63,13 +66,16 @@ public class SignupFragment extends Fragment {
             passwordL.requestFocus();
         } else {
             try {
+                showDialog();
                 fb.getAuth().createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        dialog.dismissWithAnimation();
                         fb.getUser().sendEmailVerification().addOnCompleteListener(task1 -> {
                             Toast.makeText(getContext(), "Signup successful.\nPlease verify your mail.", Toast.LENGTH_LONG).show();
                             fb.signOut();
                         });
                     } else {
+                        dialog.dismissWithAnimation();
                         Toast.makeText(getContext(), task.getException().toString(), Toast.LENGTH_LONG).show();
                         passwordL.getEditText().getText().clear();
                         password2L.getEditText().getText().clear();
@@ -86,6 +92,13 @@ public class SignupFragment extends Fragment {
         passwordL = (TextInputLayout) view.findViewById(R.id.password);
         password2L = (TextInputLayout) view.findViewById(R.id.password2);
         signup = view.findViewById(R.id.signup);
+        dialog=new KAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
         fb = new firebase();
+    }
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Creating account...");
+        dialog.setCancelable(false);
+        dialog.show();
     }
 }

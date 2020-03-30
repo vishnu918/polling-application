@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.R;
+import com.kinda.alert.KAlertDialog;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import Utils.firebase;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginFragment extends Fragment {
 
@@ -37,6 +39,7 @@ public class LoginFragment extends Fragment {
     private SignInButton gsignin;
     private GoogleSignInClient googleSignInClient;
     private firebase fb;
+    private KAlertDialog dialog;
 
     public LoginFragment() {
     }
@@ -65,6 +68,7 @@ public class LoginFragment extends Fragment {
         password = (TextInputLayout) view.findViewById(R.id.password);
         login = view.findViewById(R.id.login);
         gsignin = view.findViewById(R.id.gsignin);
+        dialog=new KAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
         fb = new firebase();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com")
@@ -84,18 +88,22 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getContext(), "Password can't be empty", Toast.LENGTH_SHORT).show();
             this.password.requestFocus();
         } else {
+            showDialog();
             fb.getAuth().signInWithEmailAndPassword(emailS, passwordS).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     if (!fb.getUser().isEmailVerified()) {
+                        dialog.dismissWithAnimation();
                         Toast.makeText(getContext(), "Please verify your mail.", Toast.LENGTH_SHORT).show();
                         fb.signOut();
                     } else {
                         fb.getUserDocument().get().addOnCompleteListener(task1 -> {
                             if (task1.isSuccessful()) {
+                                dialog.dismissWithAnimation();
                                 Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
                                 DocumentSnapshot dS = task1.getResult();
                                 isProfileSet(dS);
                             } else {
+                                dialog.dismissWithAnimation();
                                 Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 password.getEditText().getText().clear();
                             }
@@ -161,16 +169,19 @@ public class LoginFragment extends Fragment {
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         try {
+            showDialog();
             final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
             fb.getAuth().signInWithCredential(credential)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             fb.getUserDocument().get().addOnCompleteListener(task1 -> {
                                 if (task1.isSuccessful()) {
+                                    dialog.dismissWithAnimation();
                                     Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
                                     DocumentSnapshot dS = task1.getResult();
                                     isProfileSet(dS);
                                 } else {
+                                    dialog.dismissWithAnimation();
                                     Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     Log.d("UID", task1.getException().toString());
                                     password.getEditText().getText().clear();
@@ -183,5 +194,11 @@ public class LoginFragment extends Fragment {
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
+    }
+    private void showDialog() {
+        dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog.setTitleText("Getting things ready for you...");
+        dialog.setCancelable(false);
+        dialog.show();
     }
 }

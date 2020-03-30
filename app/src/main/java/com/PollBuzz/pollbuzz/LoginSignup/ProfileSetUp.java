@@ -305,10 +305,6 @@ public class ProfileSetUp extends AppCompatActivity {
     }
 
     private void createProfile(String nameS, String unameS, String bday) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Creating profile...");
-        progressDialog.setMessage("Please Wait...");
-        progressDialog.show();
         Map<String, String> data = new HashMap<>();
         data.put("name", nameS);
         data.put("username", unameS);
@@ -328,7 +324,6 @@ public class ProfileSetUp extends AppCompatActivity {
         }catch (Exception e){
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
-        progressDialog.dismiss();
     }
 
     private void addToDatabase(String unameS, Map<String, String> data) {
@@ -466,7 +461,7 @@ public class ProfileSetUp extends AppCompatActivity {
     }
     private void showDialog() {
         dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        dialog.setTitleText("Uploading your profile");
+        dialog.setTitleText("Creating profile...");
         dialog.setCancelable(false);
         dialog.show();
     }
