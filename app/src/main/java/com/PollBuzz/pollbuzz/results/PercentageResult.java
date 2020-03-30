@@ -113,17 +113,16 @@ public class PercentageResult extends AppCompatActivity {
             for(Map.Entry<String,Integer> entry : map.entrySet()){
                 ImageView imageView = new ImageView(this);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(200, 200);
+                layoutParams.setMargins(30, 10, 10, 10);
                 imageView.setLayoutParams(layoutParams);
-                imageView.setBackgroundResource(R.drawable.circle);
                 loadProfilePic(imageView,entry.getKey());
-                linearLayout.addView(imageView);
                 LinearLayout linearLayout1 = new LinearLayout(getApplicationContext());
                 linearLayout1.setOrientation(LinearLayout.VERTICAL);
                 LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 layoutParams1.setMargins(30, 40, 10, 40);
                 linearLayout1.setLayoutParams(layoutParams1);
                 LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(30, 10, 10, 10);
+                layoutParams2.setMargins(30, 10, 10, 10);
                 ProgressBar progressBar = new ProgressBar(PercentageResult.this, null, android.R.attr.progressBarStyleHorizontal);
                 progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
                 progressBar.setLayoutParams(layoutParams2);
@@ -131,32 +130,37 @@ public class PercentageResult extends AppCompatActivity {
 
                 TextView textView = new TextView(this);
                 TextView voted_by = new TextView(this);
+                textView.setTypeface(typeface);
+                voted_by.setTypeface(typeface);
                 int v_by;
                 if(total!=0) {
                     Integer per = (int) ((entry.getValue() / total) * 100);
                     textView.setText(per + "%");
                     progressBar.setProgress(per);
-                    textView.setLayoutParams(layoutParams);
                     v_by=entry.getValue();
                     String text="Voted by: "+v_by;
-                    voted_by.setText(text);
-                    linearLayout1.addView(textView);
-                    linearLayout1.addView(progressBar);
-                    linearLayout1.addView(voted_by);
-                    linearLayout.addView(linearLayout1);
-                }else{
+                    voted_by.setText(text);}
+
+
+                else{
                     Integer per = 0;
                     textView.setText(per + "%");
                     String text="Voted by: "+0;
                     voted_by.setText(text);
                     progressBar.setProgress(per);
-                    textView.setLayoutParams(layoutParams);
-                    linearLayout1.addView(textView);
-                    linearLayout1.addView(progressBar);
-                    linearLayout1.addView(voted_by);
-                    linearLayout.addView(linearLayout1);
 
                 }
+                textView.setLayoutParams(layoutParams2);
+                voted_by.setLayoutParams(layoutParams2);
+                textView.setTextSize(20.0f);
+                voted_by.setTextSize(20.0f);
+                textView.setTextColor(getResources().getColor(R.color.black));
+                voted_by.setTextColor(getResources().getColor(R.color.black));
+            linearLayout1.addView(imageView);
+                linearLayout1.addView(textView);
+            linearLayout1.addView(progressBar);
+            linearLayout1.addView(voted_by);
+            linearLayout.addView(linearLayout1);
 
             }
 
