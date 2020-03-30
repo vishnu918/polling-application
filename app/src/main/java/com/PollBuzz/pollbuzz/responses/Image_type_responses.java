@@ -51,7 +51,7 @@ public class Image_type_responses extends AppCompatActivity {
     RadioButton b1,b2;
     MaterialButton submit;
     Map<String,Integer> options,update;
-    Map<String,String> response;
+    Map<String,Object> response;
     String key,imageoption1,imageoption2;
     Typeface typeface;
     Dialog dialog;
@@ -130,30 +130,29 @@ public class Image_type_responses extends AppCompatActivity {
         fb.getPollsCollection().document(key).update("map",update);
         if (fb.getUser() != null)
         {
+            response.put("timestamp",Timestamp.now().getSeconds());
             fb.getPollsCollection().document(key).collection("Response")
-                    .document(fb.getUserId()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Map<String,Object> mapi = new HashMap<>();
-                    mapi.put("pollId", fb.getUserId());
-                    mapi.put("timestamp", Timestamp.now().getSeconds());
-                    fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
-                                Intent i=new Intent(Image_type_responses.this, MainActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(i);
+                    .document(fb.getUserId()).set(response).addOnSuccessListener(aVoid -> {
+                        Map<String,Object> mapi = new HashMap<>();
+                        mapi.put("pollId", fb.getUserId());
+                        mapi.put("timestamp", Timestamp.now().getSeconds());
+                        fb.getUsersCollection().document(fb.getUserId()).collection("Voted").document(key).set(mapi).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    dialog1.dismissWithAnimation();
+                                    Toast.makeText(Image_type_responses.this, "Successfully submitted your response", Toast.LENGTH_SHORT).show();
+                                    Intent i1 =new Intent(Image_type_responses.this, MainActivity.class);
+                                    i1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i1);
+                                }
+                                else{
+                                    dialog1.dismissWithAnimation();
+                                    Toast.makeText(Image_type_responses.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
                             }
-                            else{
-                                dialog1.dismissWithAnimation();
-                                Toast.makeText(Image_type_responses.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }
-            })
+                        });
+                    })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {

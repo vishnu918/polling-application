@@ -1,12 +1,7 @@
 package com.PollBuzz.pollbuzz.results;
 
-import com.PollBuzz.pollbuzz.PollDetails;
-import com.PollBuzz.pollbuzz.responses.Ranking_type_response;
-import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
@@ -14,6 +9,7 @@ import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.VoteDetails;
 import com.PollBuzz.pollbuzz.adapters.VoterPageAdapter;
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import Utils.firebase;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,10 +42,12 @@ public class ResultActivity extends AppCompatActivity {
     String UID,type;
     firebase fb;
     private LayoutAnimationController controller;
+    private MaterialTextView viewed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_result);
         setGlobals();
         Intent intent = getIntent();
         getIntentExtras(intent);
@@ -64,8 +61,9 @@ public class ResultActivity extends AppCompatActivity {
             fb.getPollsCollection().document(UID).collection("Response").get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult()!=null) {
                     QuerySnapshot querySnapshot = task.getResult();
+                    if(!querySnapshot.isEmpty()) {
                         for (DocumentSnapshot dS : querySnapshot) {
-                            long timestamp=(long) dS.get("timestamp");
+                            long timestamp = (long) dS.get("timestamp");
                             fb.getUsersCollection().document(dS.getId()).get()
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful() && task1.getResult() != null) {
@@ -75,9 +73,9 @@ public class ResultActivity extends AppCompatActivity {
                                             Log.d("type", author.toString());
                                             VoteDetails voteDetails;
                                             if (imageUrl != null)
-                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), imageUrl.toString(),timestamp);
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), imageUrl.toString(), timestamp);
                                             else
-                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null,timestamp);
+                                                voteDetails = new VoteDetails(UID, type, author.toString(), dS.getId(), null, timestamp);
                                             mVoteDetailsList.add(voteDetails);
                                             Collections.sort(mVoteDetailsList, new Comparator<VoteDetails>() {
                                                 @Override
@@ -91,6 +89,10 @@ public class ResultActivity extends AppCompatActivity {
                                         }
                                     });
                         }
+                    }else {
+                        voteRV.hideShimmerAdapter();
+                        viewed.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     voteRV.hideShimmerAdapter();
                     Toast.makeText(ResultActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -119,12 +121,12 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void setGlobals() {
-        setContentView(R.layout.activity_result);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
         home = view.findViewById(R.id.home);
+        viewed = findViewById(R.id.viewed);
         logout = view.findViewById(R.id.logout);
         page_title=view.findViewById(R.id.page_title);
         fb=new firebase();

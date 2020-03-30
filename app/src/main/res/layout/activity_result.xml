@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".results.ResultActivity">
-
+    <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:fontFamily="@font/maven_pro"
+            android:layout_margin="24dp"
+            android:textSize="24sp"
+            android:id="@+id/viewed"
+            android:visibility="gone"
+            android:text="You have no voters yet..."
+            android:layout_centerInParent="true" />
     <com.cooltechworks.views.shimmer.ShimmerRecyclerView
             android:id="@+id/voterListRV"
             android:layout_width="match_parent"
@@ -16,4 +26,4 @@
         app:shimmer_demo_layout_manager_type="linear_vertical"
         app:shimmer_demo_layout="@layout/placeholder_voters"
         app:shimmer_demo_child_count="7"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
