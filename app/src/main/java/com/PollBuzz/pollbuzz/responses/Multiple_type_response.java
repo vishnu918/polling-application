@@ -9,6 +9,7 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,6 +51,7 @@ public class Multiple_type_response extends AppCompatActivity {
     Map<String,Integer> update;
     PollDetails polldetails;
     Map<String,Object> response;
+    KAlertDialog dialog1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,7 @@ public class Multiple_type_response extends AppCompatActivity {
 
     private void submitResponse() {
 
+        showKAlertDialog();
         Integer p = polldetails.getPollcount();
         p++;
         for(Map.Entry<String,Object> e : response.entrySet()){
@@ -100,6 +105,7 @@ public class Multiple_type_response extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        dialog1.dismissWithAnimation();
                         Toast.makeText(Multiple_type_response.this, "Unable to submit.\nPlease try again", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -178,6 +184,7 @@ public class Multiple_type_response extends AppCompatActivity {
         update = new HashMap<>();
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Multiple_type_response.this);
+        dialog1=new KAlertDialog(Multiple_type_response.this, SweetAlertDialog.PROGRESS_TYPE);
         fb = new firebase();
     }
 
@@ -193,5 +200,11 @@ public class Multiple_type_response extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
+    }
+    private void showKAlertDialog(){
+        dialog1.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog1.setTitleText("Uploading your response");
+        dialog1.setCancelable(false);
+        dialog1.show();
     }
 }

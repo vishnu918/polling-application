@@ -14,6 +14,7 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -35,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,6 +57,7 @@ public class Ranking_type_response extends AppCompatActivity {
     ImageButton logout,home;
     int c;
     firebase fb;
+    KAlertDialog dialog1;
     ArrayList<String> resp=new ArrayList<>();
 
     @Override
@@ -136,6 +140,7 @@ public class Ranking_type_response extends AppCompatActivity {
         query_ranking = findViewById(R.id.query);
         submit = findViewById(R.id.submit);
         fb = new firebase();
+        dialog1=new KAlertDialog(Ranking_type_response.this, SweetAlertDialog.PROGRESS_TYPE);
     }
 
     private void setOptions() {
@@ -178,6 +183,7 @@ public class Ranking_type_response extends AppCompatActivity {
     }
 
     private void submitResponse(firebase fb) {
+        showKAlertDialog();
 
         fb.getPollsCollection().document(key).collection("Response").document(fb.getUserId()).set(response).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -195,6 +201,7 @@ public class Ranking_type_response extends AppCompatActivity {
                             startActivity(i);
                         }
                         else{
+                            dialog1.dismissWithAnimation();
                             Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
@@ -204,6 +211,7 @@ public class Ranking_type_response extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        dialog1.dismissWithAnimation();
                         Toast.makeText(Ranking_type_response.this, "Unable to submit your.\nPlease try again", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -243,5 +251,11 @@ public class Ranking_type_response extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
+    }
+    private void showKAlertDialog(){
+        dialog1.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog1.setTitleText("Uploading your response");
+        dialog1.setCancelable(false);
+        dialog1.show();
     }
 }
