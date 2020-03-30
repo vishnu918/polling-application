@@ -69,7 +69,7 @@ dependencies {
     implementation 'com.github.tajchert:WaitingDots:0.6.1'
 
     implementation 'com.github.ibrahimsn98:SmoothBottomBar:1.7'
-    implementation 'androidx.core:core:1.0.0'
+    implementation 'androidx.core:core:1.2.0'
     implementation 'com.daimajia.easing:library:2.0@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
     implementation 'com.github.sharish:ShimmerRecyclerView:v1.3'

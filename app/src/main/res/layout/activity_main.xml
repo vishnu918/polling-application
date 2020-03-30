@@ -25,7 +25,7 @@
             app:rippleColor="@color/colorPrimary"
             android:tooltipText="Add Poll"
             android:src="@drawable/ic_add_primary_dark_24dp"
-            app:backgroundTint="@color/white"
+            app:backgroundTint="#9C27B0"
             app:elevation="10dp"
             android:layout_above="@id/bottom"
             />
