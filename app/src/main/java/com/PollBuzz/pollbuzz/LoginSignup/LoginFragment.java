@@ -1,5 +1,22 @@
 package com.PollBuzz.pollbuzz.LoginSignup;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -12,24 +29,9 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.firestore.DocumentSnapshot;
-
-import com.PollBuzz.pollbuzz.MainActivity;
-import com.PollBuzz.pollbuzz.R;
 import com.kinda.alert.KAlertDialog;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
-
 import Utils.firebase;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginFragment extends Fragment {
@@ -68,7 +70,7 @@ public class LoginFragment extends Fragment {
         password = (TextInputLayout) view.findViewById(R.id.password);
         login = view.findViewById(R.id.login);
         gsignin = view.findViewById(R.id.gsignin);
-        dialog=new KAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+        dialog = new KAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
         fb = new firebase();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("896875392739-m41n3o1qrde27chcfh883avrhp1tvd7t.apps.googleusercontent.com")
@@ -88,6 +90,7 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getContext(), "Password can't be empty", Toast.LENGTH_SHORT).show();
             this.password.requestFocus();
         } else {
+            closeKeyboard();
             showDialog();
             fb.getAuth().signInWithEmailAndPassword(emailS, passwordS).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -169,6 +172,7 @@ public class LoginFragment extends Fragment {
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         try {
+            closeKeyboard();
             showDialog();
             final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
             fb.getAuth().signInWithCredential(credential)
@@ -195,10 +199,23 @@ public class LoginFragment extends Fragment {
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
+
     private void showDialog() {
         dialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
         dialog.setTitleText("Getting things ready for you...");
         dialog.setCancelable(false);
         dialog.show();
+    }
+
+    private void closeKeyboard() {
+        if(getActivity()!=null) {
+            View view = getActivity().getCurrentFocus();
+            if (view != null) {
+                InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputManager != null) {
+                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }
+        }
     }
 }
