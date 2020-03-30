@@ -11,6 +11,7 @@ import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.bumptech.glide.Glide;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -20,6 +21,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,6 +49,7 @@ public class PercentageResult extends AppCompatActivity {
     Map<String,Integer> map;
     LinearLayout linearLayout;
     Double total;
+    Dialog dialog;
     MaterialButton result;
     TextView vote_count;
     Typeface typeface;
@@ -79,6 +83,7 @@ public class PercentageResult extends AppCompatActivity {
 
     private void retrievedata(firebase fb) {
 
+       showDialog();
         fb.getPollsCollection().document(uid).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -102,6 +107,7 @@ public class PercentageResult extends AppCompatActivity {
     }
 
     private void setProgressbar(Map<String, Integer> map) {
+        dialog.dismiss();
         linearLayout.removeAllViews();
         if (type.equals("IMAGE POLL")) {
             for(Map.Entry<String,Integer> entry : map.entrySet()){
@@ -231,6 +237,20 @@ public class PercentageResult extends AppCompatActivity {
             startActivity(i);
         });
     }
+    private void showDialog() {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.loading_dialog);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+
+        dialog.setCancelable(false);
+        dialog.show();
+        window.setAttributes(lp);
+    }
 
     private void getIntentExtras(Intent intent) {
      uid = intent.getExtras().getString("UID");
@@ -247,6 +267,7 @@ public class PercentageResult extends AppCompatActivity {
         result = findViewById(R.id.result);
         map = new HashMap<>();
         vote_count=findViewById(R.id.vote_count);
+        dialog = new Dialog(PercentageResult.this);
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.maven_pro);
     }
 

@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.responses;
 
+import com.PollBuzz.pollbuzz.polls.Descriptive_type_poll;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -13,6 +14,7 @@ import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.bumptech.glide.Glide;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -34,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,6 +58,7 @@ public class Image_type_responses extends AppCompatActivity {
     firebase fb;
     ImageButton logout,home;
     PollDetails polldetails;
+    KAlertDialog dialog1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +108,7 @@ public class Image_type_responses extends AppCompatActivity {
 
     private void submitResponse() {
 
+        showKAlertDialog();
         Integer i = polldetails.getPollcount();
         i++;
         Integer p=0;
@@ -141,6 +147,7 @@ public class Image_type_responses extends AppCompatActivity {
                                 startActivity(i);
                             }
                             else{
+                                dialog1.dismissWithAnimation();
                                 Toast.makeText(Image_type_responses.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -150,6 +157,7 @@ public class Image_type_responses extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            dialog1.dismissWithAnimation();
                             Toast.makeText(Image_type_responses.this, "Unable to submit.\nPlease try again ", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -231,6 +239,7 @@ public class Image_type_responses extends AppCompatActivity {
         b1 = findViewById(R.id.option1);
         b2 = findViewById(R.id.option2);
         fb = new firebase();
+        dialog1=new KAlertDialog(Image_type_responses.this, SweetAlertDialog.PROGRESS_TYPE);
     }
 
 
@@ -259,5 +268,11 @@ public class Image_type_responses extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
+    }
+    private void showKAlertDialog(){
+        dialog1.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog1.setTitleText("Uploading your response");
+        dialog1.setCancelable(false);
+        dialog1.show();
     }
 }

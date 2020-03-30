@@ -109,7 +109,6 @@ public class Image_type_result extends AppCompatActivity {
                                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                             @Override
                                             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                Toast.makeText(Image_type_result.this, "Added", Toast.LENGTH_SHORT).show();
                                                 if (documentSnapshot.exists()) {
                                                     response = documentSnapshot.getData();
                                                     if (response.containsValue("Option 2")) {
@@ -125,7 +124,7 @@ public class Image_type_result extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(Image_type_result.this, "Failed", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Image_type_result.this, "Failed to access your response", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 

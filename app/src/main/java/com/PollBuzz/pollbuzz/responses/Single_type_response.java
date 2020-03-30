@@ -11,6 +11,7 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
+import com.kinda.alert.KAlertDialog;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -31,6 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Utils.firebase;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,6 +53,7 @@ public class Single_type_response extends AppCompatActivity {
     firebase fb;
     PollDetails polldetails;
     Map<String,Integer> update;
+    KAlertDialog dialog1;
 
 
     @Override
@@ -77,6 +81,7 @@ public class Single_type_response extends AppCompatActivity {
 
     private void submitResponse(firebase fb) {
 
+        showKAlertDialog();
         Integer i = polldetails.getPollcount();
         i++;
         response.put("option",resp);
@@ -105,6 +110,7 @@ public class Single_type_response extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        dialog1.dismissWithAnimation();
                         Toast.makeText(Single_type_response.this, "Unable to submit.\nPlease try again", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -185,6 +191,7 @@ public class Single_type_response extends AppCompatActivity {
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.didact_gothic);
         dialog=new Dialog(Single_type_response.this);
         fb = new firebase();
+        dialog1=new KAlertDialog(Single_type_response.this, SweetAlertDialog.PROGRESS_TYPE);
 
     }
 
@@ -200,5 +207,11 @@ public class Single_type_response extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
         window.setAttributes(lp);
+    }
+    private void showKAlertDialog(){
+        dialog1.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        dialog1.setTitleText("Uploading your response");
+        dialog1.setCancelable(false);
+        dialog1.show();
     }
 }

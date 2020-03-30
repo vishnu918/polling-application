@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -191,7 +192,10 @@ public class Single_type_result extends AppCompatActivity {
         String value = "";
 
         for (Map.Entry<String, Object> entry : response.entrySet()) {
-            value = entry.getValue().toString();
+             if(entry.getKey().equals("option")){
+                 value =entry.getValue().toString();
+            }
+
         }
 
         for (Map.Entry<String, Integer> entry : options.entrySet()) {
@@ -206,9 +210,9 @@ public class Single_type_result extends AppCompatActivity {
             final String val=value;
             if (button.getText().toString().equals(value))
                 button.setChecked(true);
-            else
+          else
                 button.setEnabled(false);
-            button.setOnClickListener(new View.OnClickListener() {
+         /*   button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     RadioButton b=(RadioButton)v;
@@ -221,7 +225,7 @@ public class Single_type_result extends AppCompatActivity {
 
 
                 }
-            });
+            });*/
         }
         dialog.dismiss();
     }
