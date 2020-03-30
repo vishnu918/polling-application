@@ -1,5 +1,7 @@
 package com.PollBuzz.pollbuzz.adapters;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.VoteDetails;
 import com.PollBuzz.pollbuzz.results.Descriptive_type_result;
@@ -53,15 +55,19 @@ public class VoterPageAdapter extends RecyclerView.Adapter<VoterPageAdapter.Vote
     }
 
     private void setData(@NonNull VoterViewHolder holder, int position) {
-        if(mVotedetails.get(position).getUsername()!=null)
-            holder.voterUsername.setText(mVotedetails.get(position).getUsername().trim());
-        if(mVotedetails.get(position).getProgfileUrl()==null){
-            holder.voterPhoto.setImageResource(R.drawable.ic_person_black_24dp);
-        }else{
-            Glide.with(mContext)
-                    .load(mVotedetails.get(position).getProgfileUrl())
-                    .transform(new CircleCrop())
-                    .into(holder.voterPhoto);
+        try {
+            if(mVotedetails.get(position).getUsername()!=null)
+                holder.voterUsername.setText(mVotedetails.get(position).getUsername().trim());
+            if(mVotedetails.get(position).getProgfileUrl()==null){
+                holder.voterPhoto.setImageResource(R.drawable.ic_person_black_24dp);
+            } else {
+                Glide.with(mContext)
+                        .load(mVotedetails.get(position).getProgfileUrl())
+                        .transform(new CircleCrop())
+                        .into(holder.voterPhoto);
+            }
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 

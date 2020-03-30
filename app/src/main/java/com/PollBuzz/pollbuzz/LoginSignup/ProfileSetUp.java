@@ -3,6 +3,7 @@ package com.PollBuzz.pollbuzz.LoginSignup;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -120,6 +121,7 @@ public class ProfileSetUp extends AppCompatActivity {
                         }).check();
             } catch (Exception e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().log(e.getMessage());
             }
         });
         save.setOnClickListener(view -> {
@@ -258,19 +260,24 @@ public class ProfileSetUp extends AppCompatActivity {
                     loadProfilePic(uri);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().log(e.getMessage());
                 }
             }
         }
     }
 
     private void loadProfilePic(Uri uri) {
-        if (uri != null) {
-            Glide.with(this)
-                    .load(uri)
-                    .transform(new CircleCrop())
-                    .into(pPic);
-        } else {
-            pPic.setImageResource(R.drawable.ic_person_black_24dp);
+        try {
+            if (uri != null) {
+                Glide.with(this)
+                        .load(uri)
+                        .transform(new CircleCrop())
+                        .into(pPic);
+            } else {
+                pPic.setImageResource(R.drawable.ic_person_black_24dp);
+            }
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 
@@ -308,14 +315,18 @@ public class ProfileSetUp extends AppCompatActivity {
         data.put("birthdate", bday);
         data.put("age", String.valueOf(age));
         data.put("gender", gender);
-        if (uri == null) {
-            if (fb.getUser().getPhotoUrl() == null)
-                data.put("pic", null);
-            else
-                data.put("pic", fb.getUser().getPhotoUrl().toString());
-            addToDatabase(unameS, data);
-        } else {
-            addToStorage(unameS, data);
+        try {
+            if (uri == null) {
+                if (fb.getUser().getPhotoUrl() == null)
+                    data.put("pic", null);
+                else
+                    data.put("pic", fb.getUser().getPhotoUrl().toString());
+                addToDatabase(unameS, data);
+            } else {
+                addToStorage(unameS, data);
+            }
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
         progressDialog.dismiss();
     }

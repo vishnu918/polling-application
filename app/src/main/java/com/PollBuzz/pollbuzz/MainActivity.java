@@ -1,6 +1,7 @@
 package com.PollBuzz.pollbuzz;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import com.PollBuzz.pollbuzz.navFragments.HomeFeed;
 import com.PollBuzz.pollbuzz.navFragments.ProfileFeed;
@@ -35,7 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private void setGlobals() {
         bottomBar = findViewById(R.id.bottom);
         fab = findViewById(R.id.fab);
-        YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
+        try {
+            YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
+        }
         fragment1 = new HomeFeed();
         fragment2 = new VotedFeed();
         fragment3 = new ProfileFeed();
@@ -81,19 +86,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void replaceFragment(Fragment fragment) {
-        if (fragment.getTag() != null) {
-            if (fragment.getTag().equals("3"))
-                fm.beginTransaction().hide(active).show(fragment).commit();
-            else
-                fm.beginTransaction().addToBackStack(fragment.getTag()).hide(active).show(fragment).commit();
+        try {
+            if (fragment.getTag() != null) {
+                if (fragment.getTag().equals("3"))
+                    fm.beginTransaction().hide(active).show(fragment).commit();
+                else
+                    fm.beginTransaction().addToBackStack(fragment.getTag()).hide(active).show(fragment).commit();
+            }
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 
     private void createFragment(Fragment fragment, String id) {
-        if (id.equals("3"))
-            fm.beginTransaction().add(R.id.container, fragment, id).hide(active).commit();
-        else
-            fm.beginTransaction().addToBackStack(id).add(R.id.container, fragment, id).hide(active).commit();
+        try {
+            if (id.equals("3"))
+                fm.beginTransaction().add(R.id.container, fragment, id).hide(active).commit();
+            else
+                fm.beginTransaction().addToBackStack(id).add(R.id.container, fragment, id).hide(active).commit();
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
+        }
     }
 
     @Override

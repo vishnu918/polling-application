@@ -2,6 +2,7 @@ package com.PollBuzz.pollbuzz.navFragments;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -71,7 +72,6 @@ public class ProfileFeed extends Fragment {
     private ProfileFeedAdapter mAdapter;
     private ArrayList<PollDetails> mArrayList;
     private firebase fb;
-//    private FloatingActionButton fab;
     private LayoutAnimationController controller;
     private MaterialTextView viewed;
 
@@ -93,10 +93,6 @@ public class ProfileFeed extends Fragment {
     }
 
     private void setListeners() {
-//        fab.setOnClickListener(view1 -> {
-//            Intent i = new Intent(getContext(), PollList.class);
-//            startActivity(i);
-//        });
         edit.setOnClickListener(view1 -> {
             try {
                 Dexter.withActivity(getActivity())
@@ -118,48 +114,48 @@ public class ProfileFeed extends Fragment {
                         }).check();
             } catch (Exception e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().log(e.getMessage());
             }
         });
     }
 
     private void getData() {
-        fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                if(!task.getResult().isEmpty()) {
-                    for (QueryDocumentSnapshot dS : task.getResult()) {
-                        if (dS.get("pollId") != null)
-                            fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
-                                if (task1.isSuccessful() && task1.getResult() != null) {
-                                    DocumentSnapshot dS1 = task1.getResult();
-                                    if (dS1.exists()) {
-                                        addToRecyclerView(dS1);
+        try {
+            fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    if (!task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot dS : task.getResult()) {
+                            if (dS.get("pollId") != null)
+                                fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
+                                    if (task1.isSuccessful() && task1.getResult() != null) {
+                                        DocumentSnapshot dS1 = task1.getResult();
+                                        if (dS1.exists()) {
+                                            addToRecyclerView(dS1);
+                                        }
+                                    } else {
+                                        Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                });
+                        }
+                    } else {
+                        profileRV.hideShimmerAdapter();
+                        viewed.setVisibility(View.VISIBLE);
                     }
-                }else{
+                } else {
                     profileRV.hideShimmerAdapter();
-                    viewed.setVisibility(View.VISIBLE);
+                    Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            }else{
-                profileRV.hideShimmerAdapter();
-                Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
+        }
     }
 
     private void addToRecyclerView(DocumentSnapshot dS1) {
         PollDetails polldetails = dS1.toObject(PollDetails.class);
         polldetails.setUID(dS1.getId());
         mArrayList.add(polldetails);
-        Collections.sort(mArrayList, new Comparator<PollDetails>() {
-            @Override
-            public int compare(PollDetails pollDetails, PollDetails t1) {
-                return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
-            }
-        });
+        Collections.sort(mArrayList, (pollDetails, t1) -> Long.compare(t1.getTimestamp(), pollDetails.getTimestamp()));
         mAdapter.notifyDataSetChanged();
         profileRV.hideShimmerAdapter();
         profileRV.scheduleLayoutAnimation();
@@ -190,29 +186,32 @@ public class ProfileFeed extends Fragment {
         profileRV.setAdapter(mAdapter);
         profileRV.setLayoutAnimation(controller);
         profileRV.showShimmerAdapter();
-//        fab = view.findViewById(R.id.fab);
         Uname.setText(Utils.helper.getusernamePref(getContext()));
         loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
     }
 
     private void onBackArrowPressed(Toolbar toolbar) {
-        toolbar.setNavigationOnClickListener(view1 -> {
-            if (getFragmentManager() != null) {
-                int index = getFragmentManager().getBackStackEntryCount() - 1;
-                FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
-                String tag = backEntry.getName();
-                getFragmentManager().beginTransaction().hide(ProfileFeed.this)
-                        .show(getFragmentManager().findFragmentByTag(tag))
-                        .commit();
-                if (tag.equals("1")) {
-                    MainActivity.bottomBar.setActiveItem(0);
-                    MainActivity.active = MainActivity.fragment1;
-                } else if (tag.equals("2")) {
-                    MainActivity.bottomBar.setActiveItem(1);
-                    MainActivity.active = MainActivity.fragment2;
+        try {
+            toolbar.setNavigationOnClickListener(view1 -> {
+                if (getFragmentManager() != null) {
+                    int index = getFragmentManager().getBackStackEntryCount() - 1;
+                    FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
+                    String tag = backEntry.getName();
+                    getFragmentManager().beginTransaction().hide(ProfileFeed.this)
+                            .show(getFragmentManager().findFragmentByTag(tag))
+                            .commit();
+                    if (tag.equals("1")) {
+                        MainActivity.bottomBar.setActiveItem(0);
+                        MainActivity.active = MainActivity.fragment1;
+                    } else if (tag.equals("2")) {
+                        MainActivity.bottomBar.setActiveItem(1);
+                        MainActivity.active = MainActivity.fragment2;
+                    }
                 }
-            }
-        });
+            });
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
+        }
     }
 
     private void showImagePickerOptions() {
@@ -235,11 +234,15 @@ public class ProfileFeed extends Fragment {
     }
 
     private void defaultIntent() {
-        if (fb.getUser().getPhotoUrl() != null)
-            loadProfilePic(fb.getUser().getPhotoUrl().toString(), true);
-        else
-            loadProfilePic(null, true);
-        fb.getStorageReference().child("images/" + fb.getUserId()).delete();
+        try {
+            if (fb.getUser().getPhotoUrl() != null)
+                loadProfilePic(fb.getUser().getPhotoUrl().toString(), true);
+            else
+                loadProfilePic(null, true);
+            fb.getStorageReference().child("images/" + fb.getUserId()).delete();
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
+        }
     }
 
     private void launchCameraIntent() {
@@ -290,45 +293,53 @@ public class ProfileFeed extends Fragment {
     }
 
     private void addToStorage(Uri uri) {
-        StorageReference mRef = fb.getStorageReference().child("images/" + fb.getUserId());
-        byte[] compressedImage = compressImage(uri);
-        if (compressedImage != null) {
-            mRef.putBytes(compressedImage)
-                    .addOnSuccessListener(taskSnapshot -> {
-                        mRef.getDownloadUrl().addOnSuccessListener((Uri uri1) -> {
-                            if (uri1 != null)
-                                loadProfilePic(uri1.toString(), true);
-                            else loadProfilePic(null, true);
+        try {
+            StorageReference mRef = fb.getStorageReference().child("images/" + fb.getUserId());
+            byte[] compressedImage = compressImage(uri);
+            if (compressedImage != null) {
+                mRef.putBytes(compressedImage)
+                        .addOnSuccessListener(taskSnapshot -> {
+                            mRef.getDownloadUrl().addOnSuccessListener((Uri uri1) -> {
+                                if (uri1 != null)
+                                    loadProfilePic(uri1.toString(), true);
+                                else loadProfilePic(null, true);
+                            });
+                        })
+                        .addOnFailureListener(exception -> {
+                            exception.printStackTrace();
+                            Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.d("Exception", exception.toString());
+                        })
+                        .addOnProgressListener(taskSnapshot -> {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                         });
-                    })
-                    .addOnFailureListener(exception -> {
-                        exception.printStackTrace();
-                        Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("Exception", exception.toString());
-                    })
-                    .addOnProgressListener(taskSnapshot -> {
-                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    });
+            }
+            deleteCache();
+        }catch(Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
-        deleteCache();
     }
 
     private void loadProfilePic(String url, Boolean update) {
-        if (url != null) {
-            Glide.with(this)
-                    .load(url)
-                    .transform(new CircleCrop())
-                    .into(pPic);
-            if (update) {
-                Utils.helper.setpPicPref(getContext(), url);
-                fb.getUserDocument().update("pic", url);
+        try {
+            if (url != null) {
+                Glide.with(this)
+                        .load(url)
+                        .transform(new CircleCrop())
+                        .into(pPic);
+                if (update) {
+                    Utils.helper.setpPicPref(getContext(), url);
+                    fb.getUserDocument().update("pic", url);
+                }
+            } else {
+                pPic.setImageResource(R.drawable.ic_person_black_24dp);
+                if (update) {
+                    Utils.helper.setpPicPref(getContext(), null);
+                    fb.getUserDocument().update("pic", null);
+                }
             }
-        } else {
-            pPic.setImageResource(R.drawable.ic_person_black_24dp);
-            if (update) {
-                Utils.helper.setpPicPref(getContext(), null);
-                fb.getUserDocument().update("pic", null);
-            }
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 

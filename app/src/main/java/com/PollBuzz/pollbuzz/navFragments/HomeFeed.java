@@ -37,7 +37,6 @@ public class HomeFeed extends Fragment {
     private ShimmerRecyclerView recyclerView;
     private com.PollBuzz.pollbuzz.adapters.HomePageAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-//    private FloatingActionButton fab;
     private firebase fb;
     private LayoutAnimationController controller;
     MaterialTextView viewed;
@@ -55,7 +54,6 @@ public class HomeFeed extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setGlobals(view);
-//        setListeners();
         getData();
     }
 
@@ -78,12 +76,6 @@ public class HomeFeed extends Fragment {
         });
     }
 
-//    private void setListeners() {
-//        fab.setOnClickListener(view1 -> {
-//            Intent i = new Intent(getContext(), PollList.class);
-//            startActivity(i);
-//        });
-//    }
 
     private void addToRecyclerView(QueryDocumentSnapshot dS) {
         PollDetails polldetails = dS.toObject(PollDetails.class);
@@ -100,12 +92,7 @@ public class HomeFeed extends Fragment {
                         }
                         if (flag) {
                             arrayList.add(polldetails);
-                            Collections.sort(arrayList, new Comparator<PollDetails>() {
-                                @Override
-                                public int compare(PollDetails pollDetails, PollDetails t1) {
-                                    return Long.compare(t1.getTimestamp(), pollDetails.getTimestamp());
-                                }
-                            });
+                            Collections.sort(arrayList, (pollDetails, t1) -> Long.compare(t1.getTimestamp(), pollDetails.getTimestamp()));
                             viewed.setVisibility(View.GONE);
                             adapter.notifyDataSetChanged();
                             recyclerView.hideShimmerAdapter();
@@ -117,7 +104,6 @@ public class HomeFeed extends Fragment {
 
     private void setGlobals(@NonNull View view) {
         arrayList = new ArrayList<>();
-//        fab = view.findViewById(R.id.fab);
         viewed=view.findViewById(R.id.viewed);
         controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
         recyclerView = view.findViewById(R.id.recyclerview);
@@ -129,9 +115,6 @@ public class HomeFeed extends Fragment {
         recyclerView.setLayoutAnimation(controller);
         recyclerView.showShimmerAdapter();
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(view.findViewById(R.id.text));
-//        YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(fab);
         fb = new firebase();
     }
-
-
 }

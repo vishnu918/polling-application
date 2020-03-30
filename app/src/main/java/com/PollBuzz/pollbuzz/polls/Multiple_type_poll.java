@@ -4,6 +4,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -11,15 +12,13 @@ import com.PollBuzz.pollbuzz.LoginSignup.LoginSignupActivity;
 import com.PollBuzz.pollbuzz.MainActivity;
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
-import com.PollBuzz.pollbuzz.responses.Multiple_type_response;
 import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -32,7 +31,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -44,9 +42,9 @@ import java.util.Map;
 
 import Utils.firebase;
 import Utils.helper;
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class Multiple_type_poll extends AppCompatActivity {
     Button add;
@@ -145,42 +143,46 @@ public class Multiple_type_poll extends AppCompatActivity {
 
 
     private void addToDatabase(String formatteddate) {
-        showDialog();
-        post_multi.setEnabled(false);
-        if (fb.getUser() != null) {
-            PollDetails polldetails = new PollDetails();
-            polldetails.setQuestion(question_multi.getText().toString().trim());
-            polldetails.setCreated_date(formatteddate);
-            polldetails.setPoll_type("MULTI ANSWER POLL");
-            polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
-            polldetails.setAuthorUID(fb.getUserId());
-            polldetails.setTimestamp(Timestamp.now().getSeconds());
-            Map<String, Integer> map = new HashMap<>();
-            for (int i = 0; i < group.getChildCount(); i++) {
-                RadioButton v = (RadioButton) group.getChildAt(i);
-                map.put(v.getText().toString().trim(), 0);
-            }
-            polldetails.setMap(map);
-            CollectionReference docCreated = fb.getUserDocument().collection("Created");
-            DocumentReference doc = fb.getPollsCollection().document();
-            doc.set(polldetails)
-                    .addOnSuccessListener(aVoid -> {
-                        dialog.dismissWithAnimation();
-                        Map<String, Object> m = new HashMap<>();
-                        m.put("pollId", doc.getId());
-                        m.put("timestamp",Timestamp.now().getSeconds());
-                        docCreated.document().set(m);
-                        Toast.makeText(Multiple_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(Multiple_type_poll.this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(Multiple_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
-                        dialog.dismissWithAnimation();
-                        post_multi.setEnabled(true);
-                    });
+        try {
+            showDialog();
+            post_multi.setEnabled(false);
+            if (fb.getUser() != null) {
+                PollDetails polldetails = new PollDetails();
+                polldetails.setQuestion(question_multi.getText().toString().trim());
+                polldetails.setCreated_date(formatteddate);
+                polldetails.setPoll_type("MULTI ANSWER POLL");
+                polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+                polldetails.setAuthorUID(fb.getUserId());
+                polldetails.setTimestamp(Timestamp.now().getSeconds());
+                Map<String, Integer> map = new HashMap<>();
+                for (int i = 0; i < group.getChildCount(); i++) {
+                    RadioButton v = (RadioButton) group.getChildAt(i);
+                    map.put(v.getText().toString().trim(), 0);
+                }
+                polldetails.setMap(map);
+                CollectionReference docCreated = fb.getUserDocument().collection("Created");
+                DocumentReference doc = fb.getPollsCollection().document();
+                doc.set(polldetails)
+                        .addOnSuccessListener(aVoid -> {
+                            dialog.dismissWithAnimation();
+                            Map<String, Object> m = new HashMap<>();
+                            m.put("pollId", doc.getId());
+                            m.put("timestamp", Timestamp.now().getSeconds());
+                            docCreated.document().set(m);
+                            Toast.makeText(Multiple_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(Multiple_type_poll.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(Multiple_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                            dialog.dismissWithAnimation();
+                            post_multi.setEnabled(true);
+                        });
 
+            }
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 
@@ -245,7 +247,7 @@ public class Multiple_type_poll extends AppCompatActivity {
         dialogButton.setOnClickListener(v -> {
             name = text.getEditText().getText().toString();
             if (name.isEmpty()) {
-                text.setError("Please enter tit");
+                text.setError("Please enter this");
                 text.requestFocus();
             } else {
                 if(!doesContain(name))

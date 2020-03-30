@@ -7,6 +7,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.ServerTimestamp;
@@ -131,9 +132,10 @@ public class Single_type_poll extends AppCompatActivity {
     }
 
     private void addToDatabase(String formattedDate) {
-        showDialog();
-        button.setEnabled(false);
-        if (fb.getUser() != null) {
+        try {
+            showDialog();
+            button.setEnabled(false);
+            if (fb.getUser() != null) {
 
                 PollDetails polldetails = new PollDetails();
                 polldetails.setQuestion(question.getText().toString());
@@ -157,7 +159,7 @@ public class Single_type_poll extends AppCompatActivity {
                                 dialog.dismissWithAnimation();
                                 Map<String, Object> m = new HashMap<>();
                                 m.put("pollId", doc.getId());
-                                m.put("timestamp",Timestamp.now().getSeconds());
+                                m.put("timestamp", Timestamp.now().getSeconds());
                                 docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
@@ -166,8 +168,7 @@ public class Single_type_poll extends AppCompatActivity {
                                             Intent intent = new Intent(Single_type_poll.this, MainActivity.class);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(intent);
-                                        } else
-                                        {
+                                        } else {
                                             Toast.makeText(Single_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                             dialog.dismissWithAnimation();
                                             button.setEnabled(true);
@@ -183,7 +184,9 @@ public class Single_type_poll extends AppCompatActivity {
                         });
 
 
-
+            }
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 

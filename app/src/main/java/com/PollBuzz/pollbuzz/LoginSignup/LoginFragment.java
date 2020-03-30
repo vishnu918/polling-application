@@ -160,24 +160,28 @@ public class LoginFragment extends Fragment {
     }
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
-        final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        fb.getAuth().signInWithCredential(credential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        fb.getUserDocument().get().addOnCompleteListener(task1 -> {
-                            if (task1.isSuccessful()) {
-                                Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
-                                DocumentSnapshot dS = task1.getResult();
-                                isProfileSet(dS);
-                            } else {
-                                Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                Log.d("UID", task1.getException().toString());
-                                password.getEditText().getText().clear();
-                            }
-                        });
-                    } else {
-                        Toast.makeText(getContext(), "Google Sign In Failed!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        try {
+            final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+            fb.getAuth().signInWithCredential(credential)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            fb.getUserDocument().get().addOnCompleteListener(task1 -> {
+                                if (task1.isSuccessful()) {
+                                    Toast.makeText(getActivity(), "Logged In Successfully!", Toast.LENGTH_SHORT).show();
+                                    DocumentSnapshot dS = task1.getResult();
+                                    isProfileSet(dS);
+                                } else {
+                                    Toast.makeText(getContext(), task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    Log.d("UID", task1.getException().toString());
+                                    password.getEditText().getText().clear();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getContext(), "Google Sign In Failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
+        }
     }
 }

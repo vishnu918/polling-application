@@ -1,5 +1,7 @@
 package com.PollBuzz.pollbuzz.adapters;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import com.PollBuzz.pollbuzz.PollDetails;
 import com.PollBuzz.pollbuzz.R;
 import com.PollBuzz.pollbuzz.results.PercentageResult;
@@ -52,14 +54,18 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
     }
 
     private void setData(@NonNull ProfileViewHolder holder, int position) {
-        if (mPollDetails.get(position).getPoll_type() != null)
-            holder.card_type.setText(mPollDetails.get(position).getPoll_type());
-        if (mPollDetails.get(position).getQuestion() != null)
-            holder.card_query.setText(mPollDetails.get(position).getQuestion().trim());
-        if (mPollDetails.get(position).getAuthor() != null)
-            holder.card_author.setText(mPollDetails.get(position).getAuthor());
-        if (mPollDetails.get(position).getCreated_date() != null)
-            holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
+        try {
+            if (mPollDetails.get(position).getPoll_type() != null)
+                holder.card_type.setText(mPollDetails.get(position).getPoll_type());
+            if (mPollDetails.get(position).getQuestion() != null)
+                holder.card_query.setText(mPollDetails.get(position).getQuestion().trim());
+            if (mPollDetails.get(position).getAuthor() != null)
+                holder.card_author.setText(mPollDetails.get(position).getAuthor());
+            if (mPollDetails.get(position).getCreated_date() != null)
+                holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
+        }
     }
 
     @Override
@@ -70,7 +76,7 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
     static class ProfileViewHolder extends RecyclerView.ViewHolder {
 
         private CardView cardV;
-        private TextView card_title, card_type, card_query, card_author, card_date;
+        private TextView  card_type, card_query, card_author, card_date;
 
         ProfileViewHolder(@NonNull View itemView) {
             super(itemView);

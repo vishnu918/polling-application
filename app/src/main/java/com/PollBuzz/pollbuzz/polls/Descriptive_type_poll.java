@@ -6,6 +6,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -91,46 +92,50 @@ public class Descriptive_type_poll extends AppCompatActivity {
     }
 
     private void addToDatabase(String formatteddate) {
-        showDialog();
-        post_descriptive.setEnabled(false);
-        if (fb.getUser() != null) {
-            PollDetails polldetails = new PollDetails();
-            polldetails.setQuestion(question_descriptive.getText().toString().trim());
-            polldetails.setCreated_date(formatteddate);
-            polldetails.setPoll_type("DESCRIPTIVE POLL");
-            polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
-            polldetails.setAuthorUID(fb.getUserId());
-            polldetails.setTimestamp(Timestamp.now().getSeconds());
-            CollectionReference docCreated = fb.getUserDocument().collection("Created");
-            DocumentReference doc = fb.getPollsCollection().document();
-            doc.set(polldetails)
-                    .addOnSuccessListener(aVoid -> {
-                        dialog.dismissWithAnimation();
-                        Map<String, Object> m = new HashMap<>();
-                        m.put("pollId", doc.getId());
-                        m.put("timestamp",Timestamp.now().getSeconds());
-                        docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(Descriptive_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(Descriptive_type_poll.this, MainActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(Descriptive_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                    dialog.dismissWithAnimation();
-                                    post_descriptive.setEnabled(true);
+        try {
+            showDialog();
+            post_descriptive.setEnabled(false);
+            if (fb.getUser() != null) {
+                PollDetails polldetails = new PollDetails();
+                polldetails.setQuestion(question_descriptive.getText().toString().trim());
+                polldetails.setCreated_date(formatteddate);
+                polldetails.setPoll_type("DESCRIPTIVE POLL");
+                polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
+                polldetails.setAuthorUID(fb.getUserId());
+                polldetails.setTimestamp(Timestamp.now().getSeconds());
+                CollectionReference docCreated = fb.getUserDocument().collection("Created");
+                DocumentReference doc = fb.getPollsCollection().document();
+                doc.set(polldetails)
+                        .addOnSuccessListener(aVoid -> {
+                            dialog.dismissWithAnimation();
+                            Map<String, Object> m = new HashMap<>();
+                            m.put("pollId", doc.getId());
+                            m.put("timestamp", Timestamp.now().getSeconds());
+                            docCreated.document().set(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(Descriptive_type_poll.this, "Your data added successfully", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(Descriptive_type_poll.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                    } else {
+                                        Toast.makeText(Descriptive_type_poll.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        dialog.dismissWithAnimation();
+                                        post_descriptive.setEnabled(true);
+                                    }
                                 }
-                            }
-                        });
+                            });
 
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(Descriptive_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
-                        dialog.dismissWithAnimation();
-                        post_descriptive.setEnabled(true);
-                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(Descriptive_type_poll.this, "Unable to post.Please try again", Toast.LENGTH_SHORT).show();
+                            dialog.dismissWithAnimation();
+                            post_descriptive.setEnabled(true);
+                        });
+            }
+        }catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
     private void showDialog() {
