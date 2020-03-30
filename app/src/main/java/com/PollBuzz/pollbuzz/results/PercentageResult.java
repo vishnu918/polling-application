@@ -154,6 +154,8 @@ public class PercentageResult extends AppCompatActivity {
                 voted_by.setLayoutParams(layoutParams2);
                 textView.setTextSize(20.0f);
                 voted_by.setTextSize(20.0f);
+                textView.setTextColor(getResources().getColor(R.color.black));
+                voted_by.setTextColor(getResources().getColor(R.color.black));
             linearLayout1.addView(imageView);
                 linearLayout1.addView(textView);
             linearLayout1.addView(progressBar);
