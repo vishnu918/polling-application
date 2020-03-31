@@ -72,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="10dp">
 
 
 
@@ -83,6 +83,12 @@
         android:orientation="vertical">
 
     </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/result"
@@ -90,7 +96,25 @@
                 android:layout_height="wrap_content"
                 app:cornerRadius="20dp"
                 android:layout_gravity="center"
-                android:text="DETAIL RESULT"
+                android:text="VOTERS LIST"
+                android:layout_weight="1"
+                android:fontFamily="@font/maven_pro"
+                android:textStyle="bold"
+                android:layout_marginTop="50dp"
+                android:padding="10dp"
+                android:textSize="15sp"
+                android:layout_marginBottom="40dp"
+                android:layout_marginHorizontal="5dp"
+                android:stateListAnimator="@animator/button_anim"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:cornerRadius="20dp"
+                android:layout_gravity="center"
+                android:text="Pie Charts"
+                android:layout_marginHorizontal="5dp"
                 android:fontFamily="@font/maven_pro"
                 android:textStyle="bold"
                 android:layout_marginTop="50dp"
@@ -98,6 +122,7 @@
                 android:textSize="15sp"
                 android:layout_marginBottom="40dp"
                 android:stateListAnimator="@animator/button_anim"/>
+            </LinearLayout>
         </LinearLayout>
 
 

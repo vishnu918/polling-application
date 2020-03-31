@@ -1,5 +1,6 @@
 package com.PollBuzz.pollbuzz.results;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -48,11 +49,13 @@ public class PercentageResult extends AppCompatActivity {
     String uid,type;
     Map<String,Integer> map;
     LinearLayout linearLayout;
-    Double total;
+    public static Double total;
     Dialog dialog;
-    MaterialButton result;
+    MaterialButton result,pie_charts;
     TextView vote_count;
     Typeface typeface;
+    public static Map<String,Integer> data=new HashMap<>();
+    public static String question;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +80,13 @@ public class PercentageResult extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        pie_charts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(PercentageResult.this,PieChartActivity.class);
+                startActivity(i);
+            }
+        });
 
 
     }
@@ -92,6 +102,7 @@ public class PercentageResult extends AppCompatActivity {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             PollDetails pollDetails = documentSnapshot.toObject(PollDetails.class);
                             question_percentage.setText(pollDetails.getQuestion());
+                            question=pollDetails.getQuestion();
                             String d="Created on: "+pollDetails.getCreated_date();
                             date_percentage.setText(d);
                             map = pollDetails.getMap();
@@ -109,8 +120,10 @@ public class PercentageResult extends AppCompatActivity {
     private void setProgressbar(Map<String, Integer> map) {
         dialog.dismiss();
         linearLayout.removeAllViews();
+        data.clear();
         if (type.equals("IMAGE POLL")) {
             for(Map.Entry<String,Integer> entry : map.entrySet()){
+                Integer per;
                 ImageView imageView = new ImageView(this);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(200, 200);
                 layoutParams.setMargins(30, 10, 10, 10);
@@ -123,10 +136,20 @@ public class PercentageResult extends AppCompatActivity {
                 linearLayout1.setLayoutParams(layoutParams1);
                 LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 layoutParams2.setMargins(30, 10, 10, 10);
-                ProgressBar progressBar = new ProgressBar(PercentageResult.this, null, android.R.attr.progressBarStyleHorizontal);
-                progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
-                progressBar.setLayoutParams(layoutParams2);
-                progressBar.setScaleY(5);
+                RoundCornerProgressBar progressBar = new RoundCornerProgressBar(PercentageResult.this, null, android.R.attr.progressBarStyleHorizontal);
+                //progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+                progressBar.setProgressColor(Color.parseColor("#56d2c2"));
+                progressBar.setProgressBackgroundColor(getResources().getColor(R.color.grey));
+                LinearLayout wrap_bar=new LinearLayout(getApplicationContext());
+                wrap_bar.setOrientation(LinearLayout.VERTICAL);
+                progressBar.setPadding(5,20,10,20);
+                progressBar.setRadius(20);
+                LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams3.setMargins(10, 30, 10, 30);
+                wrap_bar.setLayoutParams(layoutParams2);
+                wrap_bar.setBackgroundColor(getResources().getColor(R.color.grey));;
+                progressBar.setLayoutParams(layoutParams3);
+                progressBar.setScaleY(15);
 
                 TextView textView = new TextView(this);
                 TextView voted_by = new TextView(this);
@@ -134,22 +157,25 @@ public class PercentageResult extends AppCompatActivity {
                 voted_by.setTypeface(typeface);
                 int v_by;
                 if(total!=0) {
-                    Integer per = (int) ((entry.getValue() / total) * 100);
+                    per = (int) ((entry.getValue() / total) * 100);
                     textView.setText(per + "%");
                     progressBar.setProgress(per);
                     v_by=entry.getValue();
                     String text="Voted by: "+v_by;
-                    voted_by.setText(text);}
+                    voted_by.setText(text);
+
+                }
 
 
                 else{
-                    Integer per = 0;
+                   per = 0;
                     textView.setText(per + "%");
                     String text="Voted by: "+0;
                     voted_by.setText(text);
                     progressBar.setProgress(per);
 
                 }
+                data.put(entry.getKey(),entry.getValue());
                 textView.setLayoutParams(layoutParams2);
                 voted_by.setLayoutParams(layoutParams2);
                 textView.setTextSize(20.0f);
@@ -158,7 +184,8 @@ public class PercentageResult extends AppCompatActivity {
                 voted_by.setTextColor(getResources().getColor(R.color.black));
             linearLayout1.addView(imageView);
                 linearLayout1.addView(textView);
-            linearLayout1.addView(progressBar);
+            linearLayout1.addView(wrap_bar);
+            wrap_bar.addView(progressBar);
             linearLayout1.addView(voted_by);
             linearLayout.addView(linearLayout1);
 
@@ -170,22 +197,36 @@ public class PercentageResult extends AppCompatActivity {
             for (Map.Entry<String, Integer> entry : map.entrySet()) {
                 LinearLayout linearLayout1 = new LinearLayout(getApplicationContext());
                 linearLayout1.setOrientation(LinearLayout.VERTICAL);
-                ProgressBar progressBar = new ProgressBar(PercentageResult.this, null, android.R.attr.progressBarStyleHorizontal);
-                progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+                RoundCornerProgressBar progressBar = new RoundCornerProgressBar(PercentageResult.this, null, android.R.attr.progressBarStyleHorizontal);
+                //progressBar.getIndeterminateDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_IN);
+                progressBar.setProgressColor(Color.parseColor("#56d2c2"));
+                progressBar.setProgressBackgroundColor(getResources().getColor(R.color.grey));
+                LinearLayout wrap_bar=new LinearLayout(getApplicationContext());
+                wrap_bar.setOrientation(LinearLayout.VERTICAL);
+                progressBar.setPadding(5,20,10,20);
+                progressBar.setRadius(20);
+                LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams3.setMargins(10, 30, 10, 30);
+
+
+
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(30, 10, 10, 10);
+                layoutParams.setMargins(30, 20, 10, 20);
                 LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 layoutParams1.setMargins(30, 40, 10, 40);
                 linearLayout1.setLayoutParams(layoutParams1);
-                progressBar.setLayoutParams(layoutParams);
-                progressBar.setScaleY(5);
+                wrap_bar.setLayoutParams(layoutParams);
+                wrap_bar.setBackgroundColor(getResources().getColor(R.color.grey));;
+                progressBar.setLayoutParams(layoutParams3);
+                progressBar.setScaleY(15);
                 TextView textView = new TextView(this);
                 TextView voted_by = new TextView(this);
                 int v_by;
+                Integer per;
                 Log.d("option", entry.getKey());
                 if (total != 0) {
 
-                    Integer per = (int) ((entry.getValue() / total) * 100);
+                     per = (int) ((entry.getValue() / total) * 100);
                     v_by=entry.getValue();
                     String text="Voted by: "+v_by;
                     voted_by.setText(text);
@@ -193,12 +234,13 @@ public class PercentageResult extends AppCompatActivity {
                     progressBar.setProgress(per);
                 }
                 else {
-                    Integer per = 0;
+                     per = 0;
                     textView.setText(entry.getKey() + " - " + per + "%");
                     String text="Voted by: "+0;
                     voted_by.setText(text);
                     progressBar.setProgress(per);
                 }
+                data.put(entry.getKey(),entry.getValue());
                 textView.setLayoutParams(layoutParams);
                 voted_by.setLayoutParams(layoutParams);
                 textView.setGravity(Gravity.START);
@@ -210,7 +252,8 @@ public class PercentageResult extends AppCompatActivity {
                 voted_by.setTypeface(typeface);
                 voted_by.setTextColor(getResources().getColor(R.color.black));
                 linearLayout1.addView(textView);
-                linearLayout1.addView(progressBar);
+                wrap_bar.addView(progressBar);
+                linearLayout1.addView(wrap_bar);
                 linearLayout1.addView(voted_by);
                 linearLayout.addView(linearLayout1);
             }
@@ -273,6 +316,13 @@ public class PercentageResult extends AppCompatActivity {
         vote_count=findViewById(R.id.vote_count);
         dialog = new Dialog(PercentageResult.this);
         typeface= ResourcesCompat.getFont(getApplicationContext(),R.font.maven_pro);
+        pie_charts=findViewById(R.id.pie);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
     }
 
 }
