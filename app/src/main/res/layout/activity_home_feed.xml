@@ -17,8 +17,14 @@
             android:visibility="gone"
             android:text="You have voted all active polls..."
             android:layout_centerInParent="true" />
-    <com.google.android.material.textview.MaterialTextView
+
+    <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/linear_search">
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:layout_alignParentTop="true"
         android:text="@string/home_feed_title"
@@ -28,16 +34,66 @@
         android:id="@+id/text"
         android:textAlignment="center"
         android:gravity="center"
-
+        android:layout_weight="2"
         />
 
+        <ImageButton
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_search"
+            android:layout_gravity="center_vertical"
+            android:background="@color/colorPrimaryDark"
+            android:layout_weight="1"
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/type_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/linear_search"
+        android:background="@color/white">
+
+        <ImageButton
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_back"
+            android:background="@color/white"
+            android:paddingRight="10dp"/>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/search_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search for username"
+            android:textColor="@color/black"
+            android:layout_marginRight="10dp"
+            android:layout_weight="3"/>
+
+        <Button
+            android:id="@id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:background="@color/colorPrimaryDark"
+            android:layout_marginRight="20dp"
+            app:cornerRadius="20dp"
+            android:layout_marginBottom="10dp"
+            />
+
+
+    </LinearLayout>
 
     <com.cooltechworks.views.shimmer.ShimmerRecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
-        android:layout_below="@+id/text"
+        android:layout_below="@id/type_layout"
         android:layoutAnimation="@anim/animation_down_to_up"
         app:shimmer_demo_shimmer_color="@color/white"
         app:shimmer_demo_angle="20"
@@ -46,6 +102,12 @@
         app:shimmer_demo_layout="@layout/placeholder"
         app:shimmer_demo_child_count="7"
         />
+
+
+
+
+
+
 
 
 </RelativeLayout>
