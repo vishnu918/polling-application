@@ -26,10 +26,12 @@ import com.kinda.alert.KAlertDialog;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -37,10 +39,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -58,6 +62,7 @@ import Utils.firebase;
 import Utils.helper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -78,6 +83,8 @@ public class Image_type_poll extends AppCompatActivity {
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     final String formatteddate = dateFormat.format(date);
     KAlertDialog dialog;
+    TextView expiry;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +163,22 @@ public class Image_type_poll extends AppCompatActivity {
                addToStorage();
             }
         });
+        expiry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(Image_type_poll.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                String date=day+"/"+(month+1)+"/"+year;
+                                expiry.setText(date);
+
+                            }
+                        }, 0, 0, 0);
+                datePickerDialog.show();
+            }
+        });
+
     }
 
     private void setActionBarFunctionality() {
@@ -179,6 +202,7 @@ public class Image_type_poll extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.action_bar);
         View view = getSupportActionBar().getCustomView();
         fb = new firebase();
+        expiry=findViewById(R.id.expiry_date);
         l1 = findViewById(R.id.l1);
         group = findViewById(R.id.options);
         add = findViewById(R.id.add);
@@ -290,6 +314,7 @@ public class Image_type_poll extends AppCompatActivity {
             polldetails.setQuestion(question_image.getText().toString().trim());
             polldetails.setCreated_date(formatteddate);
             polldetails.setPoll_type("IMAGE POLL");
+            polldetails.setExpiry_date(expiry.getText().toString());
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
             polldetails.setTimestamp(Timestamp.now().getSeconds());
