@@ -1,7 +1,10 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
@@ -51,6 +54,7 @@ import java.util.List;
 
 import Utils.ImagePickerActivity;
 import Utils.firebase;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -70,22 +74,72 @@ public class ProfileFeed extends Fragment {
     private firebase fb;
     private LayoutAnimationController controller;
     private MaterialTextView viewed;
+    private String UID="";
+    private DocumentReference userDoc;
+    private Toolbar tB;
 
     public ProfileFeed() {
     }
 
+    public static ProfileFeed newInstance(String UID) {
+        ProfileFeed profileFeed = new ProfileFeed();
+        Bundle args = new Bundle();
+        args.putString("UID", UID);
+        profileFeed.setArguments(args);
+        return profileFeed;
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_profile_feed, container, false);
+        View view= inflater.inflate(R.layout.activity_profile_feed, container, false);
+        setGlobals(view);
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setGlobals(view);
+        getBundle();
+        decideUserFeed();
         setListeners();
         getData();
+    }
+
+    private void getBundle() {
+        if (getArguments() != null) {
+            UID = getArguments().getString("UID");
+            userDoc = fb.getUsersCollection().document(UID);
+        }
+        else{
+            userDoc=fb.getUserDocument();
+        }
+    }
+
+    private void decideUserFeed() {
+        if (UID.isEmpty() || UID.equals(fb.getUserId())) {
+            tB.setTitle("Your Polls");
+            viewed.setText("You have not created any polls...");
+            edit.setVisibility(View.VISIBLE);
+            Uname.setText(Utils.helper.getusernamePref(getContext()));
+            loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
+        } else {
+            viewed.setText("This user has not created any polls...");
+            tB.setTitle("Their Polls");
+            edit.setVisibility(View.GONE);
+            userDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        Uname.setText(task.getResult().get("username").toString());
+                        loadProfilePic(task.getResult().get("pic").toString(), false);
+                    } else {
+                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
     private void setListeners() {
@@ -103,6 +157,7 @@ public class ProfileFeed extends Fragment {
                                     showSettingsDialog();
                                 }
                             }
+
                             @Override
                             public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                                 token.continuePermissionRequest();
@@ -117,9 +172,10 @@ public class ProfileFeed extends Fragment {
 
     private void getData() {
         try {
-            fb.getUserDocument().collection("Created").get().addOnCompleteListener(task -> {
+            userDoc.collection("Created").get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     if (!task.getResult().isEmpty()) {
+                        Log.d("ProfielFeed",userDoc.getId());
                         for (QueryDocumentSnapshot dS : task.getResult()) {
                             if (dS.get("pollId") != null)
                                 fb.getPollsCollection().document(dS.get("pollId").toString()).get().addOnCompleteListener(task1 -> {
@@ -143,7 +199,7 @@ public class ProfileFeed extends Fragment {
                         Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
@@ -167,13 +223,14 @@ public class ProfileFeed extends Fragment {
             ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             onBackArrowPressed(toolbar);
         }
+        tB = view.findViewById(R.id.htab_toolbar2);
         controller = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.animation_down_to_up);
-        viewed=view.findViewById(R.id.viewed);
+        viewed = view.findViewById(R.id.viewed);
         fb = new firebase();
         Uname = view.findViewById(R.id.username);
         edit = view.findViewById(R.id.edit);
         pPic = view.findViewById(R.id.profilePic);
-        profileRV =(ShimmerRecyclerView) view.findViewById(R.id.profileRV);
+        profileRV = (ShimmerRecyclerView) view.findViewById(R.id.profileRV);
         profileRV.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
@@ -183,30 +240,29 @@ public class ProfileFeed extends Fragment {
         profileRV.setAdapter(mAdapter);
         profileRV.setLayoutAnimation(controller);
         profileRV.showShimmerAdapter();
-        Uname.setText(Utils.helper.getusernamePref(getContext()));
-        loadProfilePic(Utils.helper.getpPicPref(getContext()), false);
     }
 
     private void onBackArrowPressed(Toolbar toolbar) {
         try {
             toolbar.setNavigationOnClickListener(view1 -> {
-                if (getFragmentManager() != null) {
-                    int index = getFragmentManager().getBackStackEntryCount() - 1;
-                    FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
-                    String tag = backEntry.getName();
-                    getFragmentManager().beginTransaction().hide(ProfileFeed.this)
-                            .show(getFragmentManager().findFragmentByTag(tag))
-                            .commit();
-                    if (tag.equals("1")) {
-                        MainActivity.bottomBar.setActiveItem(0);
-                        MainActivity.active = MainActivity.fragment1;
-                    } else if (tag.equals("2")) {
-                        MainActivity.bottomBar.setActiveItem(1);
-                        MainActivity.active = MainActivity.fragment2;
-                    }
-                }
+                getActivity().onBackPressed();
+//                if (getFragmentManager() != null) {
+//                    int index = getFragmentManager().getBackStackEntryCount() - 1;
+//                    FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
+//                    String tag = backEntry.getName();
+//                    getFragmentManager().beginTransaction().hide(ProfileFeed.this)
+//                            .show(getFragmentManager().findFragmentByTag(tag))
+//                            .commit();
+//                    if (tag.equals("1")) {
+//                        MainActivity.bottomBar.setActiveItem(0);
+//                        MainActivity.active = MainActivity.fragment1;
+//                    } else if (tag.equals("2")) {
+//                        MainActivity.bottomBar.setActiveItem(1);
+//                        MainActivity.active = MainActivity.fragment2;
+//                    }
+//                }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
@@ -237,7 +293,7 @@ public class ProfileFeed extends Fragment {
             else
                 loadProfilePic(null, true);
             fb.getStorageReference().child("images/" + fb.getUserId()).delete();
-        }catch (Exception e){
+        } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
@@ -312,15 +368,15 @@ public class ProfileFeed extends Fragment {
                         });
             }
             deleteCache();
-        }catch(Exception e){
+        } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 
     private void loadProfilePic(String url, Boolean update) {
         try {
-            if (url != null) {
-                Glide.with(this)
+            if (url != null && getActivity()!=null) {
+                Glide.with(getActivity().getApplicationContext())
                         .load(url)
                         .transform(new CircleCrop())
                         .into(pPic);
@@ -335,7 +391,7 @@ public class ProfileFeed extends Fragment {
                     fb.getUserDocument().update("pic", null);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
@@ -400,7 +456,7 @@ public class ProfileFeed extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
-        inflater.inflate(R.menu.main_menu,menu);
+        inflater.inflate(R.menu.main_menu, menu);
     }
 
     @Override
