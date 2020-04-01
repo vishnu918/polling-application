@@ -103,7 +103,7 @@ public class VotedFeed extends Fragment {
                                 lastIndex = dS;
                             }
                         } else {
-                            flagFetch=true;
+                            flagFetch=false;
                             votedRV.hideShimmerAdapter();
                             viewed.setVisibility(View.VISIBLE);
                         }
