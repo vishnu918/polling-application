@@ -64,13 +64,13 @@ public class Multiple_type_poll extends AppCompatActivity {
     RadioButton option1,option2;
     ArrayList<String> uniqueoptions=new ArrayList<>();
     TextView expiry;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setGlobals();
         setActionBarFunctionality();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         final String formatteddate = dateFormat.format(date);
         setListeners(formatteddate);
     }
@@ -144,7 +144,7 @@ public class Multiple_type_poll extends AppCompatActivity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                                String date=day+"/"+(month+1)+"/"+year;
+                                String date=day+"-"+(month+1)+"-"+year;
                                 expiry.setText(date);
 
                             }
@@ -168,12 +168,12 @@ public class Multiple_type_poll extends AppCompatActivity {
             if (fb.getUser() != null) {
                 PollDetails polldetails = new PollDetails();
                 polldetails.setQuestion(question_multi.getText().toString().trim());
-                polldetails.setCreated_date(formatteddate);
+                polldetails.setCreated_date(dateFormat.parse(formatteddate));
                 polldetails.setPoll_type("MULTI ANSWER POLL");
                 polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                 polldetails.setAuthorUID(fb.getUserId());
                 polldetails.setTimestamp(Timestamp.now().getSeconds());
-                polldetails.setExpiry_date(expiry.getText().toString());
+                polldetails.setExpiry_date(dateFormat.parse(expiry.getText().toString()));
                 Map<String, Integer> map = new HashMap<>();
                 for (int i = 0; i < group.getChildCount(); i++) {
                     RadioButton v = (RadioButton) group.getChildAt(i);

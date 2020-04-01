@@ -74,13 +74,13 @@ public class Single_type_poll extends AppCompatActivity {
     RadioButton option1,option2;
     ArrayList<String> uniqueoptions=new ArrayList<>();
     TextView expiry;
+    SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setGlobals();
         setActionBarFunctionality();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         final String formattedDate = df.format(date);
         setListeners(formattedDate);
 
@@ -139,7 +139,7 @@ public class Single_type_poll extends AppCompatActivity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                                String date=day+"/"+(month+1)+"/"+year;
+                                String date=day+"-"+(month+1)+"-"+year;
                                 expiry.setText(date);
 
                             }
@@ -161,7 +161,7 @@ public class Single_type_poll extends AppCompatActivity {
                 polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                 polldetails.setAuthorUID(fb.getUserId());
                 polldetails.setTimestamp(Timestamp.now().getSeconds());
-                polldetails.setExpiry_date(expiry.getText().toString());
+                polldetails.setExpiry_date(df.parse(expiry.getText().toString()));
                 Map<String, Integer> map = new HashMap<>();
                 for (int i = 0; i < group.getChildCount(); i++) {
                     RadioButton v = (RadioButton) group.getChildAt(i);
@@ -169,7 +169,7 @@ public class Single_type_poll extends AppCompatActivity {
                 }
                 polldetails.setMap(map);
                 polldetails.setPoll_type("SINGLE ANSWER POLL");
-                polldetails.setCreated_date(formattedDate);
+                polldetails.setCreated_date(df.parse(formattedDate));
                 CollectionReference docCreated = fb.getUserDocument().collection("Created");
                 DocumentReference doc = fb.getPollsCollection().document();
                 doc.set(polldetails)

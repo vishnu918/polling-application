@@ -44,6 +44,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
     firebase fb;
     ImageButton home,logout;
     Date date = Calendar.getInstance().getTime();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
    KAlertDialog dialog;
 
     @Override
@@ -51,7 +52,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_descriptive_type);
         setGlobals();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
         final String formatteddate = dateFormat.format(date);
         setListeners(formatteddate);
         setActionBarFunctionality();
@@ -98,7 +99,7 @@ public class Descriptive_type_poll extends AppCompatActivity {
             if (fb.getUser() != null) {
                 PollDetails polldetails = new PollDetails();
                 polldetails.setQuestion(question_descriptive.getText().toString().trim());
-                polldetails.setCreated_date(formatteddate);
+                polldetails.setCreated_date(dateFormat.parse(formatteddate));
                 polldetails.setPoll_type("DESCRIPTIVE POLL");
                 polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                 polldetails.setAuthorUID(fb.getUserId());
