@@ -47,6 +47,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import Utils.firebase;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
@@ -63,22 +64,23 @@ public class HomeFeed extends Fragment {
     private LayoutAnimationController controller;
     MaterialTextView viewed;
     private TextInputEditText search_type;
-    private ImageButton search,back,back2,check;
-    private LinearLayout search_layout,date_layout;
+    private ImageButton search, back, back2, check;
+    private LinearLayout search_layout, date_layout;
     private Button search_button;
-    private  String name;
-    TextView starting,ending;
+    private String name;
+    TextView starting, ending;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     private DocumentSnapshot lastIndex;
     ProgressBar progressBar;
-    Boolean flagFirst=true,flagFetch=true;
+    Boolean flagFirst = true, flagFetch = true;
+
     public HomeFeed() {
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.activity_home_feed, container, false);
+        View view = inflater.inflate(R.layout.activity_home_feed, container, false);
         setGlobals(view);
         return view;
     }
@@ -95,21 +97,20 @@ public class HomeFeed extends Fragment {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                Log.d("Size",String.valueOf(arrayList.size()) + " "+String.valueOf(layoutManager.findLastVisibleItemPosition()));
-                if(!arrayList.isEmpty() && layoutManager.findLastVisibleItemPosition()==arrayList.size()-1 && flagFetch){
+                Log.d("Size", String.valueOf(arrayList.size()) + " " + String.valueOf(layoutManager.findLastVisibleItemPosition()));
+                if (!arrayList.isEmpty() && layoutManager.findLastVisibleItemPosition() == arrayList.size() - 1 && flagFetch && !flagFirst) {
                     progressBar.setVisibility(View.VISIBLE);
-                    flagFirst=false;
-                    flagFetch=false;
-                    getData(0,"",null,null);
+                    flagFetch = false;
+                    getData(0, "", null, null);
                 }
             }
         });
-        getData(0,"",null,null);
+        getData(0, "", null, null);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               showPopup(view);
+                showPopup(view);
             }
         });
 /*        search_type.addTextChangedListener(new TextWatcher() {
@@ -137,12 +138,13 @@ public class HomeFeed extends Fragment {
             @Override
             public void onClick(View view) {
 
-                     arrayList.clear();;
-                     name = search_type.getText().toString();
-                     if(!name.isEmpty()){
-                         getData(1,name,null,null);
-                     }
-                     search_type.setText("");
+                arrayList.clear();
+                ;
+                name = search_type.getText().toString();
+                if (!name.isEmpty()) {
+                    getData(1, name, null, null);
+                }
+                search_type.setText("");
             }
         });
 
@@ -150,7 +152,7 @@ public class HomeFeed extends Fragment {
             @Override
             public void onClick(View view) {
                 arrayList.clear();
-                getData(0,"",null,null);
+                getData(0, "", null, null);
                 YoYo.with(Techniques.DropOut).duration(1000).playOn(search_layout);
                 search_layout.setVisibility(View.GONE);
             }
@@ -159,7 +161,7 @@ public class HomeFeed extends Fragment {
             @Override
             public void onClick(View view) {
                 arrayList.clear();
-                getData(0,"",null,null);
+                getData(0, "", null, null);
                 YoYo.with(Techniques.DropOut).duration(1000).playOn(search_layout);
                 date_layout.setVisibility(View.GONE);
             }
@@ -171,7 +173,7 @@ public class HomeFeed extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                                String date=day+"-"+(month+1)+"-"+year;
+                                String date = day + "-" + (month + 1) + "-" + year;
                                 starting.setText(date);
 
                             }
@@ -186,7 +188,7 @@ public class HomeFeed extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                                String date=day+"-"+(month+1)+"-"+year;
+                                String date = day + "-" + (month + 1) + "-" + year;
                                 ending.setText(date);
 
                             }
@@ -199,26 +201,24 @@ public class HomeFeed extends Fragment {
             public void onClick(View v) {
                 try {
 
-                    if(starting.getText().toString().isEmpty() && ending.getText().toString().isEmpty())
-                        Toast.makeText(getActivity(),"Please atleast one of the dates",Toast.LENGTH_LONG).show();
+                    if (starting.getText().toString().isEmpty() && ending.getText().toString().isEmpty())
+                        Toast.makeText(getActivity(), "Please atleast one of the dates", Toast.LENGTH_LONG).show();
                     else {
-                        if(!starting.getText().toString().isEmpty() && !ending.getText().toString().isEmpty())
-                        {
-                            Date start=dateFormat.parse(starting.getText().toString());
-                            Date end=dateFormat.parse(ending.getText().toString());
-                            if(start.compareTo(end)>0)
-                                Toast.makeText(getActivity(),"Starting date can't be after the ending date",Toast.LENGTH_LONG).show();
-                            else
-                            {   arrayList.clear();
-                                getData(2,"",dateFormat.parse(starting.getText().toString()),dateFormat.parse(ending.getText().toString()));
+                        if (!starting.getText().toString().isEmpty() && !ending.getText().toString().isEmpty()) {
+                            Date start = dateFormat.parse(starting.getText().toString());
+                            Date end = dateFormat.parse(ending.getText().toString());
+                            if (start.compareTo(end) > 0)
+                                Toast.makeText(getActivity(), "Starting date can't be after the ending date", Toast.LENGTH_LONG).show();
+                            else {
+                                arrayList.clear();
+                                getData(2, "", dateFormat.parse(starting.getText().toString()), dateFormat.parse(ending.getText().toString()));
                             }
-                        }
-                        else
-                        {   arrayList.clear();
-                            if(starting.getText().toString().isEmpty())
-                                getData(2,"",null,dateFormat.parse(ending.getText().toString()));
+                        } else {
+                            arrayList.clear();
+                            if (starting.getText().toString().isEmpty())
+                                getData(2, "", null, dateFormat.parse(ending.getText().toString()));
                             else
-                                getData(2,"",dateFormat.parse(starting.getText().toString()),null);
+                                getData(2, "", dateFormat.parse(starting.getText().toString()), null);
 
 
                         }
@@ -234,16 +234,15 @@ public class HomeFeed extends Fragment {
 
     private void getData(int flag, String editable, Date start, Date end) {
         if (lastIndex == null) {
-
             fb.getPollsCollection().orderBy("timestamp", Query.Direction.DESCENDING).
-                    limit(5).get().addOnCompleteListener(task -> {
+                    limit(20).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     if (!task.getResult().isEmpty()) {
                         viewed.setVisibility(View.VISIBLE);
                         arrayList.clear();
                         for (QueryDocumentSnapshot dS : task.getResult()) {
                             addToRecyclerView(dS, flag, editable, start, end);
-                            lastIndex=dS;
+                            lastIndex = dS;
                         }
                         if (flag == 2 && arrayList.size() == 0) {
                             viewed.setText("No active polls for you to vote in that span ");
@@ -251,7 +250,7 @@ public class HomeFeed extends Fragment {
                         } else
                             viewed.setText("You have voted all active polls");
                     } else {
-                        flagFetch=false;
+                        flagFetch = false;
                         recyclerView.hideShimmerAdapter();
                         viewed.setVisibility(View.VISIBLE);
                     }
@@ -260,20 +259,18 @@ public class HomeFeed extends Fragment {
                     Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else{
+        } else {
             fb.getPollsCollection().orderBy("timestamp", Query.Direction.DESCENDING).
-                    startAfter(lastIndex).limit(5).get().addOnCompleteListener(task -> {
+                    startAfter(lastIndex).limit(20).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     if (!task.getResult().isEmpty()) {
                         for (QueryDocumentSnapshot dS : task.getResult()) {
                             addToRecyclerView(dS, flag, editable, start, end);
-                            lastIndex=dS;
+                            lastIndex = dS;
                         }
-                    }
-                    else{
+                    } else {
                         progressBar.setVisibility(View.GONE);
-                        flagFetch=false;
+                        flagFetch = false;
                         Toast.makeText(getContext(), "You have viewed all polls...", Toast.LENGTH_SHORT).show();
                     }
                 } else {
@@ -284,90 +281,82 @@ public class HomeFeed extends Fragment {
     }
 
 
-    private void addToRecyclerView(QueryDocumentSnapshot dS,int flagi,String editable,Date start, Date end) {
+    private void addToRecyclerView(QueryDocumentSnapshot dS, int flagi, String editable, Date start, Date end) {
         PollDetails polldetails = dS.toObject(PollDetails.class);
         polldetails.setUID(dS.getId());
-            fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult() != null) {
-                        Boolean flag = Boolean.TRUE;
-                        for (QueryDocumentSnapshot dS1 : task.getResult()) {
-                            if (dS1.getId().equals(fb.getUserId())) {
-                                flag = Boolean.FALSE;
-                                if(flagFirst==null)
-                                recyclerView.hideShimmerAdapter();
-                                break;
-                            }
-                        }
-                        Log.d("TimeStamp",dS.get("timestamp").toString());
-                        if (flag) {
-                            if(flagi == 1 && !editable.isEmpty()){
-                                if(polldetails.getAuthor().toLowerCase().contains(editable.toLowerCase()) && !arrayList.contains(polldetails)) {
-                                    Log.d("HomeFeed",String.valueOf(arrayList.size()) );
-                                    arrayList.add(polldetails);
-                                }
-                            }
-                            else if(flagi==2)
-                            {
-                                if(start!=null && end!=null)
-                                {
-                                    int d,d1;
-                                    if(start.compareTo(end)==0)
-                                    {
-                                        if(polldetails.getCreated_date().compareTo(start)==0)
-                                        {
-                                            arrayList.add(polldetails);
-
-                                        }
-
-                                    }
-                                    if(polldetails.getCreated_date().compareTo(start)>=0 && polldetails.getCreated_date().compareTo(end)<=0)
-                                    {
-                                        arrayList.add(polldetails);
-                                    }
-                                    d=polldetails.getCreated_date().compareTo(start);
-                                    d1=polldetails.getCreated_date().compareTo(end);
-
-                                    //Toast.makeText(getActivity(),String.valueOf(d)+" "+String.valueOf(d1),Toast.LENGTH_LONG).show();
-                                }
-                                if(start==null)
-                                {
-                                    if(polldetails.getCreated_date().compareTo(end)<=0)
-                                        arrayList.add(polldetails);
-                                    {
-
-                                    }
-                                }
-                                if(end==null)
-                                {
-                                    if(polldetails.getCreated_date().compareTo(start)>=0)
-                                        arrayList.add(polldetails);
-                                    {
-
-                                    }
-                                }
-                            }
-                            else {
-                                if(flagi == 0)
-                                    arrayList.add(polldetails);
-                            }
-                            Collections.sort(arrayList, (pollDetails, t1) -> Long.compare(t1.getTimestamp(), pollDetails.getTimestamp()));
-                            viewed.setVisibility(View.GONE);
-                            adapter.notifyDataSetChanged();
-                            progressBar.setVisibility(View.GONE);
-                            flagFetch=true;
-                            if(flagFirst) {
-                                recyclerView.hideShimmerAdapter();
-                                recyclerView.scheduleLayoutAnimation();
-                            }
-                        }
+        fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                Boolean flag = Boolean.TRUE;
+                for (QueryDocumentSnapshot dS1 : task.getResult()) {
+                    if (dS1.getId().equals(fb.getUserId())) {
+                        flag = Boolean.FALSE;
+                        if (flagFirst)
+                            recyclerView.hideShimmerAdapter();
+                        break;
+                    }
                 }
-            });
+                Log.d("TimeStamp", dS.get("timestamp").toString());
+                if (flag) {
+                    if (flagi == 1 && !editable.isEmpty()) {
+                        if (polldetails.getAuthor().toLowerCase().contains(editable.toLowerCase()) && !arrayList.contains(polldetails)) {
+                            Log.d("HomeFeed", String.valueOf(arrayList.size()));
+                            arrayList.add(polldetails);
+                        }
+                    } else if (flagi == 2) {
+                        if (start != null && end != null) {
+                            int d, d1;
+                            if (start.compareTo(end) == 0) {
+                                if (polldetails.getCreated_date().compareTo(start) == 0) {
+                                    arrayList.add(polldetails);
+
+                                }
+
+                            }
+                            if (polldetails.getCreated_date().compareTo(start) >= 0 && polldetails.getCreated_date().compareTo(end) <= 0) {
+                                arrayList.add(polldetails);
+                            }
+                            d = polldetails.getCreated_date().compareTo(start);
+                            d1 = polldetails.getCreated_date().compareTo(end);
+
+                            //Toast.makeText(getActivity(),String.valueOf(d)+" "+String.valueOf(d1),Toast.LENGTH_LONG).show();
+                        }
+                        if (start == null) {
+                            if (polldetails.getCreated_date().compareTo(end) <= 0)
+                                arrayList.add(polldetails);
+                            {
+
+                            }
+                        }
+                        if (end == null) {
+                            if (polldetails.getCreated_date().compareTo(start) >= 0)
+                                arrayList.add(polldetails);
+                            {
+
+                            }
+                        }
+                    } else {
+                        if (flagi == 0)
+                            arrayList.add(polldetails);
+                    }
+                    Collections.sort(arrayList, (pollDetails, t1) -> Long.compare(t1.getTimestamp(), pollDetails.getTimestamp()));
+                    viewed.setVisibility(View.GONE);
+                    adapter.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
+                    flagFetch = true;
+                    if (flagFirst) {
+                        recyclerView.hideShimmerAdapter();
+                        recyclerView.scheduleLayoutAnimation();
+                        flagFirst=false;
+                    }
+                }
+            }
+        });
     }
 
     private void setGlobals(@NonNull View view) {
-        progressBar=view.findViewById(R.id.pBar);
+        progressBar = view.findViewById(R.id.pBar);
         arrayList = new ArrayList<>();
-        viewed=view.findViewById(R.id.viewed);
+        viewed = view.findViewById(R.id.viewed);
         search_layout = view.findViewById(R.id.type_layout);
         search_layout.setVisibility(View.GONE);
         search = view.findViewById(R.id.search);
@@ -386,13 +375,14 @@ public class HomeFeed extends Fragment {
         recyclerView.showShimmerAdapter();
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(view.findViewById(R.id.text));
         fb = new firebase();
-        starting=view.findViewById(R.id.starting_date);
-        ending=view.findViewById(R.id.ending_date);
-        back2=view.findViewById(R.id.back2);
-        check=view.findViewById(R.id.check);
-        date_layout=view.findViewById(R.id.date_layout);
+        starting = view.findViewById(R.id.starting_date);
+        ending = view.findViewById(R.id.ending_date);
+        back2 = view.findViewById(R.id.back2);
+        check = view.findViewById(R.id.check);
+        date_layout = view.findViewById(R.id.date_layout);
         date_layout.setVisibility(View.GONE);
     }
+
     public void showPopup(View v) {
         PopupMenu popup = new PopupMenu(getActivity(), v);
         MenuInflater inflater = popup.getMenuInflater();
@@ -419,7 +409,6 @@ public class HomeFeed extends Fragment {
 
         popup.show();
     }
-
 
 
 }
