@@ -6,6 +6,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import com.PollBuzz.pollbuzz.PollDetails;
@@ -33,6 +35,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +58,7 @@ public class HomeFeed extends Fragment {
     private ArrayList<PollDetails> arrayList;
     private ShimmerRecyclerView recyclerView;
     private com.PollBuzz.pollbuzz.adapters.HomePageAdapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
     private firebase fb;
     private LayoutAnimationController controller;
     MaterialTextView viewed;
@@ -66,7 +69,9 @@ public class HomeFeed extends Fragment {
     private  String name;
     TextView starting,ending;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-
+    private DocumentSnapshot lastIndex;
+    ProgressBar progressBar;
+    Boolean flagFirst=true,flagFetch=true;
     public HomeFeed() {
     }
 
@@ -81,6 +86,24 @@ public class HomeFeed extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                Log.d("Size",String.valueOf(arrayList.size()) + " "+String.valueOf(layoutManager.findLastVisibleItemPosition()));
+                if(!arrayList.isEmpty() && layoutManager.findLastVisibleItemPosition()==arrayList.size()-1 && flagFetch){
+                    progressBar.setVisibility(View.VISIBLE);
+                    flagFirst=false;
+                    flagFetch=false;
+                    getData(0,"",null,null);
+                }
+            }
+        });
         getData(0,"",null,null);
 
         search.setOnClickListener(new View.OnClickListener() {
@@ -210,36 +233,59 @@ public class HomeFeed extends Fragment {
     }
 
     private void getData(int flag, String editable, Date start, Date end) {
-        fb.getPollsCollection().get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
+        if (lastIndex == null) {
+
+            fb.getPollsCollection().orderBy("timestamp", Query.Direction.DESCENDING).
+                    limit(5).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
                     if (!task.getResult().isEmpty()) {
                         viewed.setVisibility(View.VISIBLE);
                         arrayList.clear();
                         for (QueryDocumentSnapshot dS : task.getResult()) {
-                            addToRecyclerView(dS,flag,editable,start,end);
+                            addToRecyclerView(dS, flag, editable, start, end);
+                            lastIndex=dS;
                         }
-                        if(flag==2 && arrayList.size()==0)
-                        {
+                        if (flag == 2 && arrayList.size() == 0) {
                             viewed.setText("No active polls for you to vote in that span ");
                             viewed.setVisibility(View.VISIBLE);
-                        }
-                        else
+                        } else
                             viewed.setText("You have voted all active polls");
                     } else {
+                        flagFetch=false;
                         recyclerView.hideShimmerAdapter();
                         viewed.setVisibility(View.VISIBLE);
                     }
-            }
-                else{
+                } else {
                     recyclerView.hideShimmerAdapter();
                     Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
-        });
+            });
+        }
+        else{
+            fb.getPollsCollection().orderBy("timestamp", Query.Direction.DESCENDING).
+                    startAfter(lastIndex).limit(5).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    if (!task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot dS : task.getResult()) {
+                            addToRecyclerView(dS, flag, editable, start, end);
+                            lastIndex=dS;
+                        }
+                        progressBar.setVisibility(View.GONE);
+                    }
+                    else{
+                        progressBar.setVisibility(View.GONE);
+                        flagFetch=false;
+                        Toast.makeText(getContext(), "You have viewed all polls...", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
 
     private void addToRecyclerView(QueryDocumentSnapshot dS,int flagi,String editable,Date start, Date end) {
-
         PollDetails polldetails = dS.toObject(PollDetails.class);
         polldetails.setUID(dS.getId());
             fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(task -> {
@@ -248,10 +294,12 @@ public class HomeFeed extends Fragment {
                         for (QueryDocumentSnapshot dS1 : task.getResult()) {
                             if (dS1.getId().equals(fb.getUserId())) {
                                 flag = Boolean.FALSE;
+                                if(flagFirst==null)
                                 recyclerView.hideShimmerAdapter();
                                 break;
                             }
                         }
+                        Log.d("TimeStamp",dS.get("timestamp").toString());
                         if (flag) {
                             if(flagi == 1 && !editable.isEmpty()){
                                 if(polldetails.getAuthor().toLowerCase().contains(editable.toLowerCase()) && !arrayList.contains(polldetails)) {
@@ -306,14 +354,18 @@ public class HomeFeed extends Fragment {
                             Collections.sort(arrayList, (pollDetails, t1) -> Long.compare(t1.getTimestamp(), pollDetails.getTimestamp()));
                             viewed.setVisibility(View.GONE);
                             adapter.notifyDataSetChanged();
-                            recyclerView.hideShimmerAdapter();
-                            recyclerView.scheduleLayoutAnimation();
+                            flagFetch=true;
+                            if(flagFirst) {
+                                recyclerView.hideShimmerAdapter();
+                                recyclerView.scheduleLayoutAnimation();
+                            }
                         }
                 }
             });
     }
 
     private void setGlobals(@NonNull View view) {
+        progressBar=view.findViewById(R.id.pBar);
         arrayList = new ArrayList<>();
         viewed=view.findViewById(R.id.viewed);
         search_layout = view.findViewById(R.id.type_layout);
@@ -326,6 +378,7 @@ public class HomeFeed extends Fragment {
         recyclerView.setHasFixedSize(true);
         search_button = view.findViewById(R.id.search_button);
         layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setOrientation(RecyclerView.VERTICAL);
         adapter = new HomePageAdapter(getContext(), arrayList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
