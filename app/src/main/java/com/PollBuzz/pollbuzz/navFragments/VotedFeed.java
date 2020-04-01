@@ -45,13 +45,14 @@ public class VotedFeed extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_voted_feed, container, false);
+        View view= inflater.inflate(R.layout.activity_voted_feed, container, false);
+        setGlobals(view);
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setGlobals(view);
         getData();
     }
 

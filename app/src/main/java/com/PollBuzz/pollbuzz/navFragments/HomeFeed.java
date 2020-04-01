@@ -69,13 +69,14 @@ public class HomeFeed extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_home_feed, container, false);
+        View view= inflater.inflate(R.layout.activity_home_feed, container, false);
+        setGlobals(view);
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setGlobals(view);
         getData(0,"");
 
         search.setOnClickListener(new View.OnClickListener() {
