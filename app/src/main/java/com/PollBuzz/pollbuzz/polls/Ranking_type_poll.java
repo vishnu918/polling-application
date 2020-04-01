@@ -18,6 +18,7 @@ import com.PollBuzz.pollbuzz.R;
 import com.kinda.alert.KAlertDialog;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Context;
@@ -31,6 +32,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -69,6 +71,7 @@ public class Ranking_type_poll extends AppCompatActivity {
     KAlertDialog dialog;
     RadioButton option1,option2;
     private ArrayList<String> uniqueoptions=new ArrayList<>();
+    TextView expiry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +143,21 @@ public class Ranking_type_poll extends AppCompatActivity {
             }
 
         });
+        expiry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(Ranking_type_poll.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                String date=day+"/"+(month+1)+"/"+year;
+                                expiry.setText(date);
+
+                            }
+                        }, 0, 0, 0);
+                datePickerDialog.show();
+            }
+        });
     }
 
     private void addToDatabase(String formatteddate) {
@@ -153,6 +171,7 @@ public class Ranking_type_poll extends AppCompatActivity {
                 polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
                 polldetails.setAuthorUID(fb.getUserId());
                 polldetails.setTimestamp(Timestamp.now().getSeconds());
+                polldetails.setExpiry_date(expiry.getText().toString());
                 Map<String, Integer> map = new HashMap<>();
                 for (int i = 0; i < group.getChildCount(); i++) {
                     RadioButton v = (RadioButton) group.getChildAt(i);
@@ -221,6 +240,7 @@ public class Ranking_type_poll extends AppCompatActivity {
         uniqueoptions.add("Option 2");
         registerForContextMenu(option1);
         registerForContextMenu(option2);
+        expiry=findViewById(R.id.expiry_date);
 
         if (group.getChildCount() == 0)
             group.setVisibility(View.INVISIBLE);
