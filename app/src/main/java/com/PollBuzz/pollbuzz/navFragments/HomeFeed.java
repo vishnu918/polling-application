@@ -36,9 +36,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import Utils.firebase;
 import androidx.annotation.NonNull;
@@ -62,6 +65,7 @@ public class HomeFeed extends Fragment {
     private Button search_button;
     private  String name;
     TextView starting,ending;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
     public HomeFeed() {
     }
@@ -77,7 +81,7 @@ public class HomeFeed extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getData(0,"");
+        getData(0,"",null,null);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +117,7 @@ public class HomeFeed extends Fragment {
                      arrayList.clear();;
                      name = search_type.getText().toString();
                      if(!name.isEmpty()){
-                         getData(1,name);
+                         getData(1,name,null,null);
                      }
                      search_type.setText("");
             }
@@ -123,16 +127,16 @@ public class HomeFeed extends Fragment {
             @Override
             public void onClick(View view) {
                 arrayList.clear();
-                getData(0,"");
+                getData(0,"",null,null);
                 YoYo.with(Techniques.DropOut).duration(1000).playOn(search_layout);
                 search_layout.setVisibility(View.GONE);
             }
         });
-        back.setOnClickListener(new View.OnClickListener() {
+        back2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 arrayList.clear();
-                getData(0,"");
+                getData(0,"",null,null);
                 YoYo.with(Techniques.DropOut).duration(1000).playOn(search_layout);
                 date_layout.setVisibility(View.GONE);
             }
@@ -144,7 +148,7 @@ public class HomeFeed extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                                String date=day+"/"+(month+1)+"/"+year;
+                                String date=day+"-"+(month+1)+"-"+year;
                                 starting.setText(date);
 
                             }
@@ -159,7 +163,7 @@ public class HomeFeed extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                                String date=day+"/"+(month+1)+"/"+year;
+                                String date=day+"-"+(month+1)+"-"+year;
                                 ending.setText(date);
 
                             }
@@ -167,16 +171,60 @@ public class HomeFeed extends Fragment {
                 datePickerDialog.show();
             }
         });
+        check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+
+                    if(starting.getText().toString().isEmpty() && ending.getText().toString().isEmpty())
+                        Toast.makeText(getActivity(),"Please atleast one of the dates",Toast.LENGTH_LONG).show();
+                    else {
+                        if(!starting.getText().toString().isEmpty() && !ending.getText().toString().isEmpty())
+                        {
+                            Date start=dateFormat.parse(starting.getText().toString());
+                            Date end=dateFormat.parse(ending.getText().toString());
+                            if(start.compareTo(end)>0)
+                                Toast.makeText(getActivity(),"Starting date can't be after the ending date",Toast.LENGTH_LONG).show();
+                            else
+                            {   arrayList.clear();
+                                getData(2,"",dateFormat.parse(starting.getText().toString()),dateFormat.parse(ending.getText().toString()));
+                            }
+                        }
+                        else
+                        {   arrayList.clear();
+                            if(starting.getText().toString().isEmpty())
+                                getData(2,"",null,dateFormat.parse(ending.getText().toString()));
+                            else
+                                getData(2,"",dateFormat.parse(starting.getText().toString()),null);
+
+
+                        }
+
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    private void getData(int flag,String editable) {
+    private void getData(int flag, String editable, Date start, Date end) {
         fb.getPollsCollection().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                     if (!task.getResult().isEmpty()) {
                         viewed.setVisibility(View.VISIBLE);
+                        arrayList.clear();
                         for (QueryDocumentSnapshot dS : task.getResult()) {
-                            addToRecyclerView(dS,flag,editable);
+                            addToRecyclerView(dS,flag,editable,start,end);
                         }
+                        if(flag==2 && arrayList.size()==0)
+                        {
+                            viewed.setText("No active polls for you to vote in that span ");
+                            viewed.setVisibility(View.VISIBLE);
+                        }
+                        else
+                            viewed.setText("You have voted all active polls");
                     } else {
                         recyclerView.hideShimmerAdapter();
                         viewed.setVisibility(View.VISIBLE);
@@ -190,7 +238,8 @@ public class HomeFeed extends Fragment {
     }
 
 
-    private void addToRecyclerView(QueryDocumentSnapshot dS,int flagi,String editable) {
+    private void addToRecyclerView(QueryDocumentSnapshot dS,int flagi,String editable,Date start, Date end) {
+
         PollDetails polldetails = dS.toObject(PollDetails.class);
         polldetails.setUID(dS.getId());
             fb.getPollsCollection().document(dS.getId()).collection("Response").get().addOnCompleteListener(task -> {
@@ -208,6 +257,46 @@ public class HomeFeed extends Fragment {
                                 if(polldetails.getAuthor().toLowerCase().contains(editable.toLowerCase()) && !arrayList.contains(polldetails)) {
                                     Log.d("HomeFeed",String.valueOf(arrayList.size()) );
                                     arrayList.add(polldetails);
+                                }
+                            }
+                            else if(flagi==2)
+                            {
+                                if(start!=null && end!=null)
+                                {
+                                    int d,d1;
+                                    if(start.compareTo(end)==0)
+                                    {
+                                        if(polldetails.getCreated_date().compareTo(start)==0)
+                                        {
+                                            arrayList.add(polldetails);
+
+                                        }
+
+                                    }
+                                    if(polldetails.getCreated_date().compareTo(start)>=0 && polldetails.getCreated_date().compareTo(end)<=0)
+                                    {
+                                        arrayList.add(polldetails);
+                                    }
+                                    d=polldetails.getCreated_date().compareTo(start);
+                                    d1=polldetails.getCreated_date().compareTo(end);
+
+                                    //Toast.makeText(getActivity(),String.valueOf(d)+" "+String.valueOf(d1),Toast.LENGTH_LONG).show();
+                                }
+                                if(start==null)
+                                {
+                                    if(polldetails.getCreated_date().compareTo(end)<=0)
+                                        arrayList.add(polldetails);
+                                    {
+
+                                    }
+                                }
+                                if(end==null)
+                                {
+                                    if(polldetails.getCreated_date().compareTo(start)>=0)
+                                        arrayList.add(polldetails);
+                                    {
+
+                                    }
                                 }
                             }
                             else {
