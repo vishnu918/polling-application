@@ -1,10 +1,12 @@
 package com.PollBuzz.pollbuzz;
 
+import java.util.Date;
 import java.util.Map;
 
 public class PollDetails {
 
-    private String question, created_date, expiry_date, poll_type, author, UID,authorUID;
+    private String question,  poll_type, author, UID,authorUID;
+    Date created_date, expiry_date;
     private Map<String, Integer> map;
     private Integer pollcount=0;
 
@@ -65,19 +67,19 @@ public class PollDetails {
         this.question = question;
     }
 
-    public String getCreated_date() {
+    public Date getCreated_date() {
         return created_date;
     }
 
-    public void setCreated_date(String created_date) {
+    public void setCreated_date(Date created_date) {
         this.created_date = created_date;
     }
 
-    public String getExpiry_date() {
+    public Date getExpiry_date() {
         return expiry_date;
     }
 
-    public void setExpiry_date(String expiry_date) {
+    public void setExpiry_date(Date expiry_date) {
         this.expiry_date = expiry_date;
     }
 

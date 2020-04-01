@@ -1,5 +1,7 @@
 package com.PollBuzz.pollbuzz.navFragments;
 
+import com.PollBuzz.pollbuzz.MainActivity;
+import com.PollBuzz.pollbuzz.polls.Image_type_poll;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -14,19 +16,24 @@ import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -36,6 +43,7 @@ import java.util.Comparator;
 import Utils.firebase;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,10 +57,11 @@ public class HomeFeed extends Fragment {
     private LayoutAnimationController controller;
     MaterialTextView viewed;
     private TextInputEditText search_type;
-    private ImageButton search,back;
-    private LinearLayout search_layout;
+    private ImageButton search,back,back2,check;
+    private LinearLayout search_layout,date_layout;
     private Button search_button;
     private  String name;
+    TextView starting,ending;
 
     public HomeFeed() {
     }
@@ -72,8 +81,7 @@ public class HomeFeed extends Fragment {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                search_layout.setVisibility(View.VISIBLE);
-                YoYo.with(Techniques.BounceInDown).delay(1000).playOn(search_layout);
+               showPopup(view);
             }
         });
 /*        search_type.addTextChangedListener(new TextWatcher() {
@@ -117,6 +125,45 @@ public class HomeFeed extends Fragment {
                 getData(0,"");
                 YoYo.with(Techniques.DropOut).duration(1000).playOn(search_layout);
                 search_layout.setVisibility(View.GONE);
+            }
+        });
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                arrayList.clear();
+                getData(0,"");
+                YoYo.with(Techniques.DropOut).duration(1000).playOn(search_layout);
+                date_layout.setVisibility(View.GONE);
+            }
+        });
+        starting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                String date=day+"/"+(month+1)+"/"+year;
+                                starting.setText(date);
+
+                            }
+                        }, 0, 0, 0);
+                datePickerDialog.show();
+            }
+        });
+        ending.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                String date=day+"/"+(month+1)+"/"+year;
+                                ending.setText(date);
+
+                            }
+                        }, 0, 0, 0);
+                datePickerDialog.show();
             }
         });
     }
@@ -196,5 +243,40 @@ public class HomeFeed extends Fragment {
         recyclerView.showShimmerAdapter();
         YoYo.with(Techniques.ZoomInDown).duration(1100).playOn(view.findViewById(R.id.text));
         fb = new firebase();
+        starting=view.findViewById(R.id.starting_date);
+        ending=view.findViewById(R.id.ending_date);
+        back2=view.findViewById(R.id.back2);
+        check=view.findViewById(R.id.check);
+        date_layout=view.findViewById(R.id.date_layout);
+        date_layout.setVisibility(View.GONE);
     }
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(getActivity(), v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.filter, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.by_author:
+                        search_layout.setVisibility(View.VISIBLE);
+                        date_layout.setVisibility(View.GONE);
+                        YoYo.with(Techniques.BounceInDown).delay(1000).playOn(search_layout);
+                        return true;
+                    case R.id.by_date:
+                        date_layout.setVisibility(View.VISIBLE);
+                        YoYo.with(Techniques.BounceInDown).delay(1000).playOn(search_layout);
+                        search_layout.setVisibility(View.GONE);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popup.show();
+    }
+
+
+
 }

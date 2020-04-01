@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,7 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
 
     private void setData(@NonNull ProfileViewHolder holder, int position) {
         try {
+            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
             if (mPollDetails.get(position).getPoll_type() != null)
                 holder.card_type.setText(mPollDetails.get(position).getPoll_type());
             if (mPollDetails.get(position).getQuestion() != null)
@@ -62,7 +64,11 @@ public class ProfileFeedAdapter extends RecyclerView.Adapter<ProfileFeedAdapter.
             if (mPollDetails.get(position).getAuthor() != null)
                 holder.card_author.setText(mPollDetails.get(position).getAuthor());
             if (mPollDetails.get(position).getCreated_date() != null)
-                holder.card_date.setText(mPollDetails.get(position).getCreated_date().trim());
+            {
+                String date=df.format(mPollDetails.get(position).getCreated_date());
+                holder.card_date.setText(date.trim());
+            }
+
         }catch (Exception e){
             FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
