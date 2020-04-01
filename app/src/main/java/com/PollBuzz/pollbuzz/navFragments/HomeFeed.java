@@ -270,7 +270,6 @@ public class HomeFeed extends Fragment {
                             addToRecyclerView(dS, flag, editable, start, end);
                             lastIndex=dS;
                         }
-                        progressBar.setVisibility(View.GONE);
                     }
                     else{
                         progressBar.setVisibility(View.GONE);
@@ -354,6 +353,7 @@ public class HomeFeed extends Fragment {
                             Collections.sort(arrayList, (pollDetails, t1) -> Long.compare(t1.getTimestamp(), pollDetails.getTimestamp()));
                             viewed.setVisibility(View.GONE);
                             adapter.notifyDataSetChanged();
+                            progressBar.setVisibility(View.GONE);
                             flagFetch=true;
                             if(flagFirst) {
                                 recyclerView.hideShimmerAdapter();
