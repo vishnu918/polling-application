@@ -166,6 +166,10 @@ public class Image_type_poll extends AppCompatActivity {
         expiry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final Calendar c = Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR);
+                int mMonth = c.get(Calendar.MONTH);
+                int mDay = c.get(Calendar.DAY_OF_MONTH);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(Image_type_poll.this,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -174,7 +178,8 @@ public class Image_type_poll extends AppCompatActivity {
                                 expiry.setText(date);
 
                             }
-                        }, 0, 0, 0);
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
                 datePickerDialog.show();
             }
         });
@@ -314,7 +319,12 @@ public class Image_type_poll extends AppCompatActivity {
             polldetails.setQuestion(question_image.getText().toString().trim());
             polldetails.setCreated_date(dateFormat.parse(formatteddate));
             polldetails.setPoll_type("IMAGE POLL");
-            polldetails.setExpiry_date(dateFormat.parse(expiry.getText().toString()));
+            if(expiry.getText().toString().equals("No Expiry")){
+                polldetails.setExpiry_date(dateFormat.parse("31-12-2020"));
+            }
+            else {
+                polldetails.setExpiry_date(dateFormat.parse(expiry.getText().toString()));
+            }
             polldetails.setAuthor(helper.getusernamePref(getApplicationContext()));
             polldetails.setAuthorUID(fb.getUserId());
             polldetails.setTimestamp(Timestamp.now().getSeconds());

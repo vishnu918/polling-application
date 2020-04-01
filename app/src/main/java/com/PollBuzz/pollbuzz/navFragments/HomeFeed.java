@@ -39,6 +39,7 @@ import android.widget.Toast;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -119,7 +120,6 @@ public class HomeFeed extends Fragment {
                      if(!name.isEmpty()){
                          getData(1,name,null,null);
                      }
-                     search_type.setText("");
             }
         });
 
@@ -137,13 +137,19 @@ public class HomeFeed extends Fragment {
             public void onClick(View view) {
                 arrayList.clear();
                 getData(0,"",null,null);
-                YoYo.with(Techniques.DropOut).duration(1000).playOn(search_layout);
+                YoYo.with(Techniques.DropOut).duration(1000).playOn(date_layout);
                 date_layout.setVisibility(View.GONE);
             }
         });
         starting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                final Calendar c = Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR);
+                int mMonth = c.get(Calendar.MONTH);
+                int mDay = c.get(Calendar.DAY_OF_MONTH);
+
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -152,13 +158,17 @@ public class HomeFeed extends Fragment {
                                 starting.setText(date);
 
                             }
-                        }, 0, 0, 0);
+                        }, mYear, mMonth, mDay);
                 datePickerDialog.show();
             }
         });
         ending.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final Calendar c = Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR);
+                int mMonth = c.get(Calendar.MONTH);
+                int mDay = c.get(Calendar.DAY_OF_MONTH);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -167,7 +177,7 @@ public class HomeFeed extends Fragment {
                                 ending.setText(date);
 
                             }
-                        }, 0, 0, 0);
+                        }, mYear, mMonth, mDay);
                 datePickerDialog.show();
             }
         });
@@ -177,7 +187,7 @@ public class HomeFeed extends Fragment {
                 try {
 
                     if(starting.getText().toString().isEmpty() && ending.getText().toString().isEmpty())
-                        Toast.makeText(getActivity(),"Please atleast one of the dates",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"Please enter atleast one of the dates",Toast.LENGTH_LONG).show();
                     else {
                         if(!starting.getText().toString().isEmpty() && !ending.getText().toString().isEmpty())
                         {
@@ -218,13 +228,13 @@ public class HomeFeed extends Fragment {
                         for (QueryDocumentSnapshot dS : task.getResult()) {
                             addToRecyclerView(dS,flag,editable,start,end);
                         }
-                        if(flag==2 && arrayList.size()==0)
+                       /* if(flag==2 && arrayList.size()==0)
                         {
                             viewed.setText("No active polls for you to vote in that span ");
                             viewed.setVisibility(View.VISIBLE);
-                        }
-                        else
-                            viewed.setText("You have voted all active polls");
+                        }*/
+                        /*else
+                            viewed.setText("You have voted all active polls");*/
                     } else {
                         recyclerView.hideShimmerAdapter();
                         viewed.setVisibility(View.VISIBLE);
@@ -308,6 +318,11 @@ public class HomeFeed extends Fragment {
                             adapter.notifyDataSetChanged();
                             recyclerView.hideShimmerAdapter();
                             recyclerView.scheduleLayoutAnimation();
+
+                            if(arrayList.size()==0 && (flagi == 2 || flagi == 1)){
+                                viewed.setText("No active polls for you to vote in that span ");
+                                viewed.setVisibility(View.VISIBLE);
+                            }
                         }
                 }
             });
@@ -349,6 +364,7 @@ public class HomeFeed extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.by_author:
+                        search_type.setText("");
                         search_layout.setVisibility(View.VISIBLE);
                         date_layout.setVisibility(View.GONE);
                         YoYo.with(Techniques.BounceInDown).delay(1000).playOn(search_layout);
